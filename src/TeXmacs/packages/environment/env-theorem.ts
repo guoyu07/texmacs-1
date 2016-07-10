@@ -1,4 +1,4 @@
-<TeXmacs|1.0.7.14>
+<TeXmacs|1.99.1>
 
 <style|source>
 
@@ -20,6 +20,12 @@
     </src-license>
   </src-title>>
 
+  <\active*>
+    <\src-comment>
+      Style parameters
+    </src-comment>
+  </active*>
+
   <assign|enunciation-name|<macro|name|<with|font-series|bold|<arg|name>>>>
 
   <assign|enunciation-sep|<macro|. >>
@@ -36,6 +42,18 @@
 
   <assign|exercise-sep|<macro|<enunciation-sep>>>
 
+  <assign|exercise-indentation|1tab>
+
+  \;
+
+  <drd-props|enunciation-sep|macro-parameter|string>
+
+  <drd-props|theorem-sep|macro-parameter|string>
+
+  <drd-props|remark-sep|macro-parameter|string>
+
+  <drd-props|exercise-sep|macro-parameter|string>
+
   <\active*>
     <\src-comment>
       Rendering of theorem-like environments and exercises.
@@ -43,7 +61,9 @@
   </active*>
 
   <assign|render-enunciation|<\macro|which|body>
-    <padded-normal|1fn|1fn|<surround|<arg|which>|<yes-indent*>|<arg|body>>>
+    <\padded*>
+      <surround|<arg|which>|<yes-indent*>|<arg|body>>
+    </padded*>
   </macro>>
 
   <assign|render-remark|<\macro|which|body>
@@ -55,13 +75,13 @@
   </macro>>
 
   <assign|render-exercise|<\macro|which|body>
-    <\padded-normal|0.5fn|0.5fn>
-      <\indent-left|1.5fn>
+    <\padded>
+      <\indent-left|<value|exercise-indentation>>
         <\small>
           <surround|<exercise-name|<arg|which><exercise-sep>>|<yes-indent*>|<arg|body>>
         </small>
       </indent-left>
-    </padded-normal>
+    </padded>
   </macro>>
 
   <\active*>
@@ -114,17 +134,27 @@
     </src-comment>
   </active*>
 
-  <assign|dueto|<macro|name|<with|font-shape|right|<theorem-name|(<arg|name>)
-  >>>>
+  <assign|qed|<active*|<with|mode|math|\<box\>>>>
 
   <assign|proof-text|<macro|<localize|Proof>>>
 
+  <assign|solution-text|<macro|<localize|Solution>>>
+
+  <assign|answer-text|<macro|<localize|Answer>>>
+
+  <drd-props|qed|macro-parameter|regular>
+
+  \;
+
+  <assign|dueto|<macro|name|<with|font-shape|right|<theorem-name|(<arg|name>)
+  >>>>
+
   <assign|render-proof|<\macro|which|body>
-    <\render-remark|<arg|which>>
-      <\surround||<htab|0.5fn><active*|<with|mode|math|\<box\>>>>
+    <\surround||<htab|0.5fn|0><qed>>
+      <\render-remark|<arg|which>>
         <arg|body>
-      </surround>
-    </render-remark>
+      </render-remark>
+    </surround>
   </macro>>
 
   <assign|proof|<\macro|body>
@@ -135,7 +165,7 @@
     <render-proof|<proof-text> <arg|what>|<arg|body>>
   </macro>>
 
-  <assign|solution-text|<macro|<localize|Solution>>>
+  \;
 
   <assign|render-solution|<\macro|which|body>
     <\render-exercise|<arg|which>>
@@ -153,7 +183,7 @@
     <render-solution|<solution-text> <arg|what>|<arg|body>>
   </macro>>
 
-  <assign|answer-text|<macro|<localize|Answer>>>
+  \;
 
   <assign|render-answer|<value|render-remark>>
 

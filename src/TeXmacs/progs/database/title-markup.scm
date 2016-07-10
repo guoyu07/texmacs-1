@@ -112,9 +112,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (tm-define (remove-annotations t)
-  (if (tm-func? t 'doc-note-ref 3)
-      (remove-annotations (tm-ref t 2))
-      t))
+  (cond ((tm-func? t 'doc-note-ref 4) (remove-annotations (tm-ref t 3)))
+        ((tm-func? t 'concat)
+         `(concat ,@(map remove-annotations (tm-children t))))
+        (else t)))
 
 (tm-define (title->running-title t)
   `(doc-running-title ,(remove-annotations (tm-ref t 0))))
@@ -176,8 +177,9 @@
      ,@(select t '(author-email))
      ,@(select t '(author-email-note))
      ,@(select t '(author-homepage))
-     ,@(select t '(author-misc))
      ,@(select t '(author-homepage-note))
+     ,@(select t '(author-misc))
+     ,@(select t '(author-misc-note))
      ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -187,6 +189,9 @@
 (tm-define (abstract-data t)
   (:secure #t)
   (let ((opts `(document ,@(select t '(abstract-keywords))
+                         ,@(select t '(abstract-acm))
+                         ,@(select t '(abstract-arxiv))
+                         ,@(select t '(abstract-pacs))
                          ,@(select t '(abstract-msc))))
         (abst (select t '(:* abstract 0))))
     (if (list>1? opts)

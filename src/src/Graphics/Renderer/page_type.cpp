@@ -184,6 +184,21 @@ INIT_ALL () {
   INIT ("tabloid", "279mm", "432mm", "yes",
         "200mm",  "45mm",  "45mm",
         "315mm",  "45mm",  "45mm");
+  INIT ("16:9", "135mm", "240mm", "no",
+        "125mm",  "5mm",  "5mm",
+        "230mm",  "5mm",  "5mm");
+  INIT ("8:5", "150mm", "240mm", "no",
+        "140mm",  "5mm",  "5mm",
+        "230mm",  "5mm",  "5mm");
+  INIT ("3:2", "160mm", "240mm", "no",
+        "150mm",  "5mm",  "5mm",
+        "230mm",  "5mm",  "5mm");
+  INIT ("4:3", "180mm", "240mm", "no",
+        "170mm",  "5mm",  "5mm",
+        "230mm",  "5mm",  "5mm");
+  INIT ("5:4", "192mm", "240mm", "no",
+        "182mm",  "5mm",  "5mm",
+        "230mm",  "5mm",  "5mm");
   page_data_base_initizalized= true;
 }
 

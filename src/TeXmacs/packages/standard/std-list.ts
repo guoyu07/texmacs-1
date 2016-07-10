@@ -1,6 +1,6 @@
-<TeXmacs|1.0.7.14>
+<TeXmacs|1.99.2>
 
-<style|<tuple|source|std>>
+<style|<tuple|source|std|english>>
 
 <\body>
   <active*|<\src-title>
@@ -60,6 +60,8 @@
   <assign|compact-strong-dot-item|<macro|name|<compact-item|<item-strong|<arg|name>.
   >>>>
 
+  <assign|compact-strong-dot-item*|<macro|name|<no-indent><move|<item-strong|<arg|name>.>|-1.5fn|0fn>>>
+
   <assign|compact-strong-dash-item|<macro|name|<compact-item|<item-strong|<arg|name>>
   <emdash> >>>
 
@@ -74,17 +76,17 @@
 
   <new-counter|item>
 
-  <assign|last-item|<active*|<with|mode|math|||\<cdot\>||<with|math-font-series|bold|<rigid|\<ast\>>>>>>
+  <assign|last-item|<active*|<with|mode|math|<with|math-font-series|bold|<rigid|\<ast\>>>>>>
 
   <assign|current-item|<value|aligned-space-item>>
 
-  <assign|transform-item|<macro|name|<active*|<with|mode|math|||\<cdot\>||<with|math-font-series|bold|<rigid|\<ast\>>>>>>>
+  <assign|transform-item|<macro|name|<active*|<with|mode|math|<with|math-font-series|bold|<rigid|\<ast\>>>>>>>
 
   <assign|the-item|<macro|<transform-item|<value|<counter-item>>>>>
 
   <assign|render-item|<macro|name|<assign|last-item|<arg|name>><current-item|<arg|name>>>>
 
-  <assign|item*|<macro|name|<set-binding|<arg|name>><render-item|<arg|name>>>>
+  <assign|item*|<macro|name|<render-item|<arg|name>><with|index-enabled|false|<set-binding|<arg|name>>>>>
 
   <assign|item|<macro|<next-item><render-item|<the-item>>>>
 
@@ -126,6 +128,8 @@
 
   <assign|itemize-level|0>
 
+  <assign|itemize-levels|3>
+
   <new-list|itemize-1|<value|aligned-space-item>|<macro|name|<active*|<with|mode|math|\<bullet\>>>>>
 
   <new-list|itemize-2|<value|aligned-space-item>|<macro|name|<active*|<with|mode|math|<rigid|\<circ\>>>>>>
@@ -134,7 +138,7 @@
 
   <new-list|itemize-4|<value|aligned-space-item>|<macro|name|<active*|<with|mode|math|<rigid|.>>>>>
 
-  <assign|itemize-reduce|<macro|nr|<plus|<mod|<minus|<arg|nr>|1>|3>|1>>>
+  <assign|itemize-reduce|<macro|nr|<plus|<mod|<minus|<arg|nr>|1>|<minimum|<value|itemize-levels>|4>>|1>>>
 
   <assign|itemize|<\macro|body>
     <\with|itemize-level|<plus|<value|itemize-level>|1>>
@@ -156,6 +160,8 @@
 
   <assign|enumerate-level|0>
 
+  <assign|enumerate-levels|4>
+
   <new-list|enumerate-1|<value|aligned-dot-item>|<value|identity>>
 
   <new-list|enumerate-2|<value|aligned-dot-item>|<macro|name|<number|<arg|name>|alpha>>>
@@ -164,7 +170,7 @@
 
   <new-list|enumerate-4|<value|aligned-dot-item>|<macro|name|<number|<arg|name>|Alpha>>>
 
-  <assign|enumerate-reduce|<macro|nr|<plus|<mod|<minus|<arg|nr>|1>|3>|1>>>
+  <assign|enumerate-reduce|<macro|nr|<plus|<mod|<minus|<arg|nr>|1>|<minimum|<value|enumerate-levels>|4>>|1>>>
 
   <assign|enumerate|<\macro|body>
     <\with|enumerate-level|<plus|<value|enumerate-level>|1>>
@@ -175,6 +181,22 @@
   <assign|enumerate*|<\macro|body>
     <\with|enumerate-level|<plus|<value|enumerate-level>|1>>
       <compound|<merge|enumerate-|<enumerate-reduce|<value|enumerate-level>>|*>|<arg|body>>
+    </with>
+  </macro>>
+
+  <\active*>
+    <\src-comment>
+      Descriptions which use one paragraph for each item with description
+    </src-comment>
+  </active*>
+
+  <assign|item-paragraph|<macro|name|<paragraph-title|<arg|name>>>>
+
+  <assign|description-paragraphs|<\macro|body>
+    <\with|item*|<value|item-paragraph>>
+      <\padded-normal|<item-vsep>|<item-vsep>>
+        <surround|<no-page-break*>|<no-indent*>|<arg|body>>
+      </padded-normal>
     </with>
   </macro>>
 
@@ -212,9 +234,3 @@
 
   \;
 </body>
-
-<\initial>
-  <\collection>
-    <associate|language|english>
-  </collection>
-</initial>

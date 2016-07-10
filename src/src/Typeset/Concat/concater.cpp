@@ -84,23 +84,30 @@ concater_rep::flag_ok (string s, path ip, color col) {
   SI h= 4*env->fn->wfn/5;
   int r, g, b, a;
   get_rgb_color (col, r, g, b, a);
-  r= 255- (255 - r)/6;
-  g= 255- (255 - g)/6;
-  b= 255- (255 - b)/6;
+  //r= 255- (255 - r)/6;
+  //g= 255- (255 - g)/6;
+  //b= 255- (255 - b)/6;
+  a= a/6;
   color light= rgb_color (r, g, b, a);
   int info= env->info_level;
-  if (info == INFO_MINIMAL || info == INFO_SHORT) {
-    box infob= info_box (dip, h, env->fn->wline, col, light);
-    box specb= specific_box (ip, infob, false, env->fn);
-    print (specb);
+  if (info == INFO_MINIMAL || info == INFO_SHORT || info == INFO_SHORT_PAPER) {
+    box infob= info_box (dip, h, pencil (col, env->fn->wline), light);
+    if (info == INFO_SHORT_PAPER) {
+      box b= resize_box (ip, infob, 0, 0, 0, env->fn->yx);
+      print (b);
+    }
+    else {
+      box specb= specific_box (ip, infob, "screen", env->fn);
+      print (specb);
+    }
   }
   else if (info == INFO_DETAILED || info == INFO_PAPER) {
     int sz= script (env->fn_size, env->index_level+2);
     font gfn (tex_font ("ecrm", sz, (int) (env->magn*env->dpi)));
     box textb= text_box (decorate (ip), 0, s, gfn, col);
-    box flagb= flag_box (dip, textb, h, env->fn->wline, col, light);
+    box flagb= flag_box (dip, textb, h, pencil (col, env->fn->wline), light);
     if (info == INFO_DETAILED) {
-      box specb= specific_box (ip, flagb, false, env->fn);
+      box specb= specific_box (ip, flagb, "screen", env->fn);
       print (specb);
     }
     else {
@@ -161,6 +168,7 @@ concater_rep::typeset (tree t, path ip) {
 
   if (!is_accessible (ip)) {
     path ip2= obtain_ip (t);
+    //if (ip2 != ip) cout << t << ", " << ip << " -> " << ip2 << "\n";
     if (ip2 != path (DETACHED))
       ip= ip2;
   }
@@ -267,6 +275,12 @@ concater_rep::typeset (tree t, path ip) {
   case DBOX:
     typeset_decorated_box (t, ip);
     break;
+  case LINE_NOTE:
+    typeset_line_note (t, ip);
+    break;
+  case PAGE_NOTE:
+    typeset_page_note (t, ip);
+    break;
 
   case WITH_LIMITS:
     with_limits (LIMITS_DISPLAY);
@@ -315,6 +329,10 @@ concater_rep::typeset (tree t, path ip) {
   case PAGE_BREAK:
   case VAR_NO_PAGE_BREAK:
   case NO_PAGE_BREAK:
+  case VAR_NO_BREAK_HERE:
+  case NO_BREAK_HERE:
+  case NO_BREAK_START:
+  case NO_BREAK_END:
   case VAR_NEW_PAGE:
   case NEW_PAGE:
   case VAR_NEW_DPAGE:
@@ -487,8 +505,11 @@ concater_rep::typeset (tree t, path ip) {
   case EXTERN:
     typeset_rewrite (t, ip);
     break;
-  case INCLUDE:
+  case VAR_INCLUDE:
     typeset_include (t, ip);
+    break;
+  case INCLUDE:
+    typeset_compound (t, ip);
     break;
   case USE_PACKAGE:
   case USE_MODULE:
@@ -526,6 +547,7 @@ concater_rep::typeset (tree t, path ip) {
   case TRANSLATE:
   case CHANGE_CASE:
   case FIND_FILE:
+  case FIND_FILE_UPWARDS:
   case IS_TUPLE:
   case LOOK_UP:
   case EQUAL:
@@ -534,6 +556,7 @@ concater_rep::typeset (tree t, path ip) {
   case LESSEQ:
   case GREATER:
   case GREATEREQ:
+  case BLEND:
   case BOX_INFO:
   case FRAME_DIRECT:
   case FRAME_INVERSE:
@@ -564,6 +587,7 @@ concater_rep::typeset (tree t, path ip) {
   case PAG_LENGTH:
   case GW_LENGTH:
   case GH_LENGTH:
+  case GU_LENGTH:
   case TMPT_LENGTH:
   case PX_LENGTH:
     typeset_executable (t, ip);
@@ -604,6 +628,8 @@ concater_rep::typeset (tree t, path ip) {
   case LINK:
   case URL:
   case SCRIPT:
+  case OBSERVER:
+  case FIND_ACCESSIBLE:
     typeset_inactive (t, ip);
     break;
   case HLINK:
@@ -621,8 +647,14 @@ concater_rep::typeset (tree t, path ip) {
   case PAGEREF:
     typeset_compound (t, ip);
     break;
+  case GET_ATTACHMENT:
+    typeset_executable (t, ip);
+    break;
   case WRITE:
     typeset_write (t, ip);
+    break;
+  case TOC_NOTIFY:
+    typeset_toc_notify (t, ip);
     break;
 
   case TUPLE:
@@ -646,6 +678,13 @@ concater_rep::typeset (tree t, path ip) {
     typeset_flag (t, ip);
     break;
 
+  case ANIM_STATIC:
+  case ANIM_DYNAMIC:
+  case MORPH:
+  case ANIM_TIME:
+  case ANIM_PORTION:
+    typeset_executable (t, ip);
+    break;
   case ANIM_COMPOSE:
     typeset_anim_compose (t, ip);
     break;
@@ -654,6 +693,9 @@ concater_rep::typeset (tree t, path ip) {
     break;
   case ANIM_CONSTANT:
     typeset_anim_constant (t, ip);
+    break;
+  case ANIM_ACCELERATE:
+    typeset_anim_accelerate (t, ip);
     break;
   case ANIM_TRANSLATE:
     typeset_anim_translate (t, ip);
@@ -677,14 +719,20 @@ concater_rep::typeset (tree t, path ip) {
   case GR_GROUP:
     typeset_gr_group (t, ip);
     break;
-  case GR_LINEAR_TRANSFORM:
-    typeset_gr_linear_transform (t, ip);
+  case GR_TRANSFORM:
+    typeset_gr_transform (t, ip);
+    break;
+  case GR_EFFECT:
+    typeset_gr_effect (t, ip);
     break;
   case TEXT_AT:
     typeset_text_at (t, ip);
     break;
   case MATH_AT:
     typeset_math_at (t, ip);
+    break;
+  case DOCUMENT_AT:
+    typeset_document_at (t, ip);
     break;
   case _POINT:
     typeset_point (t, ip);
@@ -710,11 +758,58 @@ concater_rep::typeset (tree t, path ip) {
   case CSPLINE:
     typeset_cspline (t, ip);
     break;
+  case BEZIER:
+  case CBEZIER:
+  case SMOOTH:
+  case CSMOOTH:
+    typeset_bezier (t, ip);
+    break;
   case FILL:
     typeset_fill (t, ip);
     break;
   case IMAGE:
     typeset_image (t, ip);
+    break;
+  case TRANSFORM_3D:
+  case OBJECT_3D:
+  case TRIANGLE_3D:
+  case LIGHT_3D:
+    typeset_graphics_3d (t, ip);
+    break;
+  case LIGHT_DIFFUSE:
+  case LIGHT_SPECULAR:
+    typeset_inactive (t, ip);
+    break;
+
+  case EFF_MOVE:
+  case EFF_MAGNIFY:
+  case EFF_BUBBLE:
+  case EFF_TURBULENCE:
+  case EFF_FRACTAL_NOISE:
+  case EFF_GAUSSIAN:
+  case EFF_OVAL:
+  case EFF_RECTANGULAR:
+  case EFF_MOTION:
+  case EFF_BLUR:
+  case EFF_OUTLINE:
+  case EFF_THICKEN:
+  case EFF_ERODE:
+  case EFF_DEGRADE:
+  case EFF_DISTORT:
+  case EFF_GNAW:
+  case EFF_SUPERPOSE:
+  case EFF_ADD:
+  case EFF_SUB:
+  case EFF_MUL:
+  case EFF_MIN:
+  case EFF_MAX:
+  case EFF_MIX:
+  case EFF_NORMALIZE:
+  case EFF_MONOCHROME:
+  case EFF_COLOR_MATRIX:
+  case EFF_MAKE_TRANSPARENT:
+  case EFF_MAKE_OPAQUE:
+    typeset_inactive (t, ip);
     break;
 
   case CANVAS:

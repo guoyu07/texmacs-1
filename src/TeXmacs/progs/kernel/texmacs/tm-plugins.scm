@@ -44,16 +44,20 @@
   (if (null? opt) (set! opt (list "default")))
   (with l (or (ahash-ref connection-varlist name) (list))
     (ahash-set! connection-variant (list name (car opt)) val)
-    (ahash-set! connection-varlist name (rcons l (car opt)))))
+    (if (nin? (car opt) l)
+      (ahash-set! connection-varlist name (rcons l (car opt))))))
 
 (define-public (connection-list)
   (list-sort (list-union (map car (ahash-table->list connection-defined))
                          (remote-connection-list))
              string<=?))
 
-(define-public (connection-variants name)
+(define-public (local-connection-variants name)
   (lazy-plugin-force)
-  (append (or (ahash-ref connection-varlist name) (list))
+  (or (ahash-ref connection-varlist name) (list)))
+
+(define-public (connection-variants name)
+  (append (local-connection-variants name)
           (remote-connection-variants name)))
 
 (define-public (connection-defined? name)
@@ -300,6 +304,26 @@
   (ahash-ref remote-scripts-table name))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Cache plugin reinit
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (reinit-connection)
+  (set! connection-defined (make-ahash-table))
+  (set! connection-default (make-ahash-table))
+  (set! connection-variant (make-ahash-table))
+  (set! connection-varlist (make-ahash-table))
+  (set! connection-handler (make-ahash-table))
+  (set! connection-session (make-ahash-table))
+  (set! connection-scripts (make-ahash-table)))
+
+(define-public (reinit-plugin-cache)
+  (reinit-connection)
+  (set! reconfigure-flag? #t)
+  (with plugins (plugin-list)
+    (for-each (cut ahash-set! plugin-initialize-todo <> #t) plugins)
+    (for-each (cut plugin-initialize <>) plugins)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Cache plugin settings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -363,17 +387,30 @@
              (when (not (ahash-ref check-dir-table s))
                (ahash-set! check-dir-table s (url-last-modified v))))))))
 
-(define (add-to-path u)
+(define (add-to-path u after?)
   (add-to-check-dir-table u)
-  (with p (url-expand (url-or "$PATH" (url-complete u "dr")))
+  (let* ((u1 (url-complete u "dr"))
+         (u2 "$PATH")
+         (u3 (if after? (url-or u2 u1) (url-or u1 u2)))
+         (p  (url-expand u3)))
     (setenv "PATH" (url->system p))))
 
-(define (add-windows-program-path u)
-  (add-to-path (url-append (url-or (system->url "C:\\.")
-				   (system->url "C:\\Program File*")) u)))
+(define (add-windows-program-path u after?)
+  (add-to-path
+   (url-expand
+    (url-append (url-or (system->url "C:\\.")
+                        (system->url "C:\\Program File*")) u)) after?))
 
-(define (add-macos-program-path u)
-  (add-to-path (url-append (system->url "/Applications") u)))
+(define (add-macos-program-path u after?)
+  (add-to-path (url-append (system->url "/Applications") u) after?))
+
+(define-public (plugin-add-windows-path rad rel after?)
+  (when (os-mingw?)
+    (add-windows-program-path (url-append rad rel) after?)))
+
+(define-public (plugin-add-macos-path rad rel after?)
+  (when (os-macos?)
+    (add-macos-program-path (url-append rad rel) after?)))
 
 (define (path-up-to-date?)
   (with ok? #t
@@ -420,10 +457,10 @@
 	  name (second cmd) (symbol->string (third cmd))))
 	((func? cmd :winpath 2)
 	 (when (os-mingw?)
-           (add-windows-program-path (url-append (second cmd) (third cmd)))))
+           (add-windows-program-path (url-append (second cmd) (third cmd)) #t)))
 	((func? cmd :macpath 2)
 	 (when (os-macos?)
-           (add-macos-program-path (url-append (second cmd) (third cmd)))))
+           (add-macos-program-path (url-append (second cmd) (third cmd)) #t)))
 	((func? cmd :session 1)
 	 (session-setup name (second cmd)))
 	((func? cmd :scripts 1)

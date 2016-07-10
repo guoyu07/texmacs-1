@@ -68,12 +68,12 @@ static bool
 is_multi_paragraph_or_sectional (tree t) {
   if (is_atomic (t)) return false;
   if (is_multi_paragraph (t)) return true;
-  eval ("(use-modules (utils library tree) (text std-text-drd))");
+  eval ("(use-modules (utils library tree) (text text-drd))");
   return as_bool (call ("tree-in?", t, call ("section-tag-list")));
 }
 
 void
-edit_text_rep::remove_text (bool forward) {
+edit_text_rep::remove_text_sub (bool forward) {
   path p;
   int  last, rix;
   tree t, u;
@@ -116,7 +116,9 @@ edit_text_rep::remove_text (bool forward) {
 		 is_func (u, TFORMAT)) {
 	  if (t == tree (DOCUMENT, ""))
 	    back_in_table (u, p, forward);
-	} 
+	}
+        else if (is_func (u, DOCUMENT_AT))
+          back_in_text_at (u, p, forward);
       }
       return;
     }
@@ -209,6 +211,7 @@ edit_text_rep::remove_text (bool forward) {
       return;
     default:
       if (is_compound (t, "separating-space", 1)) back_monolithic (p);
+      else if (is_compound (t, "application-space", 1)) back_monolithic (p);
       else back_general (p, forward);
       break;
     }
@@ -258,6 +261,26 @@ edit_text_rep::remove_text (bool forward) {
       break;
     }
   }
+}
+
+void
+edit_text_rep::empty_document_fix () {
+  // FIXME: we might want to call this after arbitrary editing operations
+  tree rt= subtree (et, rp);
+  if (exists_accessible_inside (rt)) return;
+  if (!is_func (rt, DOCUMENT)) {
+    insert_node (rt, 0, DOCUMENT);
+    rt= subtree (et, rp);
+  }
+  int n= N(rt);
+  insert (rt, n, tree (DOCUMENT, ""));
+  go_to (rp * path (n, 0));
+}
+
+void
+edit_text_rep::remove_text (bool forward) {
+  remove_text_sub (forward);
+  empty_document_fix ();
 }
 
 /******************************************************************************

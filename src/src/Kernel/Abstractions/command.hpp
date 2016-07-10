@@ -12,7 +12,7 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 #include "tree.hpp"
-struct object;
+class object;
 
 extern int command_count;
 class command_rep: public tm_obj<command_rep> {

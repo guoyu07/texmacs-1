@@ -12,12 +12,10 @@
 #include "sys_utils.hpp"
 #include "file.hpp"
 #include "tree.hpp"
-#ifdef OS_WIN32
-#  include <sys/misc.h>
-#endif
 
 #if defined (QTTEXMACS) && (defined (__MINGW__) || defined (__MINGW32__))
-#  include "Qt/qt_sys_utils.hpp"
+# include "Qt/qt_sys_utils.hpp"
+#include "Windows/mingw_sys_utils.hpp"
 #else
 #  include "Unix/unix_sys_utils.hpp"
 #endif
@@ -28,7 +26,7 @@ int script_status = 1;
 * System functions
 ******************************************************************************/
 
-static int
+int
 system (string s, string& result) {
 #if defined (QTTEXMACS) && (defined (__MINGW__) || defined (__MINGW32__))
   int r= qt_system (s, result);
@@ -40,11 +38,11 @@ system (string s, string& result) {
 
 int
 system (string s) {
-  if (DEBUG_STD) cerr << "TeXmacs] System: " << s << "\n";
+  if (DEBUG_STD) debug_shell << s << "\n";
   if (DEBUG_VERBOSE) {
     string result;
     int r= system (s, result);
-    cerr << result;
+    debug_shell << result;
     return r;
   }
   else {
@@ -67,7 +65,7 @@ eval_system (string s) {
 string
 var_eval_system (string s) {
   string r= eval_system (s);
-  while ((N(r)>0) && (r[N(r)-1]=='\n')) r= r (0,N(r)-1);
+  while ((N(r)>0) && (r[N(r)-1]=='\n' || r[N(r)-1]=='\r')) r= r (0,N(r)-1);
   return r;
 }
 
@@ -104,7 +102,7 @@ get_texmacs_path () {
     //FIXME: Why is this?
   while ((N(tmpath)>0) && (tmpath [N(tmpath) - 1] == '/'))
     tmpath= tmpath (0, N(tmpath)-1);
-  return tmpath;
+  return url_system (tmpath);
 }
 
 url
@@ -113,4 +111,19 @@ get_texmacs_home_path () {
   if (path == "")
     path= url_system ("$HOME/.TeXmacs");
   return path;
+}
+
+array<string>
+evaluate_system (array<string> arg,
+		 array<int> fd_in, array<string> in,
+		 array<int> fd_out) {
+  array<string> out (N(fd_out));
+  array<string*> ptr (N(fd_out));
+  for (int i= 0; i < N(fd_out); i++) ptr[i]= &(out[i]);
+#if (defined (__MINGW__) || defined (__MINGW32__))
+  int ret= mingw_system (arg, fd_in, in, fd_out, ptr);
+#else
+  int ret= unix_system (arg, fd_in, in, fd_out, ptr);
+#endif
+  return append (as_string (ret), out);
 }

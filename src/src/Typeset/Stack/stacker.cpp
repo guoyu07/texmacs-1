@@ -17,7 +17,8 @@
 ******************************************************************************/
 
 stacker_rep::stacker_rep ():
-  l (0), unit_flag (false), unit_start (0) {}
+  l (0), unit_flag (false), unit_start (0),
+  no_break_flag (false), no_break_begin (-1) {}
 
 void
 stacker_rep::set_env_vars (
@@ -42,12 +43,12 @@ get_pos (array<SI> a, SI which) {
   int step, test;
   step= test= N(a)>>1;
   while (a[test] != which) {
-    step= step >> 1;
-    if (step==0) {
-      if (which < a[test]) return test-1;
-      else return test+1;
+    if (step==1) {
+      if (which < a[test]) return max (0, test-1);
+      else return min (N(a)-1, test+1);
     }
     else {
+      step = (step + 1) >> 1;
       if (which < a[test]) test= max (0, test- step);
       else test= min (N(a)-1, test+ step);
     }
@@ -91,22 +92,24 @@ shove_in (box b1, box b2, SI hor_sep, SI top, SI bot) {
     vpos2[i]= top;
   }
 
-  for (i=0; i<N(b1); i++) {
-    SI  y    = b1->sy1(i);
-    int start= get_pos (hpos, b1->sx1(i)- hor_sep);
-    int end  = get_pos (hpos, b1->sx2(i)+ hor_sep);
-    if (end>n) end= n;
-    for (j=start; j<end; j++)
-      vpos1[j]= min (vpos1[j], y);
-  }
-  for (i=0; i<N(b2); i++) {
-    SI  y    = b2->sy2(i);
-    int start= get_pos (hpos, b2->sx1(i)- hor_sep);
-    int end  = get_pos (hpos, b2->sx2(i)+ hor_sep);
-    if (end>n) end= n;
-    for (j=start; j<end; j++)
-      vpos2[j]= max (vpos2[j], y);
-  }
+  for (i=0; i<N(b1); i++)
+    if (b1[i]->w() > 0) {
+      SI  y    = b1->sy1(i);
+      int start= get_pos (hpos, b1->sx1(i)- hor_sep);
+      int end  = get_pos (hpos, b1->sx2(i)+ hor_sep);
+      if (end>n) end= n;
+      for (j=start; j<end; j++)
+	vpos1[j]= min (vpos1[j], y);
+    }
+  for (i=0; i<N(b2); i++)
+    if (b2[i]->w() > 0) {
+      SI  y    = b2->sy2(i);
+      int start= get_pos (hpos, b2->sx1(i)- hor_sep);
+      int end  = get_pos (hpos, b2->sx2(i)+ hor_sep);
+      if (end>n) end= n;
+      for (j=start; j<end; j++)
+	vpos2[j]= max (vpos2[j], y);
+    }
 
   SI m= vpos2[0]-vpos1[0];
   for (i=1; i<n; i++)
@@ -323,6 +326,30 @@ stacker_rep::no_page_break_after () {
 }
 
 void
+stacker_rep::no_break_before () {
+  penalty (HYPH_INVALID);
+}
+
+void
+stacker_rep::no_break_after () {
+  no_break_flag= true;
+}
+
+void
+stacker_rep::no_break_start () {
+  no_break_begin= N(l);
+}
+
+void
+stacker_rep::no_break_end () {
+  if (no_break_begin >= 0)
+    for (int i=no_break_begin; i<N(l); i++)
+      if (l[i]->type != PAGE_CONTROL_ITEM)
+        l[i]->penalty= HYPH_INVALID;
+  no_break_begin= -1;
+}
+
+void
 stacker_rep::penalty (int pen) {
   int i= N(l)-1;
   while ((i>=0) && (l[i]->type == PAGE_CONTROL_ITEM)) i--;
@@ -332,6 +359,10 @@ stacker_rep::penalty (int pen) {
 
 void
 stacker_rep::flush () {
+  if (no_break_flag) {
+    penalty (HYPH_INVALID);
+    no_break_flag= false;
+  }
   l << unit_ctrl;
   unit_ctrl= array<page_item> (0);
 }

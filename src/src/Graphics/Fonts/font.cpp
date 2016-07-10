@@ -28,7 +28,8 @@ font_rep::font_rep (string s):
   spc       (0),
   extra     (0),
   last_zoom (0.0),
-  zoomed_fn (NULL)
+  zoomed_fn (NULL),
+  protrusion_maps (-1)
 {
 }
 
@@ -43,7 +44,8 @@ font_rep::font_rep (string s, font fn):
   extra        (fn->extra),
   sep          (fn->sep),
   last_zoom    (0.0),
-  zoomed_fn    (NULL)
+  zoomed_fn    (NULL),
+  protrusion_maps (-1)
 {
   copy_math_pars (fn);
 }
@@ -61,19 +63,22 @@ font_rep::copy_math_pars (font fn) {
   ysup_hi_lim  = fn->ysup_hi_lim;
   yshift       = fn->yshift;
   wpt          = fn->wpt;
+  hpt          = fn->hpt;
   wfn          = fn->wfn;
   wline        = fn->wline;
   wquad        = fn->wquad;
 }
 
 void
-font_rep::draw (renderer ren, string s, SI x, SI y) {
-  if (ren->zoomf == 1.0 || !ren->is_screen)
-    draw_fixed (ren, s, x, y);
+font_rep::draw (renderer ren, string s, SI x, SI y, SI xk, bool ext) {
+  if (ren->zoomf == 1.0 || !ren->is_screen) {
+    if (ext) draw_fixed (ren, s, x, y, xk);
+    else draw_fixed (ren, s, x, y);
+  }
   else if (ren->zoomf != last_zoom) {
     last_zoom= ren->zoomf;
     zoomed_fn= magnify (ren->zoomf);
-    draw (ren, s, x, y);
+    draw (ren, s, x, y, xk, ext);
   }
   else {
     // FIXME: low level rendering hack
@@ -85,8 +90,9 @@ font_rep::draw (renderer ren, string s, SI x, SI y) {
     SI     old_cy2    = ren->cy2;
     double old_zoomf  = ren->zoomf;
     int    old_shrinkf= ren->shrinkf;
-    SI     old_pixel  = ren->pixel;
     SI     old_thicken= ren->thicken;
+    SI     old_pixel       = ren->pixel;
+    SI     old_retina_pixel= ren->retina_pixel;
 
     ren->ox     = (SI) tm_round (old_ox  * old_zoomf);
     ren->oy     = (SI) tm_round (old_oy  * old_zoomf);
@@ -100,12 +106,18 @@ font_rep::draw (renderer ren, string s, SI x, SI y) {
     ren->cy2    = (SI) tm_round (old_cy2 * old_zoomf);
     ren->zoomf  = 1.0;
     ren->shrinkf= std_shrinkf;
-    ren->pixel  = std_shrinkf * PIXEL;
+    ren->brushpx= ren->pixel;
     ren->thicken= (std_shrinkf >> 1) * PIXEL;
+    ren->pixel       = std_shrinkf * PIXEL;
+    ren->retina_pixel= std_shrinkf * PIXEL;
 
     SI xx= (SI) tm_round (x * old_zoomf);
     SI yy= (SI) tm_round (y * old_zoomf);
-    zoomed_fn->draw_fixed (ren, s, xx, yy);
+    if (ext) {
+      SI kk= (SI) tm_round (xk * old_zoomf);
+      zoomed_fn->draw_fixed (ren, s, xx, yy, kk);
+    }
+    else zoomed_fn->draw_fixed (ren, s, xx, yy);
 
     ren->ox     = old_ox;
     ren->oy     = old_oy;
@@ -115,15 +127,63 @@ font_rep::draw (renderer ren, string s, SI x, SI y) {
     ren->cy2    = old_cy2;
     ren->zoomf  = old_zoomf;
     ren->shrinkf= old_shrinkf;
-    ren->pixel  = old_pixel;
+    ren->brushpx= -1;
     ren->thicken= old_thicken;
+    ren->pixel       = old_pixel;
+    ren->retina_pixel= old_retina_pixel;
   }
+}
+
+void
+font_rep::draw (renderer ren, string s, SI x, SI y) {
+  draw (ren, s, x, y, 0, false);
+}
+
+void
+font_rep::draw (renderer ren, string s, SI x, SI y, SI xk) {
+  draw (ren, s, x, y, xk, true);
+}
+
+void
+font_rep::draw_fixed (renderer ren, string s, SI x, SI y, bool ligf) {
+  (void) ligf;
+  draw_fixed (ren, s, x, y);
+}
+
+void
+font_rep::draw_fixed (renderer ren, string s, SI x, SI y, SI xk) {
+  STACK_NEW_ARRAY (xpos, SI, N(s)+1);
+  get_xpositions (s, xpos, xk);
+  int i= 0;
+  while (i<N(s)) {
+    int old= i;
+    tm_char_forwards (s, i);
+    draw_fixed (ren, s (old, i), x + xpos[old], y, false);
+  }
+  STACK_DELETE_ARRAY (xpos);  
 }
 
 double font_rep::get_left_slope  (string s) { (void) s; return slope; }
 double font_rep::get_right_slope (string s) { (void) s; return slope; }
 SI     font_rep::get_left_correction  (string s) { (void) s; return 0; }
 SI     font_rep::get_right_correction (string s) { (void) s; return 0; }
+
+void
+font_rep::get_extents (string s, metric& ex, bool ligf) {
+  if (ligf) get_extents (s, ex);
+  else get_extents (s, ex, 0);
+}
+
+void
+font_rep::get_extents (string s, metric& ex, SI xk) {
+  get_extents (s, ex);
+  STACK_NEW_ARRAY (xpos, SI, N(s)+1);
+  get_xpositions (s, xpos, xk);
+  SI d= xpos[N(s)] - ex->x2;
+  ex->x2 += d;
+  ex->x4 += d - xk;
+  STACK_DELETE_ARRAY (xpos);
+}
 
 void
 font_rep::get_xpositions (string s, SI* xpos) {
@@ -140,6 +200,34 @@ font_rep::get_xpositions (string s, SI* xpos) {
     get_extents (s (0, i), ex);
     x= ex->x2;
     xpos[i]= x;
+  }
+}
+
+void
+font_rep::get_xpositions (string s, SI* xpos, bool ligf) {
+  (void) ligf;
+  get_xpositions (s, xpos);
+}
+
+void
+font_rep::get_xpositions (string s, SI* xpos, SI xk) {
+  get_xpositions (s, xpos, false);
+  int n= tm_string_length (s);
+  if (n == 0) return;
+  int i= 0, count= 0;
+  xpos[0]= xk;
+  while (i < N(s)) {
+    SI dx= (2*count + 1) * xk;
+    if (s[i] == '<')
+      while ((i < N(s)) && (s[i] != '>')) {
+	i++;
+	xpos[i] += dx;
+      }
+    i++;
+    count++;
+    if (i == N(s)) dx= 2 * count * xk;
+    else dx= (2*count + 1) * xk;
+    xpos[i] += dx;
   }
 }
 
@@ -195,16 +283,51 @@ font_rep::var_draw (renderer ren, string s, SI x, SI y) {
   }
 }
 
-bool get_glyph_fatal= true;
+//bool get_glyph_fatal= true;
+bool get_glyph_fatal= false;
+
+void
+font_rep::advance_glyph (string s, int& pos) {
+  tm_char_forwards (s, pos);
+}
 
 glyph
 font_rep::get_glyph (string s) {
   if (get_glyph_fatal) {
-    cerr << "glyph name: " << s << "\n";
+    failed_error << "glyph name: " << s << "\n";
+    failed_error << "font      : " << res_name << "\n";    
     FAILED ("no bitmap available");
   }
-  else cout << "  no bitmap available for " << s << "\n";
-  return glyph ();
+  else {
+    cout << "TeXmacs] warning, no bitmap available for " << s << "\n";
+    cout << "TeXmacs]   in font " << res_name << "\n";
+  }
+  return glyph (0, 0, 0, 0);
+}
+
+int
+font_rep::index_glyph (string s, font_metric& fnm, font_glyphs& fng) {
+  (void) fnm; (void) fng;
+  if (get_glyph_fatal) {
+    failed_error << "glyph name: " << s << "\n";
+    failed_error << "font      : " << res_name << "\n";    
+    FAILED ("no bitmap available");
+  }
+  else {
+    cout << "TeXmacs] warning, no glyph index available for " << s << "\n";
+    cout << "TeXmacs]   in font " << res_name << "\n";
+  }
+  return -1;
+}
+
+font
+font_rep::poor_magnify (double zoomx, double zoomy) {
+  return poor_stretched_font (this, zoomx, zoomy);
+}
+
+font
+font_rep::magnify (double zoom) {
+  return magnify (zoom, zoom);
 }
 
 /******************************************************************************
@@ -214,14 +337,21 @@ font_rep::get_glyph (string s) {
 struct error_font_rep: font_rep {
   font fn;
   error_font_rep (string name, font fn);
+  bool supports (string c);
   void get_extents (string s, metric& ex);
   void get_xpositions (string s, SI* xpos);
   void draw_fixed (renderer ren, string s, SI x, SI y);
-  font magnify (double zoom);
+  font magnify (double zoomx, double zoomy);
 };
 
 error_font_rep::error_font_rep (string name, font fnb):
   font_rep (name, fnb), fn (fnb) {}
+
+bool
+error_font_rep::supports (string c) {
+  (void) c;
+  return true;
+}
 
 void
 error_font_rep::get_extents (string s, metric& ex) {
@@ -235,13 +365,13 @@ error_font_rep::get_xpositions (string s, SI* xpos) {
 
 void
 error_font_rep::draw_fixed (renderer ren, string s, SI x, SI y) {
-  ren->set_color (red);
+  ren->set_pencil (red);
   fn->draw_fixed (ren, s, x, y);
 }
 
 font
-error_font_rep::magnify (double zoom) {
-  return error_font (fn->magnify (zoom));
+error_font_rep::magnify (double zoomx, double zoomy) {
+  return error_font (fn->magnify (zoomx, zoomy));
 }
 
 font
@@ -278,6 +408,36 @@ qt_font (string family, int size, int dpi) {
 * Miscellaneous
 ******************************************************************************/
 
+static hashmap<string,font> larger_font_table;
+bool has_poor_rubber= true;
+
+bool
+use_poor_rubber (font fn) {
+  return has_poor_rubber && fn->type == FONT_TYPE_UNICODE &&
+    !starts (fn->res_name, "stix-");
+}
+
+static font
+make_rubber_font (font fn) {
+  if (starts (fn->res_name, "stix-"))
+    return rubber_stix_font (fn);
+  else if (has_poor_rubber && fn->type == FONT_TYPE_UNICODE)
+    return poor_rubber_font (fn);
+  else if (fn->type == FONT_TYPE_UNICODE)
+    return rubber_unicode_font (fn);
+  else
+    return fn;
+}
+
+font
+rubber_font (font base) {
+  if (larger_font_table->contains (base->res_name))
+    return larger_font_table (base->res_name);
+  font larger= make_rubber_font (base);
+  larger_font_table (base->res_name)= larger;
+  return larger;
+}
+
 int
 script (int sz, int level) {
   int i;
@@ -289,18 +449,19 @@ script (int sz, int level) {
 
 string
 default_chinese_font_name () {
+  if (tt_font_exists ("FandolSong-Regular")) return "FandolSong";
+  if (tt_font_exists ("simsun")) return "simsun";
   if (tt_font_exists ("fireflysung")) return "fireflysung";
   if (tt_font_exists ("uming")) return "uming";
   if (tt_font_exists ("儷黑 Pro")) return "lihei";
   if (tt_font_exists ("华文细黑")) return "heiti";
-  if (tt_font_exists ("simsun")) return "simsun";
   if (tt_font_exists ("SimSun")) return "apple-simsun";
   return "roman";
 }
 
 string
 default_japanese_font_name () {
-  if (tt_font_exists ("ipam")) return "modern";
+  if (tt_font_exists ("ipam")) return (new_fonts? "IPAMincho": "modern");
   if (tt_font_exists ("sazanami")) return "sazanami";
   if (tt_font_exists ("ttf-japanese-gothic")) return "ttf-japanese";
   if (tt_font_exists ("ヒラギノ明朝 ProN W6")) return "kaku";
@@ -311,8 +472,8 @@ default_japanese_font_name () {
 
 string
 default_korean_font_name () {
-  if (tt_font_exists ("unbatang")) return "modern";
-  if (tt_font_exists ("UnBatang")) return "modern";
+  if (tt_font_exists ("unbatang")) return (new_fonts? "UnBatang": "modern");
+  if (tt_font_exists ("UnBatang")) return (new_fonts? "UnBatang": "modern");
   if (tt_font_exists ("AppleGothic")) return "apple-gothic";
   if (tt_font_exists ("Gulim")) return "gulim";
   return "roman";

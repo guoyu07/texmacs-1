@@ -25,7 +25,7 @@
 
 #ifndef VPENALTY_H
 #define VPENALTY_H
-#include "basic.hpp"
+#include "space.hpp"
 
 #define EXTEND_PAGE_PENALTY   33
 #define REDUCE_PAGE_PENALTY   33
@@ -33,6 +33,7 @@
 #define TOO_LONG_PENALTY      100000
 #define UNBALANCED_COLUMNS    1000
 #define LONGER_LATTER_COLUMN  1000
+#define BAD_FLOATS_PENALTY    1000000
 
 struct vpenalty_rep: public tm_obj<vpenalty_rep> {
   int pen;   // main penalty
@@ -62,5 +63,7 @@ public:
 };
 
 tm_ostream& operator << (tm_ostream& out, vpenalty pen);
+
+SI stretch_space (space spc, double stretch);
 
 #endif // defined VPENALTY_H

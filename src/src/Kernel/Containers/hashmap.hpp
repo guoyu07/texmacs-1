@@ -47,7 +47,8 @@ class hashmap_rep : public tm_obj<hashmap_rep<T,U> > {
 
 public:
   inline hashmap_rep<T,U>(U init2, int n2=1, int max2=1):
-    size(0), n(n2), max(max2), init(init2), a(tm_new_array<list<hashentry<T,U> > > (n)) {}
+    size(0), n(n2), max(max2), init(init2),
+    a(tm_new_array<list<hashentry<T,U> > > (n)) {}
   inline ~hashmap_rep<T,U> () { tm_delete_array (a); }
   void resize (int n);
   void reset (T x);
@@ -85,7 +86,7 @@ class hashmap : public tm_ptr<hashmap_rep<T,U> >  {
 public:
   static hashmap<T,U> init;
   inline hashmap ():
-    tm_ptr<hashmap_rep<T,U> > (tm_new<hashmap_rep<T,U> > (type_helper<U>::init, 1, 1)) {}
+    tm_ptr<hashmap_rep<T,U> > (tm_new<hashmap_rep<T,U> > (type_helper<U>::init_val (), 1, 1)) {}
   inline hashmap (U init, int n=1, int max=1):
     tm_ptr<hashmap_rep<T,U> > (tm_new<hashmap_rep<T,U> > (init, n, max)) {}
   // only for hashmap<string,tree>

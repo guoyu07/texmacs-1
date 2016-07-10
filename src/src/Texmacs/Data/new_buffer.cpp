@@ -27,6 +27,17 @@ string propose_title (string old_title, url u, tree doc);
 * Check for changes in the buffer
 ******************************************************************************/
 
+void
+tm_buffer_rep::attach_notifier () {
+  if (notify) return;
+  string id= as_string (buf->name, URL_UNIX);
+  tree& st (subtree (the_et, rp));
+  call ("buffer-initialize", id, st, buf->name);
+  lns= link_repository (true);
+  lns->insert_locus (id, st, "buffer-notify");
+  notify= true;
+}
+
 bool
 tm_buffer_rep::needs_to_be_saved () {
   if (buf->read_only) return false;
@@ -145,6 +156,9 @@ rename_buffer (url name, url new_name) {
   notify_rename_before (name);
   buf->buf->name= new_name;
   buf->buf->master= new_name;
+  array<url> vs= buffer_to_views (new_name);
+  for (int i=0; i<N(vs); i++)
+    view_to_editor (vs[i]) -> notify_change (THE_ENVIRONMENT);
   notify_rename_after (new_name);
   tree doc= subtree (the_et, buf->rp);
   string title= propose_title (buf->buf->title, new_name, doc);
@@ -312,7 +326,7 @@ set_master_buffer (url name, url master) {
   buf->buf->master= master;
   array<url> vs= buffer_to_views (name);
   for (int i=0; i<N(vs); i++)
-    view_to_editor (vs[i]) -> set_master (master);
+    view_to_editor (vs[i]) -> notify_change (THE_ENVIRONMENT);
 }
 
 void
@@ -389,6 +403,13 @@ pretend_buffer_autosaved (url name) {
     view_to_editor (vs[i]) -> notify_save (false);
 }
 
+void
+attach_buffer_notifier (url name) {
+  tm_buffer buf= concrete_buffer (name);
+  if (is_nil (buf)) return;
+  buf->attach_notifier ();
+}
+
 /******************************************************************************
 * Loading
 ******************************************************************************/
@@ -398,8 +419,10 @@ attach_subformat (tree t, url u, string fm) {
   if (fm != "verbatim" && fm != "scheme" && fm != "cpp") return t;
   string s= suffix (u);
   if (s == "scm") fm= "scheme";
+  if (s == "py")  fm= "python";
   if (s == "cpp" || s == "hpp" || s == "cc" || s == "hh") fm= "cpp";
   if (s == "mmx" || s == "mmh") fm= "mathemagix";
+  if (s == "sce" || s == "sci") fm= "scilab";
   if (fm == "verbatim") return t;
   hashmap<string,tree> h (UNINIT, extract (t, "initial"));
   h (MODE)= "prog";
@@ -410,6 +433,7 @@ attach_subformat (tree t, url u, string fm) {
 tree
 import_loaded_tree (string s, url u, string fm) {
   set_file_focus (u);
+  if (fm == "generic" && suffix (u) == "txt") fm= "verbatim";
   if (fm == "generic") fm= get_format (s, suffix (u));
   if (fm == "texmacs" && starts (s, "(document (TeXmacs")) fm= "stm";
   if (fm == "verbatim" && starts (s, "(document (TeXmacs")) fm= "stm";
@@ -443,12 +467,42 @@ buffer_load (url name) {
   return buffer_import (name, name, fm);
 }
 
+hashmap<string,tree> style_tree_cache ("");
+
+tree
+load_style_tree (string package) {
+  if (style_tree_cache->contains (package))
+    return style_tree_cache [package];
+  url name= url_none ();
+  url styp= "$TEXMACS_STYLE_PATH";
+  if (ends (package, ".ts")) name= package;
+  else name= styp * (package * ".ts");
+  name= resolve (name);
+  string doc_s;
+  if (!load_string (name, doc_s, false)) {
+    tree doc= texmacs_document_to_tree (doc_s);
+    if (is_compound (doc)) doc= extract (doc, "body");
+    style_tree_cache (package)= doc;
+    return doc;
+  }
+  style_tree_cache (package)= "";
+  return "";
+}
+
 /******************************************************************************
 * Saving
 ******************************************************************************/
 
 bool
 export_tree (tree doc, url u, string fm) {
+  // NOTE: hook for encryption
+  tree init= extract (doc, "initial");
+  if (fm == "texmacs")
+    for (int i=0; i<N(init); i++)
+      if (is_func (init[i], ASSOCIATE, 2) && init[i][0] == "encryption")
+	doc= as_tree (call ("tree-export-encrypted",
+			    object (u), object (doc)));
+  // END hook
   if (fm == "generic") fm= "verbatim";
   string s= tree_to_generic (doc, fm * "-document");
   if (s == "* error: unknown format *") return true;
@@ -472,11 +526,14 @@ buffer_export (url name, url dest, string fm) {
     body= vw->ed->exec_verbatim (body);
   if (fm == "html")
     body= vw->ed->exec_html (body);
-  if (fm == "latex")
-    body= vw->ed->exec_latex (body);
+  //if (fm == "latex")
+  //body= vw->ed->exec_latex (body);
 
   vw->ed->get_data (vw->buf->data);
   tree doc= attach_data (body, vw->buf->data, !vw->ed->get_save_aux());
+
+  if (fm == "latex")
+    doc= change_doc_attr (doc, "view", as_string (abstract_view (vw)));
 
   object arg1 (vw->buf->buf->name);
   object arg2 (body);
@@ -485,6 +542,21 @@ buffer_export (url name, url dest, string fm) {
     doc << compound ("links", links);
   
   return export_tree (doc, dest, fm);
+}
+
+tree
+latex_expand (tree doc, url name) {
+  tm_view vw= concrete_view (get_recent_view (name));
+  tree body= vw->ed->exec_latex (extract (doc, "body"));
+  return change_doc_attr (doc, "body", body);
+}
+
+tree
+latex_expand (tree doc) {
+  tm_view vw= concrete_view (url (as_string (extract (doc, "view"))));
+  tree body= vw->ed->exec_latex (extract (doc, "body"));
+  doc= change_doc_attr (doc, "body", body);
+  return remove_doc_attr (doc, "view");
 }
 
 bool
@@ -504,13 +576,13 @@ static hashmap<string,tree> document_inclusions ("");
 
 void
 reset_inclusions () {
-  document_inclusions= hashmap<string,tree> ("");
+  document_inclusions = hashmap<string,tree> ("");
 }
 
 void
 reset_inclusion (url name) {
   string name_s= as_string (name);
-  document_inclusions->reset (name_s);
+  document_inclusions -> reset (name_s);
 }
 
 tree

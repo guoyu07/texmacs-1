@@ -12,7 +12,9 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(texmacs-module (source source-menu))
+(texmacs-module (source source-menu)
+  (:use (source source-edit)
+	(source macro-widgets)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Transformational markup for the macro language
@@ -20,7 +22,7 @@
 
 (menu-bind source-define-menu
   ("Assign" (make 'assign))
-  ("With" (make-arity 'with 3))
+  ("With" (make 'with 3))
   ("Value" (make 'value)))
 
 (menu-bind source-macro-menu
@@ -74,7 +76,7 @@
   ("Length" (make 'length))
   ("Range" (make 'range))
   ("Number" (make 'number))
-  ("Today" (make-arity 'date 0))
+  ("Today" (make 'date 0))
   ("Formatted date" (make 'date))
   ("Translate" (make 'translate))
   ("Find file" (make 'find-file)))
@@ -113,8 +115,8 @@
   ("Activate" (make-mod-active 'active*))
   ("Activate once" (make-mod-active 'active))
   (when (not (in-source?))
-	("Disactivate" (make-mod-active 'inactive*))
-	("Disactivate once" (make-mod-active 'inactive))))
+	("Deactivate" (make-mod-active 'inactive*))
+	("Deactivate once" (make-mod-active 'inactive))))
 
 (menu-bind source-layout-menu
   ("Compact" (make-style-with "src-compact" "all"))
@@ -131,12 +133,23 @@
 ;; The main menu for editing source files
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(menu-bind source-macros-menu
+  ("New macro" (open-macro-editor ""))
+  (when (can-create-table-macro?)
+    ("Create table macro" (create-table-macro "")))
+  ("Edit macros" (open-macros-editor))
+  ("Edit preamble" (toggle-preamble))
+  ("Extract style file" (extract-style-file #t))
+  ("Extract style package" (extract-style-file #f)))
+
 (menu-bind source-menu
   (link source-transformational-menu)
   ---
   (link source-executable-menu)
   ---
-  (link source-presentation-menu))
+  (link source-presentation-menu)
+  ---
+  (link source-macros-menu))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; The icon bar for editing source files

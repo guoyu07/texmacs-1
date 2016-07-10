@@ -347,10 +347,8 @@ texmacs_to_tree (string s, string version) {
 * Conversion of TeXmacs strings to TeXmacs trees
 ******************************************************************************/
 
-static bool
-is_apply (tree t, string s, int n) {
-  return (L(t) == APPLY) && (N(t) == n+1) && (t[0] == s);
-}
+inline bool is_apply (tree t, string s, int n) {
+  return (L(t) == APPLY) && (N(t) == (n+1)) && (t[0] == s); }
 
 static bool
 is_expand (tree t, string s, int n) {
@@ -446,6 +444,7 @@ extract (tree doc, string attr) {
   if (attr == "final") return tree (COLLECTION);
   if (attr == "references") return tree (COLLECTION);
   if (attr == "auxiliary") return tree (COLLECTION);
+  if (attr == "attachments") return tree (COLLECTION);
   return "";
 }
 
@@ -507,4 +506,71 @@ change_doc_attr (tree doc, string attr, tree val) {
     else r[i]= doc[i];
   if (!done) r << compound (attr, val);
   return r;
+}
+
+tree
+remove_doc_attr (tree doc, string attr) {
+  int i, n= arity (doc);
+  tree r (L(doc));
+  for (i=0; i<n; i++)
+    if (!is_compound (doc[i], attr, 1))
+      r << doc[i];
+  return r;
+}
+
+/******************************************************************************
+* Extracting metadata
+******************************************************************************/
+
+static tree
+search_tag_quick (tree t, string tag) {
+  if (is_compound (t, tag)) return t;
+  if (!(is_func (t, DOCUMENT) || is_func (t, CONCAT) ||
+        is_func (t, SURROUND) || is_func (t, WITH))) return "";
+  for (int i=0; i<N(t); i++) {
+    tree r= search_tag_quick (t[i], tag);
+    if (r != "") return r;
+  }
+  return "";
+}
+
+static tree
+search_tag (tree t, string tag) {
+  if (is_atomic (t)) return tuple ();
+  else if (is_compound (t, tag, 1)) return tuple (t[0]);
+  else {
+    tree r (TUPLE);
+    for (int i=0; i<N(t); i++) {
+      tree f= search_tag (t[i], tag);
+      r << A(f);
+    }
+    return r;
+  }
+}
+
+static string
+search_metadata_tag (tree doc, string tag) {
+  string r;
+  tree t= search_tag (doc, tag);
+  for (int i=0; i<N(t); i++) {
+    if (N(r) != 0) r << ", ";
+    r << tree_to_verbatim (t[i], false, "cork");
+  }
+  return r;
+}
+
+string
+search_metadata (tree doc, string kind) {
+  tree dd= search_tag_quick (doc, "doc-data");
+  if (dd != "") {
+    if (kind == "title")
+      return search_metadata_tag (dd, "doc-title");
+    if (kind == "author")
+      return search_metadata_tag (dd, "author-name");
+  }
+  if (kind == "title") {
+    tree t= search_tag_quick (doc, "tmdoc-title");
+    if (t != "") return tree_to_verbatim (t[0], false, "cork");
+  }
+  return "";
 }

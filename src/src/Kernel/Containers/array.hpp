@@ -42,6 +42,9 @@ public:
   inline array (int n=0) : tm_ptr<array_rep<T> > (tm_new<array_rep<T> > (n)) {}
   array (T *a, int n);
   array (T x1, T x2);
+  array (T x1, T x2, T x3);
+  array (T x1, T x2, T x3, T x4);
+  array (T x1, T x2, T x3, T x4, T x5);
   inline T& operator [] (int i) { return this->rep()->a[i]; }
   operator tree (); // defined in tree.hpp
 };
@@ -61,6 +64,8 @@ TMPL array<T> range (array<T> a, int i, int j);
 TMPL array<T> reverse (array<T> a);
 TMPL bool operator == (array<T> a, array<T> b);
 TMPL bool operator != (array<T> a, array<T> b);
+TMPL array<T> operator * (array<T> a, T c);
+TMPL array<T> operator / (array<T> a, T c);
 
 TMPL int hash (array<T> a);
 #undef TMPL

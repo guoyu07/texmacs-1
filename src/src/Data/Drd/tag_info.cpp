@@ -58,10 +58,15 @@ drd_decode_type (int i) {
   case TYPE_CODE: return "code";
   case TYPE_IDENTIFIER: return "identifier";
   case TYPE_URL: return "url";
+  case TYPE_COLOR: return "color";
   case TYPE_GRAPHICAL: return "graphical";
   case TYPE_POINT: return "point";
+  case TYPE_CONSTRAINT: return "constraint";
+  case TYPE_GRAPHICAL_ID: return "graphical-id";
+  case TYPE_EFFECT: return "effect";
   case TYPE_ANIMATION: return "animation";
   case TYPE_DURATION: return "duration";
+  case TYPE_OBSOLETE: return "obsolete";
   case TYPE_UNKNOWN: return "unknown";
   case TYPE_ERROR: return "error";
   default: return "unknown";
@@ -82,8 +87,12 @@ drd_encode_type (string s) {
   else if (s == "code") return TYPE_CODE;
   else if (s == "identifier") return TYPE_IDENTIFIER;
   else if (s == "url") return TYPE_URL;
+  else if (s == "color") return TYPE_COLOR;
   else if (s == "graphical") return TYPE_GRAPHICAL;
   else if (s == "point") return TYPE_POINT;
+  else if (s == "constraint") return TYPE_CONSTRAINT;
+  else if (s == "graphical-id") return TYPE_GRAPHICAL_ID;
+  else if (s == "effect") return TYPE_EFFECT;
   else if (s == "animation") return TYPE_ANIMATION;
   else if (s == "duration") return TYPE_DURATION;
   else if (s == "unknown") return TYPE_UNKNOWN;
@@ -104,14 +113,16 @@ parent_info::parent_info (int a, int x, int am, int cm, bool frozen) {
   border_mode      = BORDER_YES;
   block            = BLOCK_NO;
   with_like        = false;
+  var_type         = VAR_MACRO;
   freeze_arity     = frozen;
   freeze_border    = frozen;
   freeze_block     = frozen;
   freeze_with      = frozen;
+  freeze_var_type  = frozen;
 }
 
 parent_info::parent_info (tree t) {
-  int i= as_int (t);
+  long int i= as_long_int (t);
   get_bits (type            , 5);
   get_bits (arity_mode      , 2);
   get_bits (arity_base      , 6);
@@ -120,15 +131,18 @@ parent_info::parent_info (tree t) {
   get_bits (border_mode     , 2);
   get_bits (block           , 2);
   get_bits (with_like       , 1);
+  get_bits (var_type        , 2);
   get_bits (freeze_type     , 1);
   get_bits (freeze_arity    , 1);
   get_bits (freeze_border   , 1);
   get_bits (freeze_block    , 1);
   get_bits (freeze_with     , 1);
+  get_bits (freeze_var_type , 1);
 }
 
 parent_info::operator tree () {
-  int i=0, offset=0;
+  long int i=0;
+  int offset=0;
   set_bits (type            , 5);
   set_bits (arity_mode      , 2);
   set_bits (arity_base      , 6);
@@ -137,11 +151,13 @@ parent_info::operator tree () {
   set_bits (border_mode     , 2);
   set_bits (block           , 2);
   set_bits (with_like       , 1);
+  set_bits (var_type        , 2);
   set_bits (freeze_type     , 1);
   set_bits (freeze_arity    , 1);
   set_bits (freeze_border   , 1);
   set_bits (freeze_block    , 1);
   set_bits (freeze_with     , 1);
+  set_bits (freeze_var_type , 1);
   return as_string (i);
 }
 
@@ -156,10 +172,12 @@ parent_info::operator == (const parent_info& pi) {
     (border_mode      == pi.border_mode     ) &&
     (block            == pi.block           ) &&
     (with_like        == pi.with_like       ) &&
+    (var_type         == pi.var_type        ) &&
     (freeze_arity     == pi.freeze_arity    ) &&
     (freeze_border    == pi.freeze_border   ) &&
     (freeze_block     == pi.freeze_block    ) &&
-    (freeze_with      == pi.freeze_with     );
+    (freeze_with      == pi.freeze_with     ) &&
+    (freeze_var_type  == pi.freeze_var_type );
 }
 
 bool
@@ -266,21 +284,21 @@ tag_info::tag_info (parent_info pi, array<child_info> ci, tree extra)
 : tm_ptr<tag_info_rep> ( tm_new<tag_info_rep> (pi, ci, extra) ) {}
 
 
-tag_info::tag_info (int a, int x, int am, int cm, bool frozen) 
+tag_info::tag_info (int a, int x, int am, int cm, bool frozen)
 : tm_ptr<tag_info_rep> ( tm_new<tag_info_rep> (a, x, am, cm, frozen) ) { }
 
 
 static tag_info_rep *
 make_from_tree(tree t) {
-	if ((!is_func (t, TUPLE)) || (N(t)<2) || (L(t[1]) != TUPLE)) {
-		cerr << "\nt= " << t << "\n";
-		FAILED ("bad tag_info");
-	}
-	parent_info pi (t[0]);
-	int i, n= N(t[1]);
-	array<child_info> ci (n);
-	for (i=0; i<n; i++)
-		ci[i]= child_info (t[1][i]);
+    if ((!is_func (t, TUPLE)) || (N(t)<2) || (L(t[1]) != TUPLE)) {
+        failed_error << "t= " << t << "\n";
+        FAILED ("bad tag_info");
+    }
+    parent_info pi (t[0]);
+    int i, n= N(t[1]);
+    array<child_info> ci (n);
+    for (i=0; i<n; i++)
+        ci[i]= child_info (t[1][i]);
 	return tm_new<tag_info_rep> (pi, ci, N(t)==3? t[2]: tree (""));
 }
 
@@ -311,6 +329,18 @@ tag_info_rep::outer_border () {
 tag_info
 tag_info_rep::with_like () {
   pi.with_like= true;
+  return tag_info (pi, ci, extra);
+}
+
+tag_info
+tag_info_rep::var_parameter () {
+  pi.var_type= VAR_PARAMETER;
+  return tag_info (pi, ci, extra);
+}
+
+tag_info
+tag_info_rep::var_macro_parameter () {
+  pi.var_type= VAR_MACRO_PARAMETER;
   return tag_info (pi, ci, extra);
 }
 
@@ -454,6 +484,7 @@ tag_info_rep::get_index (int child, int n) {
 
 child_info&
 tag_info::operator () (int child, int n) {
+<<<<<<< HEAD
   int index= rep()->get_index (child, n);
   if (index < 0 || index >= N(rep()->ci)) {
     cout << "child       = " << child << "\n";
@@ -464,6 +495,18 @@ tag_info::operator () (int child, int n) {
     cout << "arity_extra = " << rep()->pi.arity_extra << "\n";
     cout << "N(ci)       = " << N(rep()->ci) << "\n";
     ASSERT (false, "index out of range");
+=======
+  int index= rep->get_index (child, n);
+  if (index < 0 || index >= N(rep->ci)) {
+    failed_error << "child       = " << child << "\n";
+    failed_error << "out of      = " << n << "\n";
+    failed_error << "child_mode  = " << rep->pi.child_mode << "\n";
+    failed_error << "arity_mode  = " << rep->pi.arity_mode << "\n";
+    failed_error << "arity_base  = " << rep->pi.arity_base << "\n";
+    failed_error << "arity_extra = " << rep->pi.arity_extra << "\n";
+    failed_error << "N(ci)       = " << N(rep->ci) << "\n";
+    FAILED ("index out of range");
+>>>>>>> a367f2ab232211064700f3e36e542a6e54adcbee
   }
   return rep()->ci [index];
 }

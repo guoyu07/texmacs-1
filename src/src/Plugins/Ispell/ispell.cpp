@@ -66,13 +66,13 @@ ispeller_rep::start () {
   }
   if (ln->alive) return "ok";
   string message= ln->start ();
-  if (DEBUG_IO) cout << "Aspell] Received " << message << "\n";
+  if (DEBUG_IO) debug_spell << "Received " << message << "\n";
   if (starts (message, "Error: ")) {
     if (ln->alive) ln->stop ();
     return message;
   }
   message= retrieve ();
-  if (DEBUG_IO) cout << "Aspell] Received " << message << "\n";
+  if (DEBUG_IO) debug_spell << "Received " << message << "\n";
 #ifdef OS_WIN32
   if (search_forwards (message, 0, "@(#)")) return "ok";
 #else
@@ -96,7 +96,7 @@ ispeller_rep::retrieve () {
       ln->listen (10000);
       string mess = ln->read (LINK_ERR);
       string extra= ln->read (LINK_OUT);
-      if (mess  != "") cerr << "TeXmacs] aspell error: " << mess << "\n";
+      if (mess  != "") io_error << "Aspell error: " << mess << "\n";
       if (extra == "") {
 	ln->stop ();
 	return "Error: aspell does not respond";
@@ -117,11 +117,13 @@ ispeller_rep::send (string cmd) {
 
 string
 ispell_encode (string lan, string s) {
+  (void) lan;
   return cork_to_utf8 (s);
 }
 
 string
 ispell_decode (string lan, string s) {
+  (void) lan;
   return utf8_to_cork (s);
 }
 
@@ -180,7 +182,7 @@ ispell_eval (string lan, string s) {
 
 string
 ispell_start (string lan) {
-  if (DEBUG_IO) cout << "Aspell] Start " << lan << "\n";
+  if (DEBUG_IO) debug_spell << "Start " << lan << "\n";
   ispeller sc= ispeller (lan);
   if (is_nil (sc)) sc= tm_new<ispeller_rep> (lan);
   return sc->start ();
@@ -188,7 +190,7 @@ ispell_start (string lan) {
 
 tree
 ispell_check (string lan, string s) {
-  if (DEBUG_IO) cout << "Aspell] Check " << s << "\n";
+  if (DEBUG_IO) debug_spell << "Check " << s << "\n";
   ispeller sc= ispeller (lan);
   if (is_nil (sc) || (!sc->ln->alive)) {
     string message= ispell_start (lan);
@@ -201,18 +203,18 @@ ispell_check (string lan, string s) {
 
 void
 ispell_accept (string lan, string s) {
-  if (DEBUG_IO) cout << "Aspell] Accept " << s << "\n";
+  if (DEBUG_IO) debug_spell << "Accept " << s << "\n";
   ispell_send (lan, "@" * s);
 }
 
 void
 ispell_insert (string lan, string s) {
-  if (DEBUG_IO) cout << "Aspell] Insert " << s << "\n";
+  if (DEBUG_IO) debug_spell << "Insert " << s << "\n";
   ispell_send (lan, "*" * s);
 }
 
 void
 ispell_done (string lan) {
-  if (DEBUG_IO) cout << "Aspell] End " << lan << "\n";
+  if (DEBUG_IO) debug_spell << "End " << lan << "\n";
   ispell_send (lan, "#");
 }

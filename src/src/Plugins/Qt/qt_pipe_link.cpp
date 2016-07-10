@@ -68,9 +68,11 @@ qt_pipe_link_rep::~qt_pipe_link_rep () {
 string
 qt_pipe_link_rep::start () {
   if (alive) return "busy";
-  if (DEBUG_AUTO) cerr << "TeXmacs] Launching '" << PipeLink.cmd << "'\n";
+  if (DEBUG_AUTO)
+    debug_shell << "Launching '" << PipeLink.cmd << "'\n";
   if (! PipeLink.launchCmd ()) {
-    if (DEBUG_AUTO) cerr << "TeXmacs] Error: cannot start '" << PipeLink.cmd << "'\n";
+    if (DEBUG_AUTO)
+      debug_shell << "TeXmacs] Error: cannot start '" << PipeLink.cmd << "'\n";
     return "Error: cannot start application";
   }
   alive= true;
@@ -81,8 +83,8 @@ void
 qt_pipe_link_rep::write (string s, int channel) {
   if ((!alive) || (channel != LINK_IN)) return;
   if (-1 == PipeLink.writeStdin (s)) {
-    cerr << "TeXmacs] Error: cannot write to '" << PipeLink.cmd << "'\n";
-    PipeLink.killProcess ();
+    io_error << "Error: cannot write to '" << PipeLink.cmd << "'\n";
+    stop();
   }
 }
 
@@ -129,9 +131,12 @@ qt_pipe_link_rep::listen (int msecs) {
 
 bool
 qt_pipe_link_rep::is_readable (int channel) {
-  if ((!alive) || ((channel != LINK_OUT) && (channel != LINK_ERR))) return false;
-  if (channel == LINK_OUT) PipeLink.listenChannel (QProcess::StandardOutput, 0);
-  else PipeLink.listenChannel (QProcess::StandardError, 0);
+  if ((!alive) || ((channel != LINK_OUT) && (channel != LINK_ERR)))
+    return false;
+  if (channel == LINK_OUT)
+    return PipeLink.listenChannel (QProcess::StandardOutput, 0);
+  else
+    return PipeLink.listenChannel (QProcess::StandardError, 0);
 }
 
 void
@@ -146,7 +151,7 @@ qt_pipe_link_rep::interrupt () {
 
 void
 qt_pipe_link_rep::stop () {
-  PipeLink.killProcess ();
+  PipeLink.killProcess (0);
   alive= false;
 }
 

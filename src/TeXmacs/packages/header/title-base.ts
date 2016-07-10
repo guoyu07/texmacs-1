@@ -1,4 +1,4 @@
-<TeXmacs|1.0.7.17>
+<TeXmacs|1.99.2>
 
 <style|<tuple|source|std-pattern>>
 
@@ -39,6 +39,12 @@
   <assign|keywords-text|<macro|<localize|Keywords>>>
 
   <assign|AMS-class-text|<macro|<localize|A.M.S. subject classification>>>
+
+  <assign|PACS-class-text|<macro|<localize|P.A.C.S. subject classification>>>
+
+  <assign|ACM-class-text|<macro|<localize|A.C.M. subject classification>>>
+
+  <assign|arXiv-class-text|<macro|<localize|ArXiv subject classification>>>
 
   <assign|with-TeXmacs-text|<macro|This document has been written using the
   GNU <TeXmacs> text editor (see <hlink|<with|font-family|tt|www.texmacs.org>|http://www.texmacs.org>).>>
@@ -94,6 +100,12 @@
   <drd-props|abstract|arity|1|accessible|all|border|no>
 
   <drd-props|abstract-msc|arity|<tuple|repeat|1|1>|accessible|all|border|no>
+
+  <drd-props|abstract-acm|arity|<tuple|repeat|1|1>|accessible|all|border|no>
+
+  <drd-props|abstract-arxiv|arity|<tuple|repeat|1|1>|accessible|all|border|no>
+
+  <drd-props|abstract-pacs|arity|<tuple|repeat|1|1>|accessible|all|border|no>
 
   <drd-props|abstract-keywords|arity|<tuple|repeat|1|1>|accessible|all|border|no>
 
@@ -183,6 +195,8 @@
     <surround|<vspace*|0.5fn>|<vspace|0.5fn>|<doc-author-block|<arg|body>>>
   </macro>>
 
+  <assign|author-misc-note|<macro|sym|id|misc|<doc-author-block|<doc-note-text|<arg|sym>|<arg|id>|<arg|misc>>>>>
+
   <assign|author-note|<\macro|note>
     <arg|note>
   </macro>>
@@ -250,9 +264,22 @@
   <assign|abstract-keywords|<xmacro|args|<style-with|src-compact|none|<no-indent><theorem-name|<keywords-text><localize|:>
   ><concat-tuple|<quote-arg|args>|, >>>>
 
-  <assign|msc-ref|<\macro|msc-id>
-    <style-with|src-compact|none|<hlink|<arg|msc-id>|<style-with|src-compact|none|<merge|http://www.ams.org/mathscinet/search/mscbrowse.html?sk=default&sk=|<arg|msc-id>|&submit=Search>>>>
-  </macro>>
+  <assign|acm-ref|<value|identity>>
+
+  <assign|abstract-acm|<xmacro|args|<style-with|src-compact|none|<no-indent><theorem-name|<ACM-class-text><localize|:>
+  ><concat-tuple|<map|acm-ref|<quote-arg|args>>|, >>>>
+
+  <assign|arxiv-ref|<macro|cat-id|<style-with|src-compact|none|<hlink|<arg|cat-id>|<style-with|src-compact|none|<merge|http://arxiv.org/find/all/1/cat%3A+|<arg|cat-id>|/0/1/0/all/0/1>>>>>>
+
+  <assign|abstract-arxiv|<xmacro|args|<style-with|src-compact|none|<no-indent><theorem-name|<arXiv-class-text><localize|:>
+  ><concat-tuple|<map|arxiv-ref|<quote-arg|args>>|, >>>>
+
+  <assign|pacs-ref|<value|identity>>
+
+  <assign|abstract-pacs|<xmacro|args|<style-with|src-compact|none|<no-indent><theorem-name|<PACS-class-text><localize|:>
+  ><concat-tuple|<map|pacs-ref|<quote-arg|args>>|, >>>>
+
+  <assign|msc-ref|<macro|msc-id|<style-with|src-compact|none|<hlink|<arg|msc-id>|<style-with|src-compact|none|<merge|http://www.ams.org/mathscinet/search/mscbrowse.html?sk=|<arg|msc-id>|&submit=Search>>>>>>
 
   <assign|abstract-msc|<xmacro|args|<style-with|src-compact|none|<no-indent><theorem-name|<AMS-class-text><localize|:>
   ><concat-tuple|<map|msc-ref|<quote-arg|args>>|, >>>>
@@ -272,7 +299,9 @@
   </macro>>
 
   <assign|abstract|<\macro|body>
-    <render-abstract|<arg|body>>
+    <\render-abstract>
+      <arg|body>
+    </render-abstract>
   </macro>>
 
   <\active*>

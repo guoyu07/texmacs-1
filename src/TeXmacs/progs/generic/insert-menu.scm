@@ -68,7 +68,20 @@
 	  ("Explained" (make 'glossary-explain))
 	  ("Duplicate" (make 'glossary-dup))
 	  ---
-	  ("Interjection" (make 'glossary-line))))
+	  ("Interjection" (make 'glossary-line)))
+      (-> "Alternate"
+          ("Bibliography"
+           (make-alternate "Name of bibliography" "bib" 'with-bib))
+          ("Table of contents"
+           (make-alternate "Name of table of contents" "toc" 'with-toc))
+          ("Index"
+           (make-alternate "Name of index" "idx" 'with-index))
+          ("Glossary"
+           (make-alternate "Name of glossary" "gly" 'with-glossary))
+          ("List of figures"
+           (make-alternate "Name of list of figures" "figure" 'with-figure-list))
+          ("List of tables"
+           (make-alternate "Name of list of tables" "table" 'with-table-list))))
   (if (and (style-has? "calc-dtd") (calc-ready?))
       ---
       (link calc-insert-menu)))
@@ -82,61 +95,44 @@
       ("Small figure" (make 'small-figure))
       ("Big figure" (make 'big-figure))
       ---)
-  ("Draw image" (make-graphics))
-  (when (selection-active-small?)
-    ("Draw over selection" (make-graphics-over-selection)))
   ("Link image" (choose-file make-link-image "Load image" "image"))
   ("Insert image" (choose-file make-inline-image "Load image" "image"))
   (if (detailed-menus?)
       ("Thumbnails" (make-thumbnails)))
   (if (or (lazy-plugin-force)
 	  (and (style-has? "scripts-dtd") (scripts-defined? "gnuplot")))
-      ---
-      (-> "Plot" (link scripts-plot-menu))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Insert animations
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(menu-bind insert-animation-menu
-  ("Fixed" (interactive make-anim-constant))
-  ("Compose" (make 'anim-compose))
-  ("Repeat" (make 'anim-repeat))
+      (-> "Plot" (link scripts-plot-menu)))
   ---
-  (-> "Translate"
-      ("Rightwards" (interactive make-anim-translate-right))
-      ("Leftwards" (interactive make-anim-translate-left))
-      ("Upwards" (interactive make-anim-translate-up))
-      ("Downwards" (interactive make-anim-translate-down)))
-  (-> "Progressive"
-      ("Rightwards" (interactive make-anim-progressive-right))
-      ("Leftwards" (interactive make-anim-progressive-left))
-      ("Upwards" (interactive make-anim-progressive-up))
-      ("Downwards" (interactive make-anim-progressive-down))
-      ("From center" (interactive make-anim-progressive-center)))
-  ---
-  ("Animation" (choose-file make-animation "Load file" "animation"))
-  ("Sound" (choose-file make-sound "Load file" "sound")))
+  ("Draw image" (make-graphics))
+  (when (selection-active-small?)
+    ("Draw over selection" (make-graphics-over-selection)))
+  ("Ink here" (make-graphics-over))
+  (if (in-math?)
+      ("Commutative diagram" (make-cd))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; The main Insert menu
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(menu-bind texmacs-insert-menu
+  (if (not (in-text?))
+      ("Text" (make 'text)))
+  (if (not (in-math?))
+      (-> "Mathematics" (link insert-math-menu)))
+  (-> "Table" (link insert-table-menu))
+  (-> "Image" (link insert-image-menu))
+  (-> "Link" (link insert-link-menu))
+  (if (detailed-menus?)
+      (if (style-has? "std-fold-dtd")
+          (-> "Fold" (link insert-fold-menu)))
+      (-> "Animation" (link insert-animation-menu)))
+  (if (and (style-has? "session-dtd") (detailed-menus?) (not (in-math?)))
+      (-> "Session" (link insert-session-menu))))
+
 (menu-bind insert-menu
   (if (in-text?) (link text-menu))
   (if (in-math?) (link math-menu))
-  (if (not (or (in-text?) (in-math?)))
-      ("Text" (make 'text))
-      (-> "Mathematics" (link insert-math-menu))
-      (-> "Table" (link insert-table-menu))
-      (-> "Image" (link insert-image-menu))
-      (-> "Link" (link insert-link-menu))
-      (if (detailed-menus?)
-	  (if (style-has? "std-fold-dtd")
-	      (-> "Fold" (link insert-fold-menu)))
-	  (-> "Animation" (link insert-animation-menu)))
-      (if (and (style-has? "session-dtd") (detailed-menus?) (in-text?))
-	  (-> "Session" (link insert-session-menu)))))
+  (if (not (or (in-text?) (in-math?))) (link texmacs-insert-menu)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; The main Insert icons

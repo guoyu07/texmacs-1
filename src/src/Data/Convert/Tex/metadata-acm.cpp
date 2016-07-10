@@ -10,6 +10,7 @@
 ******************************************************************************/
 
 #include "Tex/convert_tex.hpp"
+#include "metadata.hpp"
 
 static bool
 is_acm_titlenote (tree t) {
@@ -59,7 +60,7 @@ clean_acm_title_markup (tree t) {
 static array<tree>
 get_acm_author_datas (tree t) {
   int i, n=N(t);
-  bool line_break= false;
+  bool line_break= true;
   array<tree> r;
   tree u;
   tree author_data (APPLY, "\\author-data");
@@ -81,6 +82,7 @@ get_acm_author_datas (tree t) {
         r << author_data;
         author_data= tree (APPLY, "\\author-data");
       }
+      line_break= true;
     }
     else if (is_acm_titlenote (u))
       author_data << tree (APPLY, "\\author-note", u[1]);
@@ -126,16 +128,8 @@ collect_metadata_acm (tree t) {
   array<tree> doc_notes;
   for (i=0; i<n; i++) {
     u= t[i];
-    if (is_tuple (u, "\\conferenceinfo", 2))
-      doc_notes << tree (APPLY, "\\doc-note",
-                                concat ("Conference: ", u[1], "; ", u[2]));
-    else if (is_tuple (u, "\\CopyrightYear", 1))
-      doc_data << tree (APPLY, "\\doc-date", concat ("Copyright: ", u[1]));
-    else if (is_tuple (u, "\\date", 1))
+    if (is_tuple (u, "\\date", 1))
       doc_data << tree (APPLY, "\\doc-date", u[1]);
-    else if (is_tuple (u, "\\crdata", 1))
-      doc_notes << tree (APPLY, "\\doc-note",
-                                 concat ("Copyright datas: ", u[1]));
     else if (is_tuple (u, "\\title", 1)) {
       get_acm_title_notes (u[1], doc_notes);
       doc_data << tree (APPLY, "\\doc-title", catm (u[1]));
@@ -161,30 +155,38 @@ collect_metadata_acm (tree t) {
         abstract_text << t[i++];
       abstract_data << tree (APPLY, "\\abstract", abstract_text);
     }
-    else if (is_tuple (u, "\\keywords", 1) || is_tuple (u, "\\terms", 1)) {
-      tree tmp (CONCAT);
-      array<tree> kw;
-      for (int j=0; j<=N(u[1]); j++) {
-        if (j < N(u[1]) && u[1][j] != "," && !is_tuple(u[1][j], "\\tmsep"))
-          tmp << u[1][j];
-        else {
-          kw << tmp;
-          tmp= concat();
-        }
+    else if (is_tuple (u, "\\begin-keywords")) {
+      tree keywords (CONCAT);
+      i++;
+      while (i<n && !is_tuple (t[i], "\\end-keywords"))
+        keywords << t[i++];
+      array<tree> tmp= tokenize_concat (keywords, A(concat (",", ";",
+              tree (TUPLE, "\\tmsep"), tree (TUPLE, "\\tmSep"))));
+      if (N(tmp) > 0) {
+        tree kw= tree (APPLY, "\\abstract-keywords");
+        kw << tmp;
+        abstract_data << kw;
       }
-      tmp= tree (APPLY, "\\abstract-keywords");
-      for (int j=0; j<N(kw); j++) tmp << kw[j];
-      abstract_data << tmp;
+    }
+    else if (is_tuple (u, "\\tmmsc")  || is_tuple (u, "\\tmarxiv") ||
+             is_tuple (u, "\\tmpacs"))
+      abstract_data << collect_abstract_data (u);
+    else if (is_tuple (u, "\\keywords", 1) || is_tuple (u, "\\terms", 1)) {
+      array<tree> tmp= tokenize_concat (u[N(u)-1], A(concat (",", ";",
+              tree (TUPLE, "\\tmsep"), tree (TUPLE, "\\tmSep"))));
+      if (N(tmp) > 0) {
+        tree kw= tree (APPLY, "\\abstract-keywords");
+        kw << tmp;
+        abstract_data << kw;
+      }
     }
     else if (is_tuple (u, "\\category") || is_tuple (u, "\\category*")) {
-      tree tmp (APPLY, "\\abstract-msc");
+      tree tmp (APPLY, "\\abstract-acm");
       for (int j=1; j<N(u); j++) tmp << u[j];
       abstract_data << tmp;
     }
   }
-  if (N(doc_notes) > 0)
-    for (int j=0; j<N(doc_notes); j++)
-      doc_data << doc_notes[j];
+  if (N(doc_notes) > 0) doc_data << doc_notes;
   if (N(doc_data) > 1) r << doc_data << "\n";
   if (N(abstract_data) > 1) r << abstract_data << "\n";
   return r;

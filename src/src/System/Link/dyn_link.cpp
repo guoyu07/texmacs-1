@@ -25,7 +25,7 @@ static hashmap<string,pointer> dyn_linked (NULL);
 
 string
 symbol_install (string lib, string symb, pointer& f) {
-#ifndef __MINGW32__
+#if (defined (TM_DYNAMIC_LINKING) && !defined(__MINGW32__))
   // f becomes NULL in case of failure
   // status message returned
   string out;
@@ -36,7 +36,7 @@ symbol_install (string lib, string symb, pointer& f) {
     else {
       lib= concretize (name);
       c_string _lib (lib);
-      dyn_linked (lib)= dlopen (_lib, RTLD_LAZY);
+      dyn_linked (lib)= TM_DYNAMIC_LINKING (_lib, RTLD_LAZY);
       if (dyn_linked [lib] == NULL) {
 	const char *err = dlerror();
 	if (err != NULL) out= string ((char *) err);
@@ -59,7 +59,7 @@ symbol_install (string lib, string symb, pointer& f) {
     if (out == "") out= "Couldn't find dynamic library '" * lib * "'";
   }
 
-  if (DEBUG_AUTO) cout << "TeXmacs] " << out << "\n";
+  if (DEBUG_AUTO) debug_automatic << out << "\n";
   return out;
 #else
   return "Dynamic linking not implemented";
@@ -114,7 +114,7 @@ dyn_link_rep::start () {
   if (routs != NULL)
     return "continuation of#'" * lib * "'";
   if (DEBUG_AUTO)
-    cout << "TeXmacs] Installing dynamic link '" << lib << "'\n";
+    debug_automatic << "Installing dynamic link '" << lib << "'\n";
 
   string message= symbol_install (lib, symbol, routs);
   if (routs != NULL) {
@@ -144,7 +144,7 @@ dyn_link_rep::write (string s, int channel) {
 #ifndef __MINGW32__
   if ((!alive) || (channel != LINK_IN)) return;
   if (routs==NULL) {
-    cerr << "Library= " << lib << "\n";
+    failed_error << "Library= " << lib << "\n";
     FAILED ("library not installed");
   }
   package_exports_1* pack= (package_exports_1*) routs;

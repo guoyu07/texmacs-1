@@ -27,8 +27,8 @@ void mac_fix_paths ();
 #endif
 
 #ifdef QTTEXMACS
+#include "Qt/QTMApplication.hpp"
 #include "Qt/qt_utilities.hpp"
-#include <QApplication>
 #include <QDir>
 #endif
 
@@ -41,7 +41,6 @@ void mac_fix_paths ();
 #endif
 
 extern bool   char_clip;
-extern bool   reverse_colors;
 
 extern url    tm_init_file;
 extern url    tm_init_buffer_file;
@@ -52,6 +51,10 @@ extern int geometry_x, geometry_y;
 
 extern tree the_et;
 extern bool texmacs_started;
+
+bool disable_error_recovery= false;
+bool start_server_flag= false;
+void server_start ();
 
 tm_ostream& cout= tm_ostream::cout;
 tm_ostream& cerr= tm_ostream::cerr;
@@ -75,6 +78,7 @@ test_routines () {
 
 void 
 clean_exit_on_segfault (int sig_num) {
+  (void) sig_num;
   FAILED ("segmentation fault");
 }
 
@@ -148,8 +152,8 @@ TeXmacs_init_paths (int& argc, char** argv) {
   
   if (get_env ("TEXMACS_PATH") == "")
     set_env ("TEXMACS_PATH", as_string (exedir * ".."));
-  if (get_env ("HOME") == "")
-    set_env ("HOME", get_env("USERPROFILE"));
+//  if (get_env ("HOME") == "") //now set in immediate_options otherwise --setup option fails
+//    set_env ("HOME", get_env("USERPROFILE"));
   // HACK
   // In WINE the variable PWD is already in the outer Unix environment 
   // so we need to override it to have a correct behaviour
@@ -179,25 +183,29 @@ TeXmacs_main (int argc, char** argv) {
       if ((N(s)>=2) && (s(0,2)=="--")) s= s (1, N(s));
       if ((s == "-s") || (s == "-silent")) flag= false;
       else if ((s == "-V") || (s == "-verbose"))
-	debug (DEBUG_FLAG_VERBOSE, true);
+        debug (DEBUG_FLAG_VERBOSE, true);
       else if ((s == "-d") || (s == "-debug")) debug (DEBUG_FLAG_STD, true);
       else if (s == "-debug-events") debug (DEBUG_FLAG_EVENTS, true);
       else if (s == "-debug-io") debug (DEBUG_FLAG_IO, true);
       else if (s == "-debug-bench") debug (DEBUG_FLAG_BENCH, true);
       else if (s == "-debug-history") debug (DEBUG_FLAG_HISTORY, true);
       else if (s == "-debug-qt") debug (DEBUG_FLAG_QT, true);
+      else if (s == "-debug-qt-widgets") debug (DEBUG_FLAG_QT_WIDGETS, true);
       else if (s == "-debug-keyboard") debug (DEBUG_FLAG_KEYBOARD, true);
       else if (s == "-debug-packrat") debug (DEBUG_FLAG_PACKRAT, true);
       else if (s == "-debug-flatten") debug (DEBUG_FLAG_FLATTEN, true);
       else if (s == "-debug-correct") debug (DEBUG_FLAG_CORRECT, true);
+      else if (s == "-debug-convert") debug (DEBUG_FLAG_CONVERT, true);
       else if (s == "-debug-all") {
-	debug (DEBUG_FLAG_EVENTS, true);
-	debug (DEBUG_FLAG_STD, true);
-	debug (DEBUG_FLAG_IO, true);
-	debug (DEBUG_FLAG_HISTORY, true);
-	debug (DEBUG_FLAG_BENCH, true);
-	debug (DEBUG_FLAG_QT, true);
+        debug (DEBUG_FLAG_EVENTS, true);
+        debug (DEBUG_FLAG_STD, true);
+        debug (DEBUG_FLAG_IO, true);
+        debug (DEBUG_FLAG_HISTORY, true);
+        debug (DEBUG_FLAG_BENCH, true);
+        debug (DEBUG_FLAG_QT, true);
+        debug (DEBUG_FLAG_QT_WIDGETS, true);
       }
+      else if (s == "-disable-error-recovery") disable_error_recovery= true;
       else if ((s == "-fn") || (s == "-font")) {
 	i++;
 	if (i<argc) the_default_font= argv[i];
@@ -254,7 +262,27 @@ TeXmacs_main (int argc, char** argv) {
       else if ((s == "-q") || (s == "-quit"))
 	my_init_cmds= my_init_cmds * " (quit-TeXmacs)";
       else if ((s == "-r") || (s == "-reverse"))
-	reverse_colors= true;
+	set_reverse_colors (true);
+      else if (s == "-no-retina") {
+        retina_manual= true;
+        retina_factor= 1;
+        retina_icons = 1;
+	retina_scale = 1.0;
+      }
+      else if ((s == "-R") || (s == "-retina")) {
+        retina_manual= true;
+        retina_factor= 2;
+        retina_icons = 2;
+	retina_scale = 1.4;
+      }
+      else if (s == "-no-retina-icons") {
+        retina_iman  = true;
+        retina_icons = 1;
+      }
+      else if (s == "-retina-icons") {
+        retina_iman  = true;
+        retina_icons = 2;
+      }
       else if ((s == "-c") || (s == "-convert")) {
 	i+=2;
 	if (i<argc) {
@@ -269,13 +297,15 @@ TeXmacs_main (int argc, char** argv) {
 	i++;
 	if (i<argc) my_init_cmds= (my_init_cmds * " ") * argv[i];
       }
+      else if (s == "-server") start_server_flag= true;
       else if (s == "-log-file") i++;
       else if ((s == "-Oc") || (s == "-no-char-clipping")) char_clip= false;
       else if ((s == "+Oc") || (s == "-char-clipping")) char_clip= true;
       else if ((s == "-S") || (s == "-setup") ||
 	       (s == "-delete-cache") || (s == "-delete-font-cache") ||
 	       (s == "-delete-style-cache") || (s == "-delete-file-cache") ||
-	       (s == "-delete-doc-cache") || (s == "-delete-plugin-cache"));
+	       (s == "-delete-doc-cache") || (s == "-delete-plugin-cache") ||
+	       (s == "-delete-server-data") || (s == "-delete-databases"));
       else if (starts (s, "-psn"));
       else {
 	cout << "\n";
@@ -304,11 +334,34 @@ TeXmacs_main (int argc, char** argv) {
     }
   if (flag) debug (DEBUG_FLAG_AUTO, true);
 
-  if (DEBUG_STD) cout << "TeXmacs] Installing internal plug-ins...\n";
+  // Further options via environment variables
+  if (get_env ("TEXMACS_RETINA") == "off") {
+    retina_manual= true;
+    retina_factor= 1;
+    retina_icons = 1;
+    retina_scale = 1.0;
+  }
+  if (get_env ("TEXMACS_RETINA") == "on") {
+    retina_manual= true;
+    retina_factor= 2;
+    retina_icons = 2;
+    retina_scale = 1.4;
+  }
+  if (get_env ("TEXMACS_RETINA_ICONS") == "off") {
+    retina_iman  = true;
+    retina_icons = 1;
+  }
+  if (get_env ("TEXMACS_RETINA_ICONS") == "on") {
+    retina_iman  = true;
+    retina_icons = 2;
+  }
+  // End options via environment variables
+  
+  if (DEBUG_STD) debug_boot << "Installing internal plug-ins...\n";
   bench_start ("initialize plugins");
   init_plugins ();
   bench_cumul ("initialize plugins");
-  if (DEBUG_STD) cout << "TeXmacs] Opening display...\n";
+  if (DEBUG_STD) debug_boot << "Opening display...\n";
   
 #if defined(X11TEXMACS) && defined(MACOSX_EXTENSIONS)
   init_mac_application ();
@@ -316,7 +369,7 @@ TeXmacs_main (int argc, char** argv) {
     
   gui_open (argc, argv);
   set_default_font (the_default_font);
-  if (DEBUG_STD) cout << "TeXmacs] Starting server...\n";
+  if (DEBUG_STD) debug_boot << "Starting server...\n";
   { // opening scope for server sv
   server sv;
 
@@ -332,7 +385,7 @@ TeXmacs_main (int argc, char** argv) {
     string s= argv[i];
     if ((N(s)>=2) && (s(0,2)=="--")) s= s (1, N(s));
     if ((s[0] != '-') && (s[0] != '+')) {
-      if (DEBUG_STD) cout << "TeXmacs] Loading " << s << "...\n";
+      if (DEBUG_STD) debug_boot << "Loading " << s << "...\n";
       url u= url_system (s);
       if (!is_rooted (u)) u= resolve (url_pwd (), "") * u;
       string b= scm_quote (as_string (u));
@@ -349,7 +402,7 @@ TeXmacs_main (int argc, char** argv) {
              (s == "-log-file")) i++;
   }
   if (install_status == 1) {
-    if (DEBUG_STD) cout << "TeXmacs] Loading welcome message...\n";
+    if (DEBUG_STD) debug_boot << "Loading welcome message...\n";
     url u= "tmfs://help/plain/tm/doc/about/welcome/first.en.tm";
     string b= scm_quote (as_string (u));
     string cmd= "(load-buffer " * b * " " * where * ")";
@@ -357,7 +410,7 @@ TeXmacs_main (int argc, char** argv) {
     exec_delayed (scheme_cmd (cmd));
   }
   else if (install_status == 2) {
-    if (DEBUG_STD) cout << "TeXmacs] Loading upgrade message...\n";
+    if (DEBUG_STD) debug_boot << "Loading upgrade message...\n";
     url u= "tmfs://help/plain/tm/doc/about/changes/changes-recent.en.tm";
     string b= scm_quote (as_string (u));
     string cmd= "(load-buffer " * b * " " * where * ")";
@@ -365,7 +418,7 @@ TeXmacs_main (int argc, char** argv) {
     exec_delayed (scheme_cmd (cmd));
   }
   if (number_buffers () == 0) {
-    if (DEBUG_STD) cout << "TeXmacs] Creating 'no name' buffer...\n";
+    if (DEBUG_STD) debug_boot << "Creating 'no name' buffer...\n";
     open_window ();
   }
 
@@ -374,22 +427,23 @@ TeXmacs_main (int argc, char** argv) {
   bench_reset ("initialize plugins");
   bench_reset ("initialize scheme");
 
-  if (DEBUG_STD) cout << "TeXmacs] Starting event loop...\n";
+  if (DEBUG_STD) debug_boot << "Starting event loop...\n";
   texmacs_started= true;
-  signal (SIGSEGV, clean_exit_on_segfault);
+  if (!disable_error_recovery) signal (SIGSEGV, clean_exit_on_segfault);
+  if (start_server_flag) server_start ();
   gui_start_loop ();
 
-  if (DEBUG_STD) cout << "TeXmacs] Stopping server...\n";
+  if (DEBUG_STD) debug_boot << "Stopping server...\n";
   } // ending scope for server sv
 
-  if (DEBUG_STD) cout << "TeXmacs] Closing display...\n";
+  if (DEBUG_STD) debug_boot << "Closing display...\n";
   gui_close ();
   
 #if defined(X11TEXMACS) && defined(MACOSX_EXTENSIONS)
   finalize_mac_application ();
 #endif
   
-  if (DEBUG_STD) cout << "TeXmacs] Good bye...\n";
+  if (DEBUG_STD) debug_boot << "Good bye...\n";
 }
 
 /******************************************************************************
@@ -415,6 +469,19 @@ boot_hacks () {
   //getrlimit (RLIMIT_NOFILE, &lims);
   //printf ("cur: %i\n", lims.rlim_cur);
   //printf ("max: %i\n", lims.rlim_max);
+#if defined(MAC_OS_X_VERSION_10_10)
+  mac_fix_yosemite_bug();
+#endif
+
+#ifdef QTTEXMACS
+#if defined(MAC_OS_X_VERSION_10_9) || defined(MAC_OS_X_VERSION_10_10)
+#if QT_VERSION <= QT_VERSION_CHECK(4,8,5)
+  // Work around Qt bug: https://bugreports.qt-project.org/browse/QTBUG-32789
+  QFont::insertSubstitution (".Lucida Grande UI", "Lucida Grande");
+#endif
+#endif
+#endif
+
 #endif
 }
 
@@ -426,9 +493,11 @@ void
 immediate_options (int argc, char** argv) {
   if (get_env ("TEXMACS_HOME_PATH") == "")
 #ifdef __MINGW32__
-    set_env ("TEXMACS_HOME_PATH", get_env ("APPDATA") * "/TeXmacs");
+    if (get_env ("HOME") == "")
+        set_env ("HOME", get_env("USERPROFILE"));
+    set_env ("TEXMACS_HOME_PATH", get_env ("APPDATA") * "\\TeXmacs");
 #else
-  set_env ("TEXMACS_HOME_PATH", get_env ("HOME") * "/.TeXmacs");
+    set_env ("TEXMACS_HOME_PATH", get_env ("HOME") * "/.TeXmacs");
 #endif
   if (get_env ("TEXMACS_HOME_PATH") == "") return;
   for (int i=1; i<argc; i++) {
@@ -440,6 +509,7 @@ immediate_options (int argc, char** argv) {
       remove (url ("$TEXMACS_HOME_PATH/system/cache") * url_wildcard ("*"));
       remove (url ("$TEXMACS_HOME_PATH/fonts/font-database.scm"));
       remove (url ("$TEXMACS_HOME_PATH/fonts/font-features.scm"));
+      remove (url ("$TEXMACS_HOME_PATH/fonts/font-characteristics.scm"));
       remove (url ("$TEXMACS_HOME_PATH/fonts/error") * url_wildcard ("*"));
     }
     else if (s == "-delete-cache")
@@ -450,6 +520,7 @@ immediate_options (int argc, char** argv) {
       remove (url ("$TEXMACS_HOME_PATH/system/cache/font_cache.scm"));
       remove (url ("$TEXMACS_HOME_PATH/fonts/font-database.scm"));
       remove (url ("$TEXMACS_HOME_PATH/fonts/font-features.scm"));
+      remove (url ("$TEXMACS_HOME_PATH/fonts/font-characteristics.scm"));
       remove (url ("$TEXMACS_HOME_PATH/fonts/error") * url_wildcard ("*"));
     }
     else if (s == "-delete-doc-cache") {
@@ -463,15 +534,22 @@ immediate_options (int argc, char** argv) {
       remove (url ("$TEXMACS_HOME_PATH/system/cache/dir_cache.scm"));
       remove (url ("$TEXMACS_HOME_PATH/system/cache/stat_cache.scm"));
     }
-    else if (s == "-delete-plugin-cache") {
+    else if (s == "-delete-plugin-cache")
       remove (url ("$TEXMACS_HOME_PATH/system/cache/plugin_cache.scm"));
+    else if (s == "-delete-server-data")
+      system ("rm -rf", url ("$TEXMACS_HOME_PATH/server"));
+    else if (s == "-delete-databases") {
+      system ("rm -rf", url ("$TEXMACS_HOME_PATH/system/database"));
+      system ("rm -rf", url ("$TEXMACS_HOME_PATH/users"));
     }
     else if (s == "-log-file" && i + 1 < argc) {
       i++;
       char* log_file = argv[i];
-      FILE* f= fopen (log_file, "w");
-      if (! f || ! cout.open (f) || ! cerr.open (f))
+      tm_ostream logf (log_file);
+      if (!logf->is_writable ())
         cerr << "TeXmacs] Error: could not open " << log_file << "\n";
+      cout.redirect (logf);
+      cerr.redirect (logf);
     }
   }
 }
@@ -496,7 +574,7 @@ main (int argc, char** argv) {
 #endif
 #ifdef QTTEXMACS
   // initialize the Qt application infrastructure
-  new QApplication (argc, argv);
+  new QTMApplication (argc, argv);
 #endif
   TeXmacs_init_paths (argc, argv);
   //cout << "Bench  ] Started TeXmacs\n";
@@ -513,7 +591,5 @@ main (int argc, char** argv) {
 //  test_environments ();
 //#endif
   start_scheme (argc, argv, TeXmacs_main);
-  cout.close ();
-  cerr.close ();
   return 0;
 }

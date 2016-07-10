@@ -43,6 +43,7 @@ texmacs_input_rep::texmacs_input_rep (string type2):
   mode (get_mode (format)),
   channel (type),
   stack (""),
+  ignore_verb (false),
   docs (tree (DOCUMENT, "")) { bof (); }
 
 texmacs_input::texmacs_input (string type)
@@ -112,10 +113,15 @@ texmacs_input_rep::put (char c) { // returns true when expecting input
       flush (true);
       status= STATUS_BEGIN;
     }
+    else if (c == DATA_ABORT && format == "verbatim" && buf == "") {
+      // Aborting sessions allows completion with a naive read-eval loop
+      ignore_verb= true;
+    }
     else if (c == DATA_END) {
       flush (true);
       end ();
       block_done= (stack == "");
+      ignore_verb= (ignore_verb && stack != "");
     }
     else buf << c;
     break;
@@ -223,7 +229,10 @@ texmacs_input_rep::flush (bool force) {
 void
 texmacs_input_rep::verbatim_flush (bool force) {
   if (force || ends (buf, "\n")) {
-    write (verbatim_to_tree (buf, false, "utf-8"));
+    if (!ignore_verb)
+      write (verbatim_to_tree (buf, false, "auto"));
+    else if (DEBUG_IO)
+      debug_io << "ignore verbatim (aborted input)" << LF;
     buf= "";
   }
 }
@@ -255,18 +264,19 @@ texmacs_input_rep::html_flush (bool force) {
 void
 texmacs_input_rep::ps_flush (bool force) {
   if (force) {
-    string w= "";
+    string pref= get_preference ("plugins:embedded postscript width");
+    string w= (pref == "default") ? "0.7par" : pref;
     string h= "";
     string b= copy (buf);
     while (true)
       if (starts (b, "width=") || starts (b, "height=")) {
-	int i=0;
-	for (i=0; i<N(b); i++)
-	  if (b[i] == '\n') break;
-	if (i == N(b)) break;
-	if (b[0] == 'w') w= b (6, i);
-	else h= b (7, i);
-	b= b (i+1, N(b));
+        int i=0;
+        for (i=0; i<N(b); i++)
+          if (b[i] == '\n') break;
+        if (i == N(b)) break;
+        if (b[0] == 'w') w= b (6, i);
+        else h= b (7, i);
+        b= b (i+1, N(b));
       }
       else break;
     tree t (IMAGE, tuple (tree (RAW_DATA, b), "ps"));

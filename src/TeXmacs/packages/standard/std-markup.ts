@@ -1,4 +1,4 @@
-<TeXmacs|1.0.7.15>
+<TeXmacs|1.99.5>
 
 <style|<tuple|source|std>>
 
@@ -41,6 +41,8 @@
   <assign|LaTeX|<macro|<active*|L<rsup|<space|-0.8spc><move|A|0fn|-0.1fn>><space|-0.2spc>T<rsub|<space|-0.4spc><move|<resize|<with|math-level|0|E>||||0.5fn>|0fn|-0.1fn>><space|-0.4spc>X>>>
 
   <assign|LaTeXe|<macro|<active*|L<rsup|<space|-0.8spc><move|A|0fn|-0.1fn>><space|-0.2spc>T<rsub|<space|-0.4spc><move|<resize|<with|math-level|0|E>||||0.5fn>|0fn|-0.1fn>><space|-0.4spc>X<compound|math|>><space|0.2spc>2<move|<math|\<varepsilon\>>|-0.0fn|-0.15fn>>>
+
+  <assign|LaTeX*|<macro|<active*|(L<rsup|<space|-0.8spc><move|A|0fn|-0.1fn>><space|-0.2spc>)<space|-0.2spc>T<rsub|<space|-0.4spc><move|<resize|<with|math-level|0|E>||||0.5fn>|0fn|-0.1fn>><space|-0.4spc>X>>>
 
   <assign|BibTeX|<macro|<active*|<with|font-shape|small-caps|Bib>T<rsub|<space|-0.4spc><move|<resize|<with|math-level|0|E>||||0.5fn>|0fn|-0.1fn>><space|-0.4spc>X>>>
 
@@ -97,7 +99,7 @@
 
   <\active*>
     <\src-comment>
-      Below follow some frequently used content tags.
+      Frequently used content tags.
     </src-comment>
   </active*>
 
@@ -147,6 +149,8 @@
 
   <assign|chinese|<macro|body|<with|language|chinese|<arg|body>>>>
 
+  <assign|croatian|<macro|body|<with|language|croatian|<arg|body>>>>
+
   <assign|czech|<macro|body|<with|language|czech|<arg|body>>>>
 
   <assign|danish|<macro|body|<with|language|danish|<arg|body>>>>
@@ -189,45 +193,35 @@
 
   <\active*>
     <\src-comment>
-      Below follow some frequently used content environments.
+      Frequently used content environments.
     </src-comment>
   </active*>
 
-  <assign|padded|<\macro|body>
-    <\padded-normal|0.5fn|0.5fn>
-      <arg|body>
-    </padded-normal>
-  </macro>>
+  <assign|tab-length|<macro|1.5fn>>
 
-  <assign|underlined|<\macro|body>
-    <padded|<wide-std-underlined|<arg|body>>>
-  </macro>>
+  <assign|quote-left-indentation|2tab>
 
-  <assign|bothlined|<\macro|body>
-    <padded|<wide-std-bothlined|<arg|body>>>
-  </macro>>
+  <assign|quote-right-indentation|2tab>
 
-  <assign|framed|<\macro|body>
-    <padded|<wide-std-framed|<arg|body>>>
-  </macro>>
+  <assign|quote-interparagraph|0.25fn>
 
-  <assign|center|<macro|body|<with|par-mode|center|<arg|body>>>>
+  <assign|verse-hangover|1tab>
 
-  <assign|left-aligned|<macro|body|<with|par-mode|left|<arg|body>>>>
+  <assign|jump-in-hangover|1tab>
 
-  <assign|right-aligned|<macro|body|<with|par-mode|right|<arg|body>>>>
+  \;
 
   <assign|quote-env|<\macro|body>
     <\padded>
-      <\indent-both|3fn|3fn>
-        <with|par-first|0fn|par-par-sep|0.25fn|<arg|body>>
+      <\indent-both|<value|quote-left-indentation>|<value|quote-right-indentation>>
+        <with|par-first|0fn|par-par-sep|<value|quote-interparagraph>|<arg|body>>
       </indent-both>
     </padded>
   </macro>>
 
   <assign|quotation|<\macro|body>
     <\padded>
-      <\indent-both|3fn|3fn>
+      <\indent-both|<value|quote-left-indentation>|<value|quote-right-indentation>>
         <surround|<yes-indent>||<arg|body>>
       </indent-both>
     </padded>
@@ -235,15 +229,15 @@
 
   <assign|verse|<\macro|body>
     <\padded>
-      <\indent-both|4.5fn|3fn>
-        <with|par-first|-1.5fn|par-par-sep|0.fn|<surround|<yes-indent>||<arg|body>>>
+      <\indent-both|<plus|<value|quote-left-indentation>|<value|verse-hangover>>|<value|quote-right-indentation>>
+        <with|par-first|<minus|<value|verse-hangover>>|par-par-sep|0.fn|<surround|<yes-indent>||<arg|body>>>
       </indent-both>
     </padded>
   </macro>>
 
   <assign|jump-in|<\macro|body>
     <\surround||<right-flush>>
-      <\with|par-left|<plus|<value|par-left>|1.5fn>|par-first|-1.5fn>
+      <\with|par-left|<plus|<value|par-left>|<value|jump-in-hangover>>|par-first|<minus|<value|jump-in-hangover>>>
         <arg|body>
       </with>
     </surround>
@@ -257,18 +251,41 @@
     </surround>
   </macro>>
 
+  <assign|ultra-compact|<\macro|body>
+    <\surround||<right-flush>>
+      <\with|par-sep|0fn|par-ver-sep|0fn|par-line-sep|0fn|par-par-sep|0fn>
+        <arg|body>
+      </with>
+    </surround>
+  </macro>>
+
+  <assign|indivisible|<\macro|body>
+    <\surround|<no-break-start>|<no-break-end><right-flush>>
+      <arg|body>
+    </surround>
+  </macro>>
+
+  \;
+
+  <assign|center|<macro|body|<with|par-mode|center|<arg|body>>>>
+
+  <assign|left-aligned|<macro|body|<with|par-mode|left|<arg|body>>>>
+
+  <assign|right-aligned|<macro|body|<with|par-mode|right|<arg|body>>>>
+
+  \;
+
   <assign|verbatim|<macro|body|<with|font-family|tt|language|verbatim|<arg|body>>>>
 
   <assign|code|<\macro|body>
-    <\padded-normal|1fn|1fn>
-      <surround||<htab|5mm>|<with|font-family|tt|language|verbatim|par-first|0fn|<arg|body>>>
-    </padded-normal>
+    <\padded*>
+      <surround||<htab|5mm>|<with|font-family|tt|language|verbatim|par-first|0fn|par-par-sep|0fn|<arg|body>>>
+    </padded*>
   </macro>>
 
   <\active*>
     <\src-comment>
-      The following environments complete the most basic tabular
-      environments.
+      Basic tabular environments.
     </src-comment>
   </active*>
 
@@ -278,13 +295,17 @@
 
   <assign|block*|<macro|body|<tformat|<cwith|1|-1|1|-1|cell-rborder|1ln>|<cwith|1|-1|1|-1|cell-bborder|1ln>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|-1|1|1|cell-lborder|1ln>|<cwith|1|-1|1|-1|cell-halign|c>|<arg|body>>>>
 
+  <assign|wide-tabular|<macro|body|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<twith|table-block|yes>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-hpart|0.001>|<cwith|1|-1|1|1|cell-lsep|0fn>|<cwith|1|-1|-1|-1|cell-rsep|0fn>|<arg|body>>>>
+
+  <assign|wide-block|<macro|body|<tformat|<twith|table-width|1par>|<twith|table-hmode|exact>|<twith|table-block|yes>|<cwith|1|-1|1|-1|cell-hyphen|t>|<cwith|1|-1|1|-1|cell-hpart|0.001>|<cwith|1|-1|1|-1|cell-rborder|1ln>|<cwith|1|-1|1|-1|cell-bborder|1ln>|<cwith|1|1|1|-1|cell-tborder|1ln>|<cwith|1|-1|1|1|cell-lborder|1ln>|<arg|body>>>>
+
   <\active*>
     <\src-comment>
-      Other presentation tags.
+      Transparency.
     </src-comment>
   </active*>
 
-  <assign|with-opacity|<macro|fact|body|<with|opacity|<times|<arg|fact>|<value|opacity>>|<arg|body>>>>
+  <assign|with-opacity|<macro|factor|body|<with|opacity|<times|<arg|factor>|<value|opacity>>|<arg|body>>>>
 
   <assign|pastel|<macro|body|<with-opacity|0.1|<arg|body>>>>
 
@@ -294,24 +315,6 @@
 
   \;
 
-  <assign|hresize|<macro|body|left|right|<resize|<arg|body>|<arg|left>||<arg|right>|>>>
-
-  <assign|hextend|<macro|body|right|<resize|<arg|body>|||<maximum|1r|<arg|right>>|>>>
-
-  <assign|vresize|<macro|body|bottom|top|<resize|<arg|body>||<arg|bottom>||<arg|top>>>>
-
-  <assign|bcorrect|<macro|body|<resize|<arg|body>||<minimum|1b|1fnbot>||>>>
-
-  <assign|tcorrect|<macro|body|<resize|<arg|body>||||<maximum|1t|1fntop>>>>
-
-  <assign|vcorrect|<macro|body|<resize|<arg|body>||<minimum|1b|1fnbot>||<maximum|1t|1fntop>>>>
-
-  <assign|smash|<macro|body|<vresize|<arg|body>|0ex|1ex>>>
-
-  <assign|smash-top|<macro|body|<vresize|<arg|body>||1ex>>>
-
-  <assign|smash-bottom|<macro|body|<vresize|<arg|body>|0ex|>>>
-
   <assign|phantom|<macro|body|<if*|false|<arg|body>>>>
 
   <drd-props|phantom|arity|1|accessible|none|syntax|<macro|body|>>
@@ -320,30 +323,138 @@
 
   <assign|vphantom|<macro|body|<hresize|<phantom|<arg|body>>|0em|0em>>>
 
+  <\active*>
+    <\src-comment>
+      Adjusting the sizes of boxes.
+    </src-comment>
+  </active*>
+
+  <assign|hresize|<macro|body|left|right|<resize|<arg|body>|<arg|left>||<arg|right>|>>>
+
+  <assign|vresize|<macro|body|bottom|top|<resize|<arg|body>||<arg|bottom>||<arg|top>>>>
+
+  <assign|smash|<macro|body|<vresize|<arg|body>|0ex|1ex>>>
+
+  <assign|smash-top|<macro|body|<vresize|<arg|body>|1b|1ex>>>
+
+  <assign|smash-bottom|<macro|body|<vresize|<arg|body>|0ex|1t>>>
+
+  <assign|reduce-by|<macro|body|by|<vresize|<arg|body>|<plus|1b|<arg|by>>|<minus|1t|<arg|by>>>>>
+
+  <assign|reduce-top-by|<macro|body|by|<vresize|<arg|body>||<minus|1t|<arg|by>>>>>
+
+  <assign|reduce-bottom-by|<macro|body|by|<vresize|<arg|body>|<plus|1b|<arg|by>>|>>>
+
+  \;
+
+  <assign|extend|<macro|body|left|bottom|right|top|<style-with|src-compact|none|<resize|<arg|body>|<if|<equal|<arg|left>|>|1l|<minimum|1l|<arg|left>>>|<if|<equal|<arg|bottom>|>|1b|<minimum|1b|<arg|bottom>>>|<if|<equal|<arg|right>|>|1r|<maximum|1r|<arg|right>>>|<if|<equal|<arg|top>|>|1t|<maximum|1t|<arg|top>>>>>>>
+
+  <assign|extend-right|<macro|body|right|<resize|<arg|body>|||<maximum|1r|<arg|right>>|>>>
+
+  <assign|swell|<macro|body|<resize|<arg|body>||<minimum|1b|1fnbot>||<maximum|1t|1fntop>>>>
+
+  <assign|swell-bottom|<macro|body|<resize|<arg|body>||<minimum|1b|1fnbot>||>>>
+
+  <assign|swell-top|<macro|body|<resize|<arg|body>||||<maximum|1t|1fntop>>>>
+
+  \;
+
   <assign|mini-paragraph|<macro|width|body|<tabular|<tformat|<cwith|1|1|1|1|cell-hyphen|t>|<cwith|1|1|1|1|cell-lsep|0spc>|<cwith|1|1|1|1|cell-rsep|0spc>|<twith|table-width|<arg|width>>|<twith|table-hmode|exact>|<twith|table-valign|T>|<table|<row|<\cell>
     <arg|body>
   </cell>>>>>>>
 
   <drd-props|mini-paragraph|arity|2|length|0|accessible|1>
 
-  \;
+  <\active*>
+    <\src-comment>
+      Frames.
+    </src-comment>
+  </active*>
 
   <assign|frame|<macro|body|<block|<tformat|<table|<row|<cell|<arg|body>>>>>>>>
 
   <assign|colored-frame|<macro|col|body|<block|<tformat|<cwith|1|1|1|1|cell-background|<arg|col>>|<table|<row|<cell|<arg|body>>>>>>>>
 
-  <assign|overline|<macro|body|<eval|<quasiquote|<style-with|src-compact|none|<datoms|<macro|body|<with|color|<unquote|<value|color>>|<wide|<arg|body>|\<wide-bar\>>>>|<arg|body>>>>>>>
-
-  <drd-props|overline|with-like|yes|arity|1|accessible|all>
-
-  <assign|underline|<macro|body|<eval|<quasiquote|<style-with|src-compact|none|<datoms|<macro|body|<with|color|<unquote|<value|color>>|<wide*|<arg|body>|\<wide-bar\>>>>|<arg|body>>>>>>>
-
-  <drd-props|underline|with-like|yes|arity|1|accessible|all>
-
   <assign|tmfs-title|<\macro|name>
     <surround||<vspace|1fn>|<block*|<tformat|<cwith|1|1|1|1|cell-background|pastel
     blue>|<twith|table-width|1par>|<twith|table-hmode|exact>|<cwith|1|1|1|1|cell-lsep|2spc>|<cwith|1|1|1|1|cell-rsep|2spc>|<cwith|1|1|1|1|cell-bsep|2spc>|<cwith|1|1|1|1|cell-tsep|2spc>|<table|<row|<cell|<large|<strong|<arg|name>>>>>>>>>
   </macro>>
+
+  <\active*>
+    <\src-comment>
+      Decorated text.
+    </src-comment>
+  </active*>
+
+  <assign|overline|<macro|body|<quasi|<style-with|src-compact|none|<datoms|<macro|x|<with|color|<unquote|<value|color>>|<wide|<arg|x>|\<wide-bar\>>>>|<arg|body>>>>>>
+
+  <drd-props|overline|with-like|yes|arity|1|accessible|all>
+
+  <assign|underline|<macro|body|<quasi|<style-with|src-compact|none|<datoms|<macro|x|<with|color|<unquote|<value|color>>|<wide*|<arg|x>|\<wide-bar\>>>>|<arg|body>>>>>>
+
+  <drd-props|underline|with-like|yes|arity|1|accessible|all>
+
+  <assign|strike-through|<macro|body|<quasi|<style-with|src-compact|none|<datoms|<macro|x|<with|color|<unquote|<value|color>>|<repeat|<arg|x>|<resize|-|<plus|1l|0.1fn>||<plus|1r|-0.1fn>|>>>>|<arg|body>>>>>>
+
+  <drd-props|strike-through|with-like|yes|arity|1|accessible|all>
+
+  <assign|repeat-through|<macro|what|body|<quasi|<style-with|src-compact|none|<datoms|<macro|x|<repeat|<arg|x>|<unquote|<arg|what>>>>|<arg|body>>>>>>
+
+  <drd-props|repeat-through|arity|2|accessible|1>
+
+  <assign|deleted-color|red>
+
+  <assign|deleted|<macro|body|<repeat-through|<with|color|<value|deleted-color>|/>|<arg|body>>>>
+
+  <assign|fill-out-color|black>
+
+  <assign|fill-out-distance|0.2fn>
+
+  <assign|fill-out|<macro|body|<repeat-through|<with|color|<value|fill-out-color>|<move|.||<minus|<value|fill-out-distance>>>>|<arg|body>>>>
+
+  <assign|marked-color|yellow>
+
+  <assign|marked-padding|0.2fn>
+
+  <assign|marked|<macro|body|<style-with|src-compact|none|<datoms|<macro|x|<resize|<tabular|<tformat|<cwith|1|1|1|1|cell-background|<value|marked-color>>|<cwith|1|1|1|1|cell-lsep|<value|marked-padding>>|<cwith|1|1|1|1|cell-rsep|<value|marked-padding>>|<cwith|1|1|1|1|cell-bsep|<value|marked-padding>>|<cwith|1|1|1|1|cell-tsep|<value|marked-padding>>|<table|<row|<cell|<arg|x>>>>>>|<plus|1l|<value|marked-padding>>|<plus|1b|<value|marked-padding>>|<minus|1r|<value|marked-padding>>|<minus|1t|<value|marked-padding>>>>|<arg|body>>>>>
+
+  <assign|todo|<macro|body|<with|color|dark
+  red|<style-with|src-compact|none|<datoms|<macro|x|<resize|<tabular|<tformat|<cwith|1|1|1|1|cell-background|pastel
+  red>|<cwith|1|1|1|1|cell-lsep|0fn>|<cwith|1|1|1|1|cell-rsep|0fn>|<cwith|1|1|1|1|cell-bsep|<value|marked-padding>>|<cwith|1|1|1|1|cell-tsep|<value|marked-padding>>|<table|<row|<cell|<arg|x>>>>>>|<plus|1l|0fn>|<plus|1b|<value|marked-padding>>|<minus|1r|0fn>|<minus|1t|<value|marked-padding>>>>|[<arg|body>]>>>>>
+
+  <\active*>
+    <\src-comment>
+      Marginal notes.
+    </src-comment>
+  </active*>
+
+  <assign|marginal-note-width|2cm>
+
+  <assign|marginal-note-sep|5mm>
+
+  <assign|marginal-note-table|<macro|body|hpos|hhyph|vpos|vhyph|<tabular|<tformat|<twith|table-width|<value|marginal-note-width>>|<twith|table-hmode|exact>|<cwith|1|1|1|1|cell-hyphen|<arg|vhyph>>|<twith|table-valign|<arg|vpos>>|<cwith|1|1|1|1|cell-lsep|0em>|<cwith|1|1|1|1|cell-rsep|0em>|<cwith|1|1|1|1|cell-halign|<arg|hpos>>|<table|<row|<\cell>
+    <\with|par-par-sep|0em|par-line-sep|0em|par-mode|<arg|hhyph>>
+      <arg|body>
+    </with>
+  </cell>>>>>>>
+
+  <assign|marginal-even-left-note|<macro|vpos|body|<line-note|<specific|even|<marginal-note-table|<arg|body>|r|right|<change-case|<arg|vpos>|UPCASE>|<arg|vpos>>>|<minus|0cm|<plus|<value|marginal-note-width>|<value|marginal-note-sep>>>|0cm><line-note|<specific|odd|<marginal-note-table|<arg|body>|l|left|<change-case|<arg|vpos>|UPCASE>|<arg|vpos>>>|<plus|1par|<value|marginal-note-sep>|<value|par-left>|<value|par-right>>|0cm><flag|marginal
+  note|dark brown>>>
+
+  <assign|marginal-even-right-note|<macro|vpos|body|<line-note|<specific|odd|<marginal-note-table|<arg|body>|r|right|<change-case|<arg|vpos>|UPCASE>|<arg|vpos>>>|<minus|0cm|<plus|<value|marginal-note-width>|<value|marginal-note-sep>>>|0cm><line-note|<specific|even|<marginal-note-table|<arg|body>|l|left|<change-case|<arg|vpos>|UPCASE>|<arg|vpos>>>|<plus|1par|<value|marginal-note-sep>|<value|par-left>|<value|par-right>>|0cm><flag|marginal
+  note|dark brown>>>
+
+  <assign|marginal-left-note|<macro|vpos|body|<line-note|<marginal-note-table|<arg|body>|r|right|<change-case|<arg|vpos>|UPCASE>|<arg|vpos>>|<minus|0cm|<plus|<value|marginal-note-width>|<value|marginal-note-sep>>>|0cm><flag|marginal
+  note|dark brown>>>
+
+  <assign|marginal-right-note|<macro|vpos|body|<line-note|<marginal-note-table|<arg|body>|l|left|<change-case|<arg|vpos>|UPCASE>|<arg|vpos>>|<plus|1par|<value|marginal-note-sep>|<value|par-left>|<value|par-right>>|0cm><flag|marginal
+  note|dark brown>>>
+
+  <assign|marginal-normal-note|<macro|vpos|body|<compound|<if|<and|<equal|<value|page-odd>|<value|page-even>>|<equal|<value|page-odd-shift>|<value|page-even-shift>>>|marginal-left-note|marginal-even-left-note>|<arg|vpos>|<arg|body>>>>
+
+  <assign|marginal-note|<macro|hpos|vpos|body|<with|dummy1|<value|marginal-note-width>|dummy2|<value|marginal-note-sep>|<compound|<merge|marginal-|<arg|hpos>|-note>|<arg|vpos>|<arg|body>|<arg|hpos>>>>>
+
+  <drd-props|marginal-note|arity|3|accessible|none>
 
   <\active*>
     <\src-comment>
@@ -369,13 +480,71 @@
 
   <\active*>
     <\src-comment>
+      Poor man font effects.
+    </src-comment>
+  </active*>
+
+  <assign|add-font-effect|<macro|prop|val|body|<with|font-effects|<merge|<value|font-effects>|<if|<equal|<value|font-effects>|>||,>|<arg|prop>|=|<arg|val>>|<arg|body>>>>
+
+  \;
+
+  <assign|embold-strength|2>
+
+  <assign|embbb-strength|3>
+
+  <assign|slanted-slope|0.25>
+
+  <assign|hmagnified-factor|1.5>
+
+  <assign|vmagnified-factor|1.5>
+
+  <assign|condensed-factor|0.8>
+
+  <assign|extended-factor|1.2>
+
+  <assign|degraded-threshold|0.667>
+
+  <assign|degraded-frequency|1.0>
+
+  <assign|distorted-strength|0.5>
+
+  <assign|distorted-frequency|1.0>
+
+  <assign|gnawed-strength|0.6>
+
+  <assign|gnawed-frequency|1.0>
+
+  \;
+
+  <assign|embold|<macro|body|<add-font-effect|bold|<value|embold-strength>|<arg|body>>>>
+
+  <assign|embbb|<macro|body|<add-font-effect|bbb|<value|embbb-strength>|<arg|body>>>>
+
+  <assign|slanted|<macro|body|<add-font-effect|slant|<value|slanted-slope>|<arg|body>>>>
+
+  <assign|hmagnified|<macro|body|<add-font-effect|hmagnify|<value|hmagnified-factor>|<arg|body>>>>
+
+  <assign|vmagnified|<macro|body|<add-font-effect|vmagnify|<value|vmagnified-factor>|<arg|body>>>>
+
+  <assign|condensed|<macro|body|<add-font-effect|hextended|<value|condensed-factor>|<arg|body>>>>
+
+  <assign|extended|<macro|body|<add-font-effect|hextended|<value|extended-factor>|<arg|body>>>>
+
+  <assign|degraded|<macro|body|<add-font-effect|degraded|<merge|<value|degraded-threshold>|;|<value|degraded-frequency>>|<arg|body>>>>
+
+  <assign|distorted|<macro|body|<add-font-effect|distorted|<merge|<value|distorted-strength>|;|<value|distorted-frequency>>|<arg|body>>>>
+
+  <assign|gnawed|<macro|body|<add-font-effect|gnawed|<merge|<value|gnawed-strength>|;|<value|gnawed-frequency>>|<arg|body>>>>
+
+  <\active*>
+    <\src-comment>
       Miscellaneous.
     </src-comment>
   </active*>
 
-  <assign|href|<macro|body|<hlink|<with|font-family|tt|<arg|body>>|<arg|body>>>>
+  <assign|href|<macro|body|<hlink|<with|font-family|tt|language|verbatim|<arg|body>>|<arg|body>>>>
 
-  <assign|slink|<macro|body|<hlink|<with|font-family|tt|<arg|body>>|<arg|body>>>>
+  <assign|slink|<macro|body|<hlink|<with|font-family|tt|language|verbatim|<arg|body>>|<arg|body>>>>
 
   <assign|square|<macro|x|<times|<arg|x>|<arg|x>>>>
 </body>
@@ -383,5 +552,6 @@
 <\initial>
   <\collection>
     <associate|preamble|true>
+    <associate|src-special|normal>
   </collection>
 </initial>

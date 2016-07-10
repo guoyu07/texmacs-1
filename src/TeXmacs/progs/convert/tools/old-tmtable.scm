@@ -169,7 +169,9 @@
 				  (string->number j2)
 				  name
 				  (stm-table-decode-format name value))))
-			(list-filter (cDdr x) (lambda (l) (= (length l) 7))))
+			(list-filter (cDdr x)
+                                     (lambda (l)
+                                        (and (list? l) (= (length l) 7)))))
 		   (stm-table-formats (cAr x))))
          (else '())))
 
@@ -293,8 +295,8 @@
     (define (format-by axis name default)
       (map (lambda (fs)
              (if (or (null? fs) (null? (last fs)) (null? (last (car fs))))
-			    default
-			    (tmformat-cell-value (first fs))))
+                 default
+                 (tmformat-cell-value (first fs))))
 	   ((cond ((eq? axis :row) tmtable-format-partition-by-row)
 		  ((eq? axis :column) tmtable-format-partition-by-column))
 	    this

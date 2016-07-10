@@ -40,10 +40,15 @@ typedef char QI;
 typedef unsigned char QN;
 #ifdef OS_WIN32
 typedef __int64 DI;
+typedef unsigned __int64 DN;
 #else
 typedef long long int DI;
+typedef unsigned long long int DN;
 #endif
 typedef void* pointer;
+typedef unsigned int color;
+#define MAX_SI 0x7fffffff
+#define MIN_SI 0x80000000
 
 /******************************************************************************
 * debugging
@@ -59,8 +64,9 @@ typedef void* pointer;
 
 enum { DEBUG_FLAG_AUTO, DEBUG_FLAG_VERBOSE, DEBUG_FLAG_EVENTS,
        DEBUG_FLAG_STD, DEBUG_FLAG_IO, DEBUG_FLAG_BENCH,
-       DEBUG_FLAG_HISTORY, DEBUG_FLAG_QT, DEBUG_FLAG_KEYBOARD,
-       DEBUG_FLAG_PACKRAT, DEBUG_FLAG_FLATTEN, DEBUG_FLAG_CORRECT };
+       DEBUG_FLAG_HISTORY, DEBUG_FLAG_QT, DEBUG_FLAG_QT_WIDGETS,
+       DEBUG_FLAG_KEYBOARD, DEBUG_FLAG_PACKRAT, DEBUG_FLAG_FLATTEN,
+       DEBUG_FLAG_CORRECT, DEBUG_FLAG_CONVERT };
 bool debug (int which, bool write_flag= false);
 int  debug_off ();
 void debug_on (int status);
@@ -75,12 +81,24 @@ bool debug_get (string s);
 #define DEBUG_BENCH (debug (DEBUG_FLAG_BENCH))
 #define DEBUG_HISTORY (debug (DEBUG_FLAG_HISTORY))
 #define DEBUG_QT (debug (DEBUG_FLAG_QT))
+#define DEBUG_QT_WIDGETS (debug (DEBUG_FLAG_QT_WIDGETS))
 #define DEBUG_KEYBOARD (debug (DEBUG_FLAG_KEYBOARD))
 #define DEBUG_PACKRAT (debug (DEBUG_FLAG_PACKRAT))
 #define DEBUG_FLATTEN (debug (DEBUG_FLAG_FLATTEN))
 #define DEBUG_CORRECT (debug (DEBUG_FLAG_CORRECT))
+#define DEBUG_CONVERT (debug (DEBUG_FLAG_CONVERT))
+#define DEBUG_AQUA (debug (DEBUG_FLAG_QT))
+#define DEBUG_AQUA_WIDGETS (debug (DEBUG_FLAG_QT_WIDGETS))
 
+#define USE_EXCEPTIONS
 void tm_failure (const char* msg);
+#ifdef USE_EXCEPTIONS
+extern string the_exception;
+void tm_throw (const char* msg);
+void handle_exceptions ();
+#define ASSERT(cond,msg) { if (!(cond)) tm_throw (msg); }
+#define FAILED(msg) { tm_throw (msg); }
+#else
 #ifdef DEBUG_ASSERT
 #include <assert.h>
 #define ASSERT(cond,msg) { if (!(cond)) { tm_failure (msg); assert (cond); } }
@@ -89,6 +107,14 @@ void tm_failure (const char* msg);
 #define ASSERT(cond,msg) { if (!(cond)) { tm_failure (msg); } }
 #define FAILED(msg) { tm_failure (msg); }
 #endif
+#endif
+
+class tree;
+void debug_message (string channel, string msg);
+void debug_formatted (string channel, tree msg);
+tree get_debug_messages (string kind, int max_number);
+void clear_debug_messages ();
+void clear_debug_messages (string channel);
 
 /******************************************************************************
 * miscellaneous routines
@@ -101,8 +127,19 @@ inline DI max (DI i, DI j) { if (i>j) return i; else return j; }
 inline double min (double i, double j) { if (i<j) return i; else return j; }
 inline double max (double i, double j) { if (i>j) return i; else return j; }
 inline int hash (int i) { return i; }
+inline int hash (long int i) { return (int) i; }
+inline int hash (DI i) { return (int) i; }
+inline int hash (unsigned int i) { return i; }
+inline int hash (unsigned long int i) { return (int) i; }
+inline int hash (DN i) { return (int) i; }
 inline int hash (pointer ptr) {
   return ((int) ((intptr_t) ptr)) + (((int) ((intptr_t) ptr)) % 19); }
+inline int hash (float x) {
+  union { int n; float d; } u;
+  u.d= x; return u.n & 0xffffffff; }
+inline int hash (double x) {
+  union { DI n; double d; } u;
+  u.d= x; return (int) (u.n ^ (u.n >> 32)); }
 inline int copy (int x) { return x; }
 inline SI as_int (double x) { return (SI) floor (x + 0.5); }
 inline double tm_round (double x) { return floor (x + 0.5); }
@@ -126,12 +163,21 @@ const char* default_look_and_feel ();
 template<typename T>
 struct type_helper {
   static int id;
-  static T   init;
+  static T init;
+  static inline T init_val () { return T (); }
 };
 
 int new_type_identifier ();
 template<typename T> int type_helper<T>::id  = new_type_identifier ();
 template<typename T> T   type_helper<T>::init= T ();
+
+#ifdef QTTEXMACS
+//#define QT_CPU_FIX 1
+#ifdef QT_CPU_FIX
+void tm_wake_up ();
+void tm_sleep ();
+#endif
+#endif
 
 /******************************************************************************
  * base classes
@@ -188,7 +234,6 @@ public:
   template <class TT, class B> friend class tm_ext_ptr;
   template <class TT, class B> friend class tm_ext_null_ptr;
 };
-
 
 template <class T>
 class tm_ptr {

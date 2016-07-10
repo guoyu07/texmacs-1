@@ -131,7 +131,7 @@ unary (vector<T> v) {
   T* a= A(v);
   T* r= tm_new_array<T> (n);
   for (i=0; i<n; i++)
-    r[i]= Op::eval (a[i]);
+    r[i]= Op::op (a[i]);
   return vector<T> (r, n);
 }
 
@@ -143,7 +143,7 @@ binary (vector<T> v, vector<T> w) {
   T* b= A(w);
   T* r= tm_new_array<T> (n);
   for (i=0; i<n; i++)
-    r[i]= Op::eval (a[i], b[i]);
+    r[i]= Op::op (a[i], b[i]);
   return vector<T> (r, n);
 }
 
