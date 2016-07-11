@@ -431,6 +431,7 @@ protected slots:
 };
 
 
+#if 0
 class QTMTreeModel;
 
 /*! A simple wrapper around a QTreeView.
@@ -460,6 +461,7 @@ private slots:
   void callOnChange (const QModelIndex& index, bool mouse=true);
 };
 
+#endif
 
 /*! A QScrollArea which automatically scrolls to selected items in QListWidgets.
  

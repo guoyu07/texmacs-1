@@ -8,7 +8,7 @@
  * It comes WITHOUT ANY WARRANTY WHATSOEVER. For details, see the file LICENSE
  * in the root directory or <http://www.gnu.org/licenses/gpl-3.0.html>.
  ******************************************************************************/
-
+#if 0
 #include "QTMGuiHelper.hpp"
 #include "QTMTreeModel.hpp"
 
@@ -39,7 +39,7 @@ QTMTreeModel::instance (const tree& data, const tree& roles, QObject* parent) {
   tree& t = const_cast<tree&> (data);
   if (!is_nil (t->obs) &&
       t->obs->get_type () == OBSERVER_WIDGET)
-    return concrete<qt_tree_observer_rep*> (t->obs())->model;
+    return static_cast<qt_tree_observer_rep*> (t->obs.rep())->model;
   else
     return new QTMTreeModel (data, roles, parent);
 }
@@ -86,10 +86,10 @@ QTMTreeModel::index_from_item (const tree& tref) const {
   path ip = obtain_ip (t);
   if (ipath_has_parent (ip)) {
     path   p = reverse (ip->next) / reverse (obtain_ip (_t));// Look one item up
-    if (is_nil (p)) return createIndex (ip->item, 0, t.rep); // parent is root?
+    if (is_nil (p)) return createIndex (ip->item, 0, t.rep()); // parent is root?
     tree& pt = subtree (_t, p);                              // pt is the parent
     int  row = ip->item - row_offset (pt);
-    return createIndex (row, 0, t.rep);
+    return createIndex (row, 0, t.rep());
   }
   return QModelIndex();
 }
@@ -107,7 +107,7 @@ QTMTreeModel::index (int row, int column, const QModelIndex& parent) const {
   tree t = item_from_index (parent);
 
   if (is_compound (t) && row + row_offset(t) < N(t))
-    return createIndex (row, column, t[row + row_offset(t)].rep);
+    return createIndex (row, column, t[row + row_offset(t)].rep());
   else
     return QModelIndex();
 }
@@ -301,3 +301,4 @@ qt_tree_observer (QTMTreeModel* model) {
   return tm_new<qt_tree_observer_rep> (model);
 }
 
+#endif

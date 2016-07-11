@@ -991,7 +991,11 @@ qt_ui_element_rep::as_qwidget () {
     {
       typedef triple<command, tree, tree> T;
       T  x = open_box<T>(load);
+#if 0
       qwid = new QTMTreeView (x.x1, x.x2, x.x3);  // command, data, roles
+#else
+        qwid = NULL;
+#endif
     }
       break;
       
