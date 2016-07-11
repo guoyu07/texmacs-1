@@ -2371,6 +2371,8 @@
 		9C61B41E141A1B780035D78F /* Base.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		9C61B41F141A1B780035D78F /* Base.xcconfig.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Base.xcconfig.in; sourceTree = "<group>"; };
 		9C61B420141A1B780035D78F /* bundle-libs.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "bundle-libs.sh"; sourceTree = "<group>"; };
+		9C61B422141A1B780035D78F /* Info-Xcode.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Info-Xcode.plist"; sourceTree = "<group>"; };
+		9C61B423141A1B780035D78F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9C61B425141A1B780035D78F /* PkgInfo */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PkgInfo; sourceTree = "<group>"; };
 		9C61B427141A1B780035D78F /* TeXmacs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = TeXmacs; sourceTree = "<group>"; };
 		9C61B428141A1B780035D78F /* TeXmacs-document.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "TeXmacs-document.icns"; sourceTree = "<group>"; };
@@ -4407,6 +4409,8 @@
 				9C61B41E141A1B780035D78F /* Base.xcconfig */,
 				9C61B41F141A1B780035D78F /* Base.xcconfig.in */,
 				9C61B420141A1B780035D78F /* bundle-libs.sh */,
+				9C61B422141A1B780035D78F /* Info-Xcode.plist */,
+				9C61B423141A1B780035D78F /* Info.plist */,
 				9C61B425141A1B780035D78F /* PkgInfo */,
 				9C61B427141A1B780035D78F /* TeXmacs */,
 				9C61B428141A1B780035D78F /* TeXmacs-document.icns */,

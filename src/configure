@@ -8061,29 +8061,6 @@ done
   if test $no_x
   then unset x_includes
   else x_libraries=${x_includes/include/lib}
-  fi
-  CFLAGS=$CFLAGS__ax_save_flags
-
-
-  CPPFLAGS=$CPPFLAGS__ax_save_flags
-
-
-  CXXFLAGS=$CXXFLAGS__ax_save_flags
-
-
-  LDFLAGS=$LDFLAGS__ax_save_flags
-
-
-  LIBS=$LIBS__ax_save_flags
-
-
-  OBJCFLAGS=$OBJCFLAGS__ax_save_flags
-
-
-  OBJCXXFLAGS=$OBJCXXFLAGS__ax_save_flags
-
-
-
 
   LC_SCATTER_FLAGS_list="-I$x_includes -L$x_libraries -lXext -lX11"
 
@@ -8413,32 +8390,6 @@ $as_echo "$as_me: WARNING: Flags $LC_SCATTER_FLAGS_flag NOT managed" >&2;};;
 
   done
   unset ${!LC_SCATTER_FLAGS_*}
-
-
-  X11_CXX=$X11_CXXFLAGS
-
-  X11_CPP=$X11_CPPFLAGS
-
-  if [[ $enable_dumpflags =~ (^|[[:space:]])(X11|ALL)($|[[:space:]]) ]]
-  then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: X11_CFLAGS:$X11_CFLAGS" >&5
-$as_echo "$as_me: X11_CFLAGS:$X11_CFLAGS" >&6;}
-  { $as_echo "$as_me:${as_lineno-$LINENO}: X11_CXXFLAGS:$X11_CXXFLAGS" >&5
-$as_echo "$as_me: X11_CXXFLAGS:$X11_CXXFLAGS" >&6;}
-  { $as_echo "$as_me:${as_lineno-$LINENO}: X11_CPPFLAGS:$X11_CPPFLAGS" >&5
-$as_echo "$as_me: X11_CPPFLAGS:$X11_CPPFLAGS" >&6;}
-  { $as_echo "$as_me:${as_lineno-$LINENO}: X11_LIBS:$X11_LIBS" >&5
-$as_echo "$as_me: X11_LIBS:$X11_LIBS" >&6;}
-  { $as_echo "$as_me:${as_lineno-$LINENO}: X11_LDFLAGS:$X11_LDFLAGS" >&5
-$as_echo "$as_me: X11_LDFLAGS:$X11_LDFLAGS" >&6;}
-
-
-  fi
-# adaptation layer remove when finished
-  X11_CFLAGS="$X11_CXXFLAGS $X11_CPPFLAGS"
-
-  X11_LDFLAGS=""
-
 
 
   if [ -z "" -a -n "$SEMISTATIC" ]
@@ -9108,6 +9059,56 @@ fi
 
 
   unset ${!LC_COMBINE_FLAGS_*}
+
+  fi
+
+  CFLAGS=$CFLAGS__ax_save_flags
+
+
+  CPPFLAGS=$CPPFLAGS__ax_save_flags
+
+
+  CXXFLAGS=$CXXFLAGS__ax_save_flags
+
+
+  LDFLAGS=$LDFLAGS__ax_save_flags
+
+
+  LIBS=$LIBS__ax_save_flags
+
+
+  OBJCFLAGS=$OBJCFLAGS__ax_save_flags
+
+
+  OBJCXXFLAGS=$OBJCXXFLAGS__ax_save_flags
+
+
+
+
+  X11_CXX=$X11_CXXFLAGS
+
+  X11_CPP=$X11_CPPFLAGS
+
+  if [[ $enable_dumpflags =~ (^|[[:space:]])(X11|ALL)($|[[:space:]]) ]]
+  then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: X11_CFLAGS:$X11_CFLAGS" >&5
+$as_echo "$as_me: X11_CFLAGS:$X11_CFLAGS" >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: X11_CXXFLAGS:$X11_CXXFLAGS" >&5
+$as_echo "$as_me: X11_CXXFLAGS:$X11_CXXFLAGS" >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: X11_CPPFLAGS:$X11_CPPFLAGS" >&5
+$as_echo "$as_me: X11_CPPFLAGS:$X11_CPPFLAGS" >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: X11_LIBS:$X11_LIBS" >&5
+$as_echo "$as_me: X11_LIBS:$X11_LIBS" >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: X11_LDFLAGS:$X11_LDFLAGS" >&5
+$as_echo "$as_me: X11_LDFLAGS:$X11_LDFLAGS" >&6;}
+
+
+  fi
+# adaptation layer remove when finished
+  X11_CFLAGS="$X11_CXXFLAGS $X11_CPPFLAGS"
+
+  X11_LDFLAGS=""
+
 
 
 ac_fn_cxx_check_type "$LINENO" "FILE" "ac_cv_type_FILE" "$ac_includes_default"
