@@ -22,7 +22,7 @@ template<typename C> class raster;
 template<typename C> bool is_nil (raster<C> r);
 
 template<typename C>
-class raster_rep: public abstract_struct {
+class raster_rep: public tm_obj<raster_rep<C> > {
 public:
   int w, h;
   int ox, oy;
@@ -63,12 +63,12 @@ public:
     return internal_smooth_pixel (x + ox, y + oy); }
 };
 
-template<typename C> class raster {
-  ABSTRACT_NULL_TEMPLATE(raster,C);
-  inline raster (int w, int h, int ox, int oy):
-    rep (tm_new<raster_rep<C> > (w, h, ox, oy)) { INC_COUNT(rep); }
+template<typename C> class raster : public tm_abs_null_ptr<raster_rep<C> > {
+public:
+    raster ( raster_rep<C>* p=NULL) : tm_abs_null_ptr<raster_rep<C> > (p) { }
+    inline raster (int w, int h, int ox, int oy):
+    tm_abs_null_ptr<raster_rep<C> > (tm_new<raster_rep<C> > (w, h, ox, oy)) { }
 };
-ABSTRACT_NULL_TEMPLATE_CODE(raster,class,C);
 
 template<typename C> void
 print (raster<C> r) {

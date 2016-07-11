@@ -23,7 +23,7 @@ class frame;
 * Ornament parameters
 ******************************************************************************/
 
-class ornament_parameters_rep: concrete_struct {
+class ornament_parameters_rep: public tm_obj<ornament_parameters_rep> {
 public:
   tree shape, tst;
   SI lw, bw, rw, tw;
@@ -46,21 +46,20 @@ public:
   friend class ornament_parameters;
 };
 
-class ornament_parameters {
-  CONCRETE(ornament_parameters);
+class ornament_parameters : public tm_ptr<ornament_parameters_rep> {
+public:
   inline
   ornament_parameters (tree shape2, tree tst2,
                        SI lw2, SI bw2, SI rw2, SI tw2, 
 		       double lx, double bx, double rx, double tx,
 		       SI lpad2, SI bpad2, SI rpad2, SI tpad2,
 		       brush bg2, brush xc2, array<brush> border2):
-    rep (tm_new<ornament_parameters_rep> (shape2, tst2,
+    tm_ptr<ornament_parameters_rep> (tm_new<ornament_parameters_rep> (shape2, tst2,
                                           lw2, bw2, rw2, tw2,
-					  lx, bx, rx, tx,
+                                          lx, bx, rx, tx,
                                           lpad2, bpad2, rpad2, tpad2,
-					  bg2, xc2, border2)) {}
+                                          bg2, xc2, border2)) {}
 };
-CONCRETE_CODE(ornament_parameters);
 
 inline ornament_parameters
 copy (ornament_parameters ps) {

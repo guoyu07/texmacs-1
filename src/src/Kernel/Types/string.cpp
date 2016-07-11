@@ -57,19 +57,13 @@ string::string (char c, int n) : tm_ptr<string_rep>(tm_new<string_rep> (n)) {
     rep()->a[i]=c;
 }
 
-string::string (const char* a) : tm_ptr<string_rep>(tm_new<string_rep> (strlen(a))) {
-  int i, n=strlen(a);
-  for (i=0; i<n; i++)
-    rep()->a[i]=a[i];
-}
-
 string::string (const char* a, int n) : tm_ptr<string_rep>(tm_new<string_rep> (n)) {
   register int i;
   for (i=0; i<n; i++)
     rep()->a[i]=a[i];
 }
 
-string::string (const char *s) : tm_ptr<string_rep>(string(s, strlen(s))) {}
+string::string (const char *s) : tm_ptr<string_rep> (string (s, strlen (s))) {}
 
 
 /******************************************************************************

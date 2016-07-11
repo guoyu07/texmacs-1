@@ -16,10 +16,10 @@
 class player;
 extern int player_count;
 
-class player_rep: public abstract_struct {
+class player_rep: public tm_obj<player_rep> {
 public:
-  inline player_rep () { TM_DEBUG(player_count++); }
-  inline virtual ~player_rep () { TM_DEBUG(player_count--); }
+  inline player_rep () { }
+  inline virtual ~player_rep () { }
 
   virtual void   set_speed (double s) = 0;
   virtual double get_speed () = 0;
@@ -40,15 +40,14 @@ public:
   friend class player;
 };
 
-class player {
-  ABSTRACT(player);
-  player ();
+class player : public tm_abs_ptr<player_rep> {
+public:
+  player (player_rep *p = NULL);
   player (double started, double speed);
   operator tree ();
   friend bool operator == (player p1, player p2);
   friend bool operator != (player p1, player p2);
 };
-ABSTRACT_CODE(player);
 
 player copy (player spc);
 bool operator == (player p1, player p2);

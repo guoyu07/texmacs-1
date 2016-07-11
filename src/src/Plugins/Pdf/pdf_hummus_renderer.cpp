@@ -545,7 +545,7 @@ pdf_hummus_renderer_rep::set_clipping (SI x1, SI y1, SI x2, SI y2, bool restore)
  * Images
  ******************************************************************************/
 
-class pdf_image_rep : public concrete_struct
+class pdf_image_rep : public tm_obj<pdf_image_rep>
 {
 public:
   url u;
@@ -564,19 +564,18 @@ public:
   bool flush_for_pattern (PDFWriter& pdfw);
 }; // class pdf_image_ref
 
-class pdf_image {
-  CONCRETE_NULL(pdf_image);
-  pdf_image (url _u, ObjectIDType _id):
-    rep (tm_new<pdf_image_rep> (_u,_id)) {};
+class pdf_image : public tm_null_ptr<pdf_image_rep> {
+public:
+  pdf_image () : tm_null_ptr<pdf_image_rep> () {};
+  pdf_image (url _u, ObjectIDType _id) :
+    tm_null_ptr<pdf_image_rep>  (tm_new<pdf_image_rep> (_u,_id)) {};
 };
-
-CONCRETE_NULL_CODE(pdf_image);
 
 /******************************************************************************
  * Tiled patterns
  ******************************************************************************/
 
-class pdf_pattern_rep : public concrete_struct {
+class pdf_pattern_rep : public tm_obj<pdf_pattern_rep> {
 public:
   pdf_image im;
   SI w, h, sx, sy;
@@ -615,15 +614,14 @@ public:
                     << im->u << "\n"; }
 };
 
-class pdf_pattern {
-  CONCRETE_NULL(pdf_pattern);
+class pdf_pattern : public tm_null_ptr<pdf_pattern_rep> {
+public:
+  pdf_pattern () : tm_null_ptr<pdf_pattern_rep>() {};
   pdf_pattern (pdf_image _im,  SI _w, SI _h, SI _sx, SI _sy,
 	       double _scale_x, double _scale_y, ObjectIDType _id):
-    rep (tm_new<pdf_pattern_rep> (_im, _w, _h, _sx, _sy,
+    tm_null_ptr<pdf_pattern_rep> (tm_new<pdf_pattern_rep> (_im, _w, _h, _sx, _sy,
 				  _scale_x, _scale_y, _id)) {};
 };
-
-CONCRETE_NULL_CODE(pdf_pattern);
 
 void
 pdf_hummus_renderer_rep::register_pattern_image (brush br, SI pixel) {
@@ -928,7 +926,7 @@ create_pdf_image_raw (PDFWriter& pdfw, string raw_data, SI width, SI height, Obj
   else delete imageXObject;
 }
 
-class pdf_raw_image_rep : public concrete_struct
+class pdf_raw_image_rep : public tm_obj<pdf_raw_image_rep>
 {
 public:
   string data;
@@ -939,19 +937,18 @@ public:
    : data(_data), w(_w), h(_h), id(_id) {}
   pdf_raw_image_rep () {}
   
-  void flush(PDFWriter& pdfw) {
+  void flush (PDFWriter& pdfw) {
     // debug_convert << "flushing :" << id << LF;
     create_pdf_image_raw (pdfw, data, w, h, id);
   }
 }; // pdf_raw_image_rep
 
-class pdf_raw_image {
-  CONCRETE_NULL(pdf_raw_image);
-  pdf_raw_image (string _data, int _w, int _h, ObjectIDType _id):
-  rep (tm_new<pdf_raw_image_rep> (_data,_w,_h,_id)) {};
+class pdf_raw_image : public tm_null_ptr<pdf_raw_image_rep> {
+public:
+  pdf_raw_image () : tm_null_ptr<pdf_raw_image_rep> () {};
+  pdf_raw_image (string _data, int _w, int _h, ObjectIDType _id) :
+  tm_null_ptr<pdf_raw_image_rep> (tm_new<pdf_raw_image_rep> (_data,_w,_h,_id)) {};
 };
-
-CONCRETE_NULL_CODE(pdf_raw_image);
 
 void
 pdf_hummus_renderer_rep::flush_glyphs ()
@@ -985,7 +982,7 @@ pdf_hummus_renderer_rep::draw_bitmap_glyph (int ch, font_glyphs fn, SI x, SI y)
  * Type 3 fonts
  ******************************************************************************/
 
-class t3font_rep : public concrete_struct {
+class t3font_rep : public tm_obj<t3font_rep> {
 public:
   font_glyphs fn;
   ObjectIDType fontId;
@@ -1008,13 +1005,12 @@ public:
   void write_definition ();
 };
 
-class t3font {
-  CONCRETE_NULL(t3font);
+class t3font : public tm_null_ptr<t3font_rep> {
+public:
+  t3font () : tm_null_ptr<t3font_rep> () {};
   t3font (font_glyphs _fn, ObjectsContext &_objectsContext)
-  : rep (tm_new<t3font_rep> (_fn,_objectsContext)) {};
+  : tm_null_ptr<t3font_rep> (tm_new<t3font_rep> (_fn,_objectsContext)) {};
 };
-
-CONCRETE_NULL_CODE(t3font);
 
 void
 t3font_rep::update_bbox(int llx, int lly, int urx, int ury)

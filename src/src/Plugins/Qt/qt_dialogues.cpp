@@ -257,7 +257,7 @@ qt_inputs_list_widget_rep::read (slot s, blackbox val) {
     check_type<int> (val, s);
     int index = open_box<int> (val);
     if (N(children) > index)
-      return static_cast<widget_rep*> (children[index].rep());
+      return children[index];
   }
   default:
     return qt_widget_rep::read (s, val);
@@ -266,7 +266,7 @@ qt_inputs_list_widget_rep::read (slot s, blackbox val) {
 
 qt_field_widget_rep*
 qt_inputs_list_widget_rep::field (int i) {
-  return static_cast<qt_field_widget_rep*> (children[i].rep);
+  return concrete<qt_field_widget_rep*> (children[i]);
 }
 
 void

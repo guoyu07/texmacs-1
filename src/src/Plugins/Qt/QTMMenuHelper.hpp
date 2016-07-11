@@ -15,6 +15,7 @@
 #include "message.hpp"
 #include "promise.hpp"
 #include "scheme.hpp"
+#include "widget.hpp"
 
 #include "qt_gui.hpp"
 #include "qt_dialogues.hpp"
@@ -290,16 +291,12 @@ class QTMInputTextWidgetHelper : public QObject {
   qt_widget   p_wid;  //!< A pointer to a qt_input_text_widget_rep
   bool         done;  //!< Has the command been executed after a modification?
 
-  qt_input_text_widget_rep* wid ()
-    { return concrete<qt_input_text_widget_rep*>(p_wid); }
-  // useful cast
-
 public:
   QTMInputTextWidgetHelper (qt_widget _wid, QTMLineEdit* parent);
   
 protected:
   qt_input_text_widget_rep* wid () { // useful cast
-    return static_cast<qt_input_text_widget_rep*> (p_wid.rep); }
+    return concrete<qt_input_text_widget_rep*> (abstract (p_wid)); }
   void apply ();
 
 public slots:

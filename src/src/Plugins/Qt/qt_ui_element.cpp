@@ -216,7 +216,7 @@ qt_ui_element_rep::get_payload (qt_widget qtw, types check_type) {
     case refresh_widget:    case refreshable_widget:  case balloon_widget:
     case glue_widget:
     {
-      qt_ui_element_rep* rep = static_cast<qt_ui_element_rep*> (qtw.rep);
+      qt_ui_element_rep* rep = concrete<qt_ui_element_rep*> (abstract (qtw));
       return rep->load;
     }
       break;

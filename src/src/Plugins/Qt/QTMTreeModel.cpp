@@ -37,9 +37,9 @@ const char* QTMTreeModel::no_observer_exception =
 QTMTreeModel*
 QTMTreeModel::instance (const tree& data, const tree& roles, QObject* parent) {
   tree& t = const_cast<tree&> (data);
-  if (!is_nil (data) && !is_nil (t->obs) &&
+  if (!is_nil (t->obs) &&
       t->obs->get_type () == OBSERVER_WIDGET)
-    return static_cast<qt_tree_observer_rep*> (t->obs.rep)->model;
+    return concrete<qt_tree_observer_rep*> (t->obs())->model;
   else
     return new QTMTreeModel (data, roles, parent);
 }

@@ -23,8 +23,8 @@ double as_percentage (tree t);
 
 bool
 operator == (const brush& a, const brush& b) {
-  brush_rep* ar= (brush_rep*) a.rep;
-  brush_rep* br= (brush_rep*) b.rep;
+  brush_rep* ar= (brush_rep*) a.rep();
+  brush_rep* br= (brush_rep*) b.rep();
   return
     ar->get_type () == br->get_type () &&
     ar->get_color () == br->get_color () &&
@@ -135,9 +135,9 @@ make_brush (tree p, int a) {
 }
 
 //brush::brush (): rep (make_brush (white)) { INC_COUNT (rep); }
-brush::brush (color c): rep (make_brush (c)) { INC_COUNT (rep); }
-brush::brush (bool b): rep (make_brush (b)) { INC_COUNT (rep); }
-brush::brush (tree p, int a): rep (make_brush (p, a)) { INC_COUNT (rep); }
+brush::brush (color c): tm_abs_null_ptr<brush_rep>  (make_brush (c)) {}
+brush::brush (bool b): tm_abs_null_ptr<brush_rep> (make_brush (b)) {}
+brush::brush (tree p, int a): tm_abs_null_ptr<brush_rep>  (make_brush (p, a)) {}
 
 /******************************************************************************
 * Unpacking pattern data

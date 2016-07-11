@@ -21,12 +21,12 @@ db_line_rep::db_line_rep (db_atom id2, db_atom attr2, db_atom val2,
                           db_time created2, db_time expires2):
   id (id2), attr (attr2), val (val2), created (created2), expires (expires2) {}
 
-db_line::db_line () {
-  rep= tm_new<db_line_rep> (0, 0, 0, DB_MAX_TIME, DB_MAX_TIME); }
+db_line::db_line () :
+  tm_ptr<db_line_rep> (tm_new<db_line_rep> (0, 0, 0, DB_MAX_TIME, DB_MAX_TIME)) {}
 
 db_line::db_line (db_atom id, db_atom attr, db_atom val,
-                  db_time created, db_time expires) {
-  rep= tm_new<db_line_rep> (id, attr, val, created, expires); }
+                  db_time created, db_time expires) :
+    tm_ptr<db_line_rep> (tm_new<db_line_rep> (id, attr, val, created, expires)) { }
 
 database_rep::database_rep (url u, bool clone):
   db_name (u), db (), outdated (0), with_history (!clone),
@@ -42,11 +42,11 @@ database_rep::database_rep (url u, bool clone):
   else if (!clone) initialize ();
 }
 
-database::database () {
-  rep= tm_new<database_rep> (url_none ()); };
+database::database () :
+  tm_ptr<database_rep> (tm_new<database_rep> (url_none ())) { };
 
-database::database (url u, bool clone) {
-  rep= tm_new<database_rep> (u, clone); };
+database::database (url u, bool clone) :
+  tm_ptr<database_rep> (tm_new<database_rep> (u, clone)) { };
 
 /******************************************************************************
 * Internal subroutines

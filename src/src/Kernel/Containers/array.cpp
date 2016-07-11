@@ -68,30 +68,33 @@ array<T>::array (T x1, T x2)
 }
 
 template<class T>
-array<T>::array (T x1, T x2, T x3) {
-  rep= tm_new<array_rep<T> > (3);
-  rep->a[0]= x1;
-  rep->a[1]= x2;
-  rep->a[2]= x3;
+array<T>::array (T x1, T x2, T x3)
+: tm_ptr<array_rep<T> >( tm_new<array_rep<T> > (3))
+{
+  this->rep()->a[0]= x1;
+  this->rep()->a[1]= x2;
+  this->rep()->a[2]= x3;
 }
 
 template<class T>
-array<T>::array (T x1, T x2, T x3, T x4) {
-  rep= tm_new<array_rep<T> > (4);
-  rep->a[0]= x1;
-  rep->a[1]= x2;
-  rep->a[2]= x3;
-  rep->a[3]= x4;
+array<T>::array (T x1, T x2, T x3, T x4)
+: tm_ptr<array_rep<T> >( tm_new<array_rep<T> > (4))
+{
+  this->rep()->a[0]= x1;
+  this->rep()->a[1]= x2;
+  this->rep()->a[2]= x3;
+  this->rep()->a[3]= x4;
 }
 
 template<class T>
-array<T>::array (T x1, T x2, T x3, T x4, T x5) {
-  rep= tm_new<array_rep<T> > (5);
-  rep->a[0]= x1;
-  rep->a[1]= x2;
-  rep->a[2]= x3;
-  rep->a[3]= x4;
-  rep->a[4]= x5;
+array<T>::array (T x1, T x2, T x3, T x4, T x5)
+: tm_ptr<array_rep<T> >( tm_new<array_rep<T> > (4))
+{
+  this->rep()->a[0]= x1;
+  this->rep()->a[1]= x2;
+  this->rep()->a[2]= x3;
+  this->rep()->a[3]= x4;
+  this->rep()->a[4]= x5;
 }
 
 /******************************************************************************

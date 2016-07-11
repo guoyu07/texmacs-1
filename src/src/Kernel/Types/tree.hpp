@@ -105,7 +105,7 @@ public:
 
   friend class tree_links_rep;
   friend class link_repository_rep;
-//  friend class edit_env_rep;
+  friend class edit_env_rep;
 #ifdef QTTEXMACS
   friend class QTMTreeModel;  // hack: wouldn't need it with a widget_observer
 #endif

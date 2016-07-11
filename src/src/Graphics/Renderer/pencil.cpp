@@ -137,20 +137,20 @@ make_pencil (tree t, int a, SI w, pencil_cap c, pencil_join j, double l) {
 }
 
 pencil::pencil (bool b):
-  rep (b? (pencil_rep*) tm_new<simple_pencil_rep> (black, std_shrinkf * PIXEL):
-       (pencil_rep*) tm_new<no_pencil_rep> ()) { INC_COUNT(rep); }
+  tm_abs_null_ptr<pencil_rep> (b? (pencil_rep*) tm_new<simple_pencil_rep> (black, std_shrinkf * PIXEL):
+       (pencil_rep*) tm_new<no_pencil_rep> ()) { }
 
 pencil::pencil (color c, SI w):
-  rep (tm_new<simple_pencil_rep> (c, w)) { INC_COUNT(rep); }
+  tm_abs_null_ptr<pencil_rep> (tm_new<simple_pencil_rep> (c, w)) { }
 pencil::pencil (brush br, SI w):
-  rep (make_pencil (br, w)) { INC_COUNT(rep); }
+  tm_abs_null_ptr<pencil_rep> (make_pencil (br, w)) { }
 pencil::pencil (tree t, int alpha, SI w):
-  rep (make_pencil (t, alpha, w)) { INC_COUNT(rep); }
+  tm_abs_null_ptr<pencil_rep> (make_pencil (t, alpha, w)) { }
 
 pencil::pencil (color col, SI w, pencil_cap c, pencil_join j, double l):
-  rep (tm_new<complex_pencil_rep>
-       (pencil_standard, col, w, c, j, l)) { INC_COUNT(rep); }
+  tm_abs_null_ptr<pencil_rep> (tm_new<complex_pencil_rep>
+       (pencil_standard, col, w, c, j, l)) { }
 pencil::pencil (brush br, SI w, pencil_cap c, pencil_join j, double l):
-  rep (make_pencil (br, w, c, j, l)) { INC_COUNT(rep); }
+  tm_abs_null_ptr<pencil_rep> (make_pencil (br, w, c, j, l)) { }
 pencil::pencil (tree t, int a, SI w, pencil_cap c, pencil_join j, double l):
-  rep (make_pencil (t, a, w, c, j, l)) { INC_COUNT(rep); }
+  tm_abs_null_ptr<pencil_rep> (make_pencil (t, a, w, c, j, l)) { }

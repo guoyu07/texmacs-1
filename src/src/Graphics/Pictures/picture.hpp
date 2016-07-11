@@ -23,11 +23,12 @@ enum picture_kind {
   picture_lazy };
 
 class picture_rep;
-class picture {
-ABSTRACT_NULL(picture);
+class picture : public tm_abs_null_ptr<picture_rep> {
+public:
+  picture (picture_rep*p =NULL) : tm_abs_null_ptr<picture_rep> (p) {};
 };
 
-class picture_rep: public abstract_struct {
+class picture_rep: public tm_obj<picture_rep> {
 protected:
   virtual color internal_smooth_pixel (double x, double y);
   virtual color internal_get_pixel (int x, int y) = 0;
@@ -66,7 +67,6 @@ public:
   friend class picture;
 };
 
-ABSTRACT_NULL_CODE(picture);
 
 /******************************************************************************
 * Pictures on disk

@@ -182,6 +182,9 @@ debug_ostream (string channel) {
 * Abstract user interface
 ******************************************************************************/
 
+#define INC_COUNT(R) { (R)->ref_count++; }
+#define DEC_COUNT(R) { if(0==--((R)->ref_count)) { tm_delete (R);}}
+
 tm_ostream::tm_ostream ():
   rep (tm_new<std_ostream_rep> ()) { INC_COUNT (this->rep); }
 tm_ostream::tm_ostream (char* s):

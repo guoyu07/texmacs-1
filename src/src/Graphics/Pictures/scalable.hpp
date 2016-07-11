@@ -27,11 +27,12 @@ enum scalable_kind {
 };
 
 class scalable_rep;
-class scalable {
-ABSTRACT_NULL(scalable);
+class scalable : public tm_abs_null_ptr<scalable_rep> {
+public:
+  scalable (scalable_rep* p=NULL) : tm_abs_null_ptr<scalable_rep>(p) {}
 };
 
-class scalable_rep: public abstract_struct {
+class scalable_rep: public tm_obj<scalable_rep> {
 public:
   inline scalable_rep () {}
   inline virtual ~scalable_rep () {}
@@ -44,8 +45,6 @@ public:
   virtual rectangle get_physical_extents () = 0;
   virtual void draw (renderer ren, SI x, SI y, int alpha= 255) = 0;
 };
-
-ABSTRACT_NULL_CODE(scalable);
 
 scalable load_scalable_image (url file_name, SI w, SI h, SI pixel);
 

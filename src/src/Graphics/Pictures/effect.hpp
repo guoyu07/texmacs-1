@@ -19,11 +19,12 @@
 ******************************************************************************/
 
 class effect_rep;
-class effect {
-ABSTRACT_NULL(effect);
+class effect : public tm_abs_null_ptr<effect_rep> {
+public:
+  effect (effect_rep *p=NULL) : tm_abs_null_ptr<effect_rep>(p) {}
 };
 
-class effect_rep: public abstract_struct {
+class effect_rep: public tm_obj<effect_rep> {
 public:
   inline effect_rep () {}
   inline virtual ~effect_rep () {}
@@ -34,8 +35,6 @@ public:
 
   friend class effect;
 };
-
-ABSTRACT_NULL_CODE(effect);
 
 /******************************************************************************
 * Standard effects

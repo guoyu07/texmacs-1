@@ -18,7 +18,7 @@
 * Text boxes
 ******************************************************************************/
 
-struct xkerning_rep: concrete_struct {
+struct xkerning_rep: tm_obj<xkerning_rep> {
   SI padding;
   SI left;
   SI right;
@@ -27,13 +27,12 @@ struct xkerning_rep: concrete_struct {
   ~xkerning_rep() {}
 };
 
-class xkerning {
-  CONCRETE_NULL(xkerning);
-  xkerning (SI p, SI l, SI r):
-    rep (tm_new<xkerning_rep> (p, l, r)) {};
+class xkerning : public tm_null_ptr<xkerning_rep> {
+public:
+  xkerning () : tm_null_ptr<xkerning_rep> () {};
+  xkerning (SI p, SI l, SI r) :
+    tm_null_ptr<xkerning_rep> (tm_new<xkerning_rep> (p, l, r)) {};
 };
-
-CONCRETE_NULL_CODE(xkerning);
 
 /******************************************************************************
 * Text boxes

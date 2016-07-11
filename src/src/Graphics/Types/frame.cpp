@@ -20,7 +20,7 @@ void
 frame::enclose (double& x1, double& y1, double& x2, double& y2,
                 point p1, point p2, bool direct) {
   int n= 1;
-  if (!rep->linear) n= 20;
+  if (!rep()->linear) n= 20;
   for (int i=0; i<n; i++) {
     point p= p1 + (((double) i) / ((double) n)) * (p2 - p1);
     point q= (direct? operator () (p): operator [] (p));

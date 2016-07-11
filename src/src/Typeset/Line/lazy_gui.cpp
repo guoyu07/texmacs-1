@@ -157,10 +157,10 @@ struct lazy_ornament_rep: public lazy_rep {
 struct lazy_ornament : public tm_ext_null_ptr<lazy_ornament_rep, lazy> {
 public:
   lazy_ornament(lazy_ornament_rep *p=NULL) : tm_ext_null_ptr<lazy_ornament_rep, lazy> (p) {}
-  lazy_ornament (edit_env env, lazy par, path ip,
+  lazy_ornament (edit_env env, lazy par, box xb, path ip,
 		ornament_parameters ps):
     tm_ext_null_ptr<lazy_ornament_rep, lazy> (
-            tm_new<lazy_ornament_rep> (env, par, ip, ps)) { }
+            tm_new<lazy_ornament_rep> (env, par, xb, ip, ps)) { }
 };
 
 format

@@ -45,9 +45,6 @@ public:
 	object (url u);
     object (modification m);
     object (patch p);
-    object (url u);
-    object (modification m);
-    object (patch p);
 };
 
 tm_ostream& operator << (tm_ostream& out, object obj);

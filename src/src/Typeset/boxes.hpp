@@ -102,7 +102,7 @@ tree as_tree (gr_selections sels);
 ******************************************************************************/
 
 class box_rep;
-struct lazy;
+class lazy;
 typedef array<double> point;
 
 class box : public tm_abs_null_ptr<box_rep> {

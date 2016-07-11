@@ -31,11 +31,12 @@ enum spacial_kind {
 };
 
 class spacial_rep;
-class spacial {
-ABSTRACT_NULL(spacial);
+class spacial : public tm_abs_null_ptr<spacial_rep> {
+public:
+  spacial (spacial_rep *p=NULL) : tm_abs_null_ptr<spacial_rep>(p) {}
 };
 
-class spacial_rep: public abstract_struct {
+class spacial_rep: public tm_obj<spacial_rep> {
 public:
   inline spacial_rep () {}
   inline virtual ~spacial_rep () {}
@@ -48,8 +49,6 @@ public:
   virtual spacial transform (matrix<double> m) = 0;
   virtual spacial enlighten (tree light) = 0;
 };
-
-ABSTRACT_NULL_CODE(spacial);
 
 spacial triangulated (array<triangle> ts, array<color> cs);
 spacial transformed (spacial obj, matrix<double> m);

@@ -153,9 +153,9 @@ object::object (list<tree> l)
 object::object (path p) : tm_ptr<object_rep> (tm_new<tmscm_object_rep> (path_to_tmscm (p))) {}
 object::object (url u) : tm_ptr<object_rep> (tm_new<tmscm_object_rep> (url_to_tmscm (u))) {}
 object::object (patch m):
-rep (tm_new<tmscm_object_rep> (patch_to_tmscm (m))) {}
+  tm_ptr<object_rep> (tm_new<tmscm_object_rep> (patch_to_tmscm (m))) {}
 object::object (modification m):
-rep (tm_new<tmscm_object_rep> (modification_to_tmscm (m))) {}
+  tm_ptr<object_rep> (tm_new<tmscm_object_rep> (modification_to_tmscm (m))) {}
 
 bool
 as_bool (object obj) {

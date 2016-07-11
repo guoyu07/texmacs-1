@@ -301,15 +301,14 @@ fixed_player (player base, double position) {
 
 int player_count= 0;
 
-player::player ():
-  rep (tm_new<basic_player_rep> ((double) texmacs_time (), 1.0)) {
-    INC_COUNT (rep); }
+player::player (player_rep *p):
+  tm_abs_ptr<player_rep> (p ? p : tm_new<basic_player_rep> ((double) texmacs_time (), 1.0)) { }
 
 player::player (double started, double speed):
-  rep (tm_new<basic_player_rep> (started, speed)) { INC_COUNT (rep); }
+  tm_abs_ptr<player_rep> (tm_new<basic_player_rep> (started, speed)) { }
 
 player::operator tree () {
-  return rep->expression ();
+  return rep()->expression ();
 }
 
 player
@@ -319,12 +318,12 @@ copy (player p) {
 
 bool
 operator == (player p1, player p2) {
-  return p1.rep == p2.rep;
+  return p1.rep() == p2.rep();
 }
 
 bool
 operator != (player p1, player p2) {
-  return p1.rep != p2.rep;
+  return p1.rep() != p2.rep();
 }
 
 tm_ostream&

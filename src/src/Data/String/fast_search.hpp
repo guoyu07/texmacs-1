@@ -17,7 +17,7 @@
 #define FAST_SEARCH_H
 
 class string_searcher;
-class string_searcher_rep: concrete_struct {
+class string_searcher_rep: public tm_obj<string_searcher_rep> {
   string s;
   array<hashmap<int,array<int> > > a;
   array<int> search_sub (string what);
@@ -32,12 +32,11 @@ public:
                                   int& b1, int& e1, int& b2, int& e2);
 };
 
-class string_searcher {
-CONCRETE(string_searcher);
-  inline string_searcher (): rep (tm_new<string_searcher_rep> ("")) {}
-  inline string_searcher (string s): rep (tm_new<string_searcher_rep> (s)) {}
+class string_searcher : public tm_ptr<string_searcher_rep> {
+public:
+  inline string_searcher (): tm_ptr<string_searcher_rep> (tm_new<string_searcher_rep> ("")) {}
+  inline string_searcher (string s): tm_ptr<string_searcher_rep> (tm_new<string_searcher_rep> (s)) {}
 };
-CONCRETE_CODE(string_searcher);
 
 void get_longest_common (string s1, string s2,
                          int& b1, int& e1, int& b2, int& e2);

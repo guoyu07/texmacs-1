@@ -172,7 +172,7 @@ QTMWidget::~QTMWidget () {
 
 qt_simple_widget_rep*
 QTMWidget::tm_widget () const { 
-  return concrete_simple_widget (tmwid); 
+  return concrete_simple_widget (abstract (tmwid));
 }
 
 void 
@@ -558,13 +558,8 @@ QTMWidget::inputMethodEvent (QInputMethodEvent* event) {
     
     r = r * as_string (pos) * ":" * from_qstring (preedit_string);
   }
-<<<<<<< HEAD
   if (tm_widget())
     the_gui -> process_keypress (tm_widget(), r, texmacs_time());
-=======
-  if (!is_nil (tmwid))
-    the_gui->process_keypress (tm_widget(), r, texmacs_time());
->>>>>>> a367f2ab232211064700f3e36e542a6e54adcbee
   event->accept();
 }  
 
@@ -582,11 +577,7 @@ QTMWidget::inputMethodQuery (Qt::InputMethodQuery query) const {
 
 void
 QTMWidget::mousePressEvent (QMouseEvent* event) {
-<<<<<<< HEAD
   if (!(tm_widget())) return;
-=======
-  if (is_nil (tmwid)) return;
->>>>>>> a367f2ab232211064700f3e36e542a6e54adcbee
   QPoint point = event->pos() + origin();
   coord2 pt = from_qpoint(point);
   unsigned int mstate= mouse_state (event, false);
@@ -598,11 +589,7 @@ QTMWidget::mousePressEvent (QMouseEvent* event) {
 
 void
 QTMWidget::mouseReleaseEvent (QMouseEvent* event) {
-<<<<<<< HEAD
   if (!(tm_widget())) return;
-=======
-  if (is_nil (tmwid)) return;
->>>>>>> a367f2ab232211064700f3e36e542a6e54adcbee
   QPoint point = event->pos() + origin();
   coord2 pt = from_qpoint(point);
   unsigned int mstate = mouse_state (event, true);
@@ -614,11 +601,7 @@ QTMWidget::mouseReleaseEvent (QMouseEvent* event) {
 
 void
 QTMWidget::mouseMoveEvent (QMouseEvent* event) {
-<<<<<<< HEAD
   if (!(tm_widget())) return;
-=======
-  if (is_nil (tmwid)) return;
->>>>>>> a367f2ab232211064700f3e36e542a6e54adcbee
   QPoint point = event->pos() + origin();
   coord2 pt = from_qpoint(point);
   unsigned int mstate = mouse_state (event, false);
@@ -648,32 +631,18 @@ QTMWidget::event (QEvent* event) {
 }
 
 void
-<<<<<<< HEAD
-QTMWidget::focusInEvent ( QFocusEvent * event ) {
-  if (tm_widget()) {
-    if (DEBUG_QT) cout << "FOCUSIN: " << tm_widget()->type_as_string() << LF;
-    the_gui -> process_keyboard_focus (tm_widget(), true, texmacs_time());
-    //tm_widget() -> handle_keyboard_focus (true, texmacs_time ());
-=======
 QTMWidget::focusInEvent (QFocusEvent * event) {
-  if (!is_nil (tmwid)) {
+  if (tm_widget()) {
     if (DEBUG_QT) debug_qt << "FOCUSIN: " << tm_widget()->type_as_string() << LF;
     the_gui->process_keyboard_focus (tm_widget(), true, texmacs_time());
->>>>>>> a367f2ab232211064700f3e36e542a6e54adcbee
   }
   QTMScrollView::focusInEvent (event);
 }
 
 void
-<<<<<<< HEAD
 QTMWidget::focusOutEvent ( QFocusEvent * event ) {
   if (tm_widget()) {
-    if (DEBUG_QT) cout << "FOCUSOUT: " << tm_widget()->type_as_string() << LF;
-=======
-QTMWidget::focusOutEvent (QFocusEvent * event) {
-  if (!is_nil (tmwid)) {
     if (DEBUG_QT) debug_qt << "FOCUSOUT: " << tm_widget()->type_as_string() << LF;
->>>>>>> a367f2ab232211064700f3e36e542a6e54adcbee
     the_gui -> process_keyboard_focus (tm_widget(), false, texmacs_time());
   }
   QTMScrollView::focusOutEvent (event);

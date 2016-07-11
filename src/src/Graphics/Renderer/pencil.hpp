@@ -36,7 +36,7 @@ enum pencil_join {
 };
 
 class pencil;
-class pencil_rep: abstract_struct {
+class pencil_rep: public tm_obj<pencil_rep> {
 public:
   inline pencil_rep () {}
   inline virtual ~pencil_rep () {}
@@ -56,8 +56,9 @@ public:
   friend class pencil;
 };
 
-class pencil {
-ABSTRACT_NULL(pencil);
+class pencil : public tm_abs_null_ptr<pencil_rep> {
+public:
+  pencil () : tm_abs_null_ptr<pencil_rep>() {}
   pencil (bool b);
   pencil (color c, SI w= std_shrinkf * PIXEL);
   pencil (brush br, SI w= std_shrinkf * PIXEL);
@@ -70,9 +71,8 @@ ABSTRACT_NULL(pencil);
 	  SI w, pencil_cap c, pencil_join j= join_round, double l= 2.0);
   friend inline bool operator == (const pencil& a, const pencil& b);
 };
-ABSTRACT_NULL_CODE(pencil);
 
 inline bool operator == (const pencil& a, const pencil& b) {
-  return a.rep == b.rep; }
+  return a.rep() == b.rep(); }
 
 #endif // defined PENCIL_H

@@ -21,7 +21,7 @@ TMPL class unary_function;
 TMPL bool is_nil (unary_function<T,S> l);
 
 TMPL
-class unary_function_rep: public abstract_struct {
+class unary_function_rep: public tm_obj<unary_function_rep<T,S> > {
 public:
   inline unary_function_rep () {}
   inline virtual ~unary_function_rep () {}
@@ -29,15 +29,14 @@ public:
 };
 
 TMPL
-class unary_function {
+class unary_function : public tm_null_ptr<unary_function_rep<T,S> > {
 public:
-ABSTRACT_NULL_TEMPLATE_2(unary_function,T,S);
+  unary_function<T,S> (unary_function_rep<T,S>* p=NULL) : tm_null_ptr<unary_function_rep<T,S> > (p) {};
   inline T operator () (const S& arg);
 };
-ABSTRACT_NULL_TEMPLATE_2_CODE(unary_function,typename,T,typename,S);
 
 TMPL inline T unary_function<T,S>::operator () (const S& arg) {
-  return rep->eval (arg); }
+  return this->rep()->eval (arg); }
 
 TMPL inline bool
 operator == (unary_function<T,S> mw1, unary_function<T,S> mw2) {

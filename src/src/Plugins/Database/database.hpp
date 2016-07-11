@@ -24,7 +24,7 @@ typedef double db_time;
 typedef array<db_atom> db_atoms;
 #define DB_MAX_TIME ((db_time) 10675199166.0)
 
-class db_line_rep: public concrete_struct {
+class db_line_rep: public tm_obj<db_line_rep> {
 public:
   db_atom id;
   db_atom attr;
@@ -38,13 +38,12 @@ public:
   friend class database;
 };
 
-class db_line {
-  CONCRETE(db_line);
+class db_line : public tm_ptr<db_line_rep> {
+public:
   db_line ();
   db_line (db_atom id, db_atom attr, db_atom val,
            db_time created, db_time expires);
 };
-CONCRETE_CODE(db_line);
 
 /******************************************************************************
 * Databases
@@ -59,7 +58,7 @@ typedef int db_key;
 typedef array<db_key> db_keys;
 
 class database;
-class database_rep: public concrete_struct {
+class database_rep: public tm_obj<database_rep> {
 private:
   url db_name;
   array<db_line> db;
@@ -156,12 +155,11 @@ public:
   friend strings get_name_completions (url u, string s);
 };
 
-class database {
-  CONCRETE(database);
+class database : public tm_ptr<database_rep> {
+public:
   database ();
   database (url u, bool clone= false);
 };
-CONCRETE_CODE(database);
 
 void keep_history (url u, bool flag);
 void set_field (url u, string id, string attr, strings vals, db_time t);

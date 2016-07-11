@@ -20,7 +20,7 @@ enum brush_kind {
   brush_pattern
 };
 
-class brush_rep: abstract_struct {
+class brush_rep: public tm_obj<brush_rep> {
 public:
   inline brush_rep () {}
   inline virtual ~brush_rep () {}
@@ -36,14 +36,14 @@ public:
   friend class brush;
 };
 
-class brush {
-ABSTRACT_NULL(brush);
+class brush : public tm_abs_null_ptr<brush_rep> {
+public:
+  brush () : tm_abs_null_ptr<brush_rep>() {}
   brush (bool b);
   brush (color c);
   brush (tree p, int a= 255);
   friend bool operator == (const brush& a, const brush& b);
 };
-ABSTRACT_NULL_CODE(brush);
 
 bool operator == (const brush& a, const brush& b);
 inline bool operator != (const brush& a, const brush& b) { return !(a == b); }

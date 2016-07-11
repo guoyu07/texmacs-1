@@ -449,7 +449,7 @@ QTMFieldWidgetHelper::QTMFieldWidgetHelper (qt_widget _wid, QLineEdit* cb)
 void
 QTMFieldWidgetHelper::commit (const QString& qst) {
 BEGIN_SLOT
-  static_cast<qt_field_widget_rep*> (wid.rep)->input =
+  concrete<qt_field_widget_rep*> (abstract (wid))->input =
       scm_quote (from_qstring (qst));
 END_SLOT
 }
