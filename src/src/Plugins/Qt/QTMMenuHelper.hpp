@@ -289,15 +289,13 @@ class QTMInputTextWidgetHelper : public QObject {
   Q_OBJECT
   
   qt_widget   p_wid;  //!< A pointer to a qt_input_text_widget_rep
-  bool         done;  //!< Has the command been executed after a modification?
 
 public:
-  QTMInputTextWidgetHelper (qt_widget _wid, QTMLineEdit* parent);
+  QTMInputTextWidgetHelper (qt_widget _wid);
   
 protected:
   qt_input_text_widget_rep* wid () { // useful cast
     return concrete<qt_input_text_widget_rep*> (abstract (p_wid)); }
-  void apply ();
 
 public slots:
   void commit ();
