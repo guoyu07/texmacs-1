@@ -160,6 +160,7 @@ edit_cursor_rep::notify_cursor_moved (int status) {
   mv_status= status;
   cu= eb->find_check_cursor (tp);
   notify_change (THE_CURSOR);
+  if (cu->valid) call ("notify-cursor-moved", object (status));
 }
 
 void
@@ -257,7 +258,7 @@ edit_cursor_rep::go_left () {
   if (has_changed (THE_TREE+THE_ENVIRONMENT)) return;
   path old_tp= copy (tp);
   go_left_physical ();
-  if (tp != old_tp && inside_same (et, old_tp, tp, DOCUMENT)) return;
+  if (tp != old_tp && var_inside_same (et, old_tp, tp, DOCUMENT)) return;
   path p= previous_valid (et, old_tp);
   if (rp < p) go_to (p);
   select_from_cursor_if_active ();
@@ -268,7 +269,7 @@ edit_cursor_rep::go_right () {
   if (has_changed (THE_TREE+THE_ENVIRONMENT)) return;
   path old_tp= copy (tp);
   go_right_physical ();
-  if (tp != old_tp && inside_same (et, old_tp, tp, DOCUMENT)) return;
+  if (tp != old_tp && var_inside_same (et, old_tp, tp, DOCUMENT)) return;
   path p= next_valid (et, old_tp);
   if (rp < p) go_to (p);
   select_from_cursor_if_active ();
@@ -338,10 +339,10 @@ edit_cursor_rep::adjust_cursor () {
 	if (dx == 0) ddelta= DELTA;
       }
       else if (ddelta > 0) {
-	if (p != tp ||
-	    tree_path (sp, mv->ox, mv->oy, mv->delta + eps * ddelta) == tp)
-	  mv->delta += eps * ddelta;
-	ddelta >>= 1;
+        if (p != tp ||
+            tree_path (sp, mv->ox, mv->oy, mv->delta + eps * ddelta) == tp)
+          mv->delta += eps * ddelta;
+        ddelta >>= 1;
       }
     }
   }
@@ -362,6 +363,7 @@ edit_cursor_rep::go_to_here () {
   if (cu->valid) adjust_cursor ();
   if (mv_status == DIRECT) mv= copy (cu);
   notify_change (THE_CURSOR);
+  if (cu->valid) call ("notify-cursor-moved", object (DIRECT));
 }
 
 void
@@ -376,6 +378,7 @@ edit_cursor_rep::go_to (path p) {
       mv= copy (cu);
     }
     notify_change (THE_CURSOR);
+    if (cu->valid) call ("notify-cursor-moved", object (DIRECT));
   }
 }
 
@@ -485,6 +488,11 @@ search_label (tree t, string which) {
     }
     return path ();
   }
+}
+
+bool
+edit_cursor_rep::cursor_is_accessible () {
+  return is_accessible_cursor (et, tp);
 }
 
 void

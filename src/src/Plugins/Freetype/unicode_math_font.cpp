@@ -31,14 +31,18 @@ struct unicode_math_font_rep: font_rep {
 			 font upright, font italic,
 			 font bold_upright, font bold_italic,
 			 font fall_back);
-  int search_font_sub (string s);
-  font search_font (string& s);
+  int    search_font_sub (string s);
+  font   search_font (string& s);
 
-  void get_extents (string s, metric& ex);
-  void get_xpositions (string s, SI* xpos);
-  void draw_fixed (renderer ren, string s, SI x, SI y);
-  font magnify (double zoom);
-  glyph get_glyph (string s);
+  bool   supports (string c);
+  void   get_extents (string s, metric& ex);
+  void   get_xpositions (string s, SI* xpos);
+  void   get_xpositions (string s, SI* xpos, SI xk);
+  void   draw_fixed (renderer ren, string s, SI x, SI y);
+  void   draw_fixed (renderer ren, string s, SI x, SI y, SI xk);
+  font   magnify (double zoomx, double zoomy);
+  glyph  get_glyph (string s);
+  int    index_glyph (string s, font_metric& fnm, font_glyphs& fng);
 
   double get_left_slope  (string s);
   double get_right_slope (string s);
@@ -66,13 +70,13 @@ unicode_math_font_rep::unicode_math_font_rep
 
 static bool
 unicode_provides (string s) {
-  return cork_to_utf8 (s) != s;
+  return strict_cork_to_utf8 (s) != s;
 }
 
 static unsigned int
 cork_to_unicode (string s) {
   int i= 0;
-  return decode_from_utf8 (cork_to_utf8 (s), i);
+  return decode_from_utf8 (strict_cork_to_utf8 (s), i);
 }
 
 //static string
@@ -179,6 +183,12 @@ unicode_math_font_rep::search_font (string& s) {
 * Getting extents and drawing strings
 ******************************************************************************/
 
+bool
+unicode_math_font_rep::supports (string c) {
+  font fn= search_font (c);
+  return fn->supports (c);
+}
+
 void
 unicode_math_font_rep::get_extents (string s, metric& ex) {
   font fn= search_font (s);
@@ -200,24 +210,51 @@ unicode_math_font_rep::get_xpositions (string s, SI* xpos) {
 }
 
 void
+unicode_math_font_rep::get_xpositions (string s, SI* xpos, SI xk) {
+  if (s == "") return;
+  string r= s;
+  font fn= search_font (r);
+  if (r == s) fn->get_xpositions (s, xpos, xk);
+  else if (N(r) != 1) font_rep::get_xpositions (s, xpos, xk);
+  else {
+    int i, n=N(s);
+    for (i=0; i<n; i++) xpos[i]= 0;
+    fn->get_xpositions (r, xpos+n-1, xk);
+  }
+}
+
+void
 unicode_math_font_rep::draw_fixed (renderer ren, string s, SI x, SI y) {
   font fn= search_font (s);
   fn->draw_fixed (ren, s, x, y);
 }
 
+void
+unicode_math_font_rep::draw_fixed (renderer ren, string s, SI x, SI y, SI xk) {
+  font fn= search_font (s);
+  fn->draw_fixed (ren, s, x, y, xk);
+}
+
 font
-unicode_math_font_rep::magnify (double zoom) {
-  return unicode_math_font (upright->magnify (zoom),
-			    italic->magnify (zoom),
-			    bold_upright->magnify (zoom),
-			    bold_italic->magnify (zoom),
-			    fall_back->magnify (zoom));
+unicode_math_font_rep::magnify (double zoomx, double zoomy) {
+  return unicode_math_font (upright->magnify (zoomx, zoomy),
+			    italic->magnify (zoomx, zoomy),
+			    bold_upright->magnify (zoomx, zoomy),
+			    bold_italic->magnify (zoomx, zoomy),
+			    fall_back->magnify (zoomx, zoomy));
 }
 
 glyph
 unicode_math_font_rep::get_glyph (string s) {
   font fn= search_font (s);
   return fn->get_glyph (s);
+}
+
+int
+unicode_math_font_rep::index_glyph (string s, font_metric& fnm,
+                                              font_glyphs& fng) {
+  font fn= search_font (s);
+  return fn->index_glyph (s, fnm, fng);
 }
 
 /******************************************************************************
@@ -276,7 +313,7 @@ unicode_math_font (font up, font it, font bup, font bit, font fb) {
     bup->res_name * "," *
     bit->res_name * "," *
     fb->res_name * "]";
-  cerr << "\n\nFont name= " << name << "\n";
+  failed_error << "Font name= " << name << "\n";
   FAILED ("true type support was disabled");
   return font ();
 }

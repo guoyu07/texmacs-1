@@ -146,7 +146,7 @@ string
 pipe_link_rep::start () {
 #ifndef __MINGW32__
   if (alive) return "busy";
-  if (DEBUG_AUTO) cout << "TeXmacs] Launching '" << cmd << "'\n";
+  if (DEBUG_AUTO) debug_io << "Launching '" << cmd << "'\n";
 
   int e1= pipe (pp_in ); (void) e1;
   int e2= pipe (pp_out); (void) e2;
@@ -213,6 +213,7 @@ debug_io_string (string s) {
     unsigned char c= (unsigned char) s[i];
     if (c == DATA_BEGIN) r << "[BEGIN]";
     else if (c == DATA_END) r << "[END]";
+    else if (c == DATA_ABORT) r << "[ABORT]";
     else if (c == DATA_COMMAND) r << "[COMMAND]";
     else if (c == DATA_ESCAPE) r << "[ESCAPE]";
     else r << s[i];
@@ -225,7 +226,7 @@ void
 pipe_link_rep::write (string s, int channel) {
 #ifndef __MINGW32__
   if ((!alive) || (channel != LINK_IN)) return;
-  if (DEBUG_IO) cout << "[INPUT]" << debug_io_string (s);
+  if (DEBUG_IO) debug_io << "[INPUT]" << debug_io_string (s);
   c_string _s (s);
   int err= ::write (in, _s, N(s));
   (void) err;
@@ -241,7 +242,7 @@ pipe_link_rep::feed (int channel) {
   if (channel == LINK_OUT) r = ::read (out, tempout, 1024);
   else r = ::read (err, tempout, 1024);
   if (r == -1) {
-    cerr << "TeXmacs] read failed for#'" << cmd << "'\n";
+    io_error << "Read failed for '" << cmd << "'\n";
     wait (NULL);
   }
   else if (r == 0) {
@@ -255,7 +256,7 @@ pipe_link_rep::feed (int channel) {
     remove_notifier (snerr);      
   }
   else {
-    if (DEBUG_IO) cout << debug_io_string (string (tempout, r));
+    if (DEBUG_IO) debug_io << debug_io_string (string (tempout, r));
     if (channel == LINK_OUT) outbuf << string (tempout, r);
     else errbuf << string (tempout, r);
   }

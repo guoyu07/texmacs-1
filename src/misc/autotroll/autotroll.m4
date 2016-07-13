@@ -122,7 +122,8 @@ dnl Memo: AC_ARG_WITH(package, help-string, [if-given], [if-not-given])
     AC_MSG_RESULT([$QMAKE])
   fi
   if test x"$QMAKE" = xmissing; then
-    AC_MSG_ERROR([Cannot find qmake in your PATH. Try using --with-qt.])
+    AC_MSG_ERROR([Cannot find qmake in your PATH. Verify that the Qt 4 library is properly
+installed with its development tools, or try using --with-qt.])
   fi
 
   # Find moc (Meta Object Compiler).
@@ -264,9 +265,8 @@ m4_ifval([$3],
 
   additional_qmake_flags=""
   case $host_os in
-    darwin*)
-      additional_qmake_flags="-spec macx-g++"
-      ;;
+    darwin13*) additional_qmake_flags="-spec unsupported/macx-clang-libc++" ;;
+    darwin*) additional_qmake_flags="-spec macx-g++" ;;
   esac
 
   if $QMAKE ${additional_qmake_flags} ; then :; else

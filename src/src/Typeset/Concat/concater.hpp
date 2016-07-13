@@ -63,6 +63,8 @@ class concater_rep {
   void typeset_repeat (tree t, path ip);
   void typeset_formatting (tree t, path ip, string var);
   void typeset_decorated_box (tree t, path ip);
+  void typeset_line_note (tree t, path ip);
+  void typeset_page_note (tree t, path ip);
 
   // mathematical markup
   void typeset_around (tree t, path ip, bool colored);
@@ -83,9 +85,10 @@ class concater_rep {
   void typeset_neg (tree t, path ip);
   void typeset_tree (tree t, path ip);
   void typeset_table (tree t, path ip);
+  void print_semantic (box b, tree sem);
   void typeset_syntax (tree t, path ip);
 
-  // disactivated markup
+  // deactivated markup
   void typeset_blue (tree t, path ip);
   void typeset_src_open (tree t, path ip, string extra);
   void typeset_src_middle (tree t, path ip, int i);
@@ -120,6 +123,7 @@ class concater_rep {
   void typeset_locus (tree t, path ip);
   void typeset_set_binding (tree t, path ip);
   void typeset_write (tree t, path ip);
+  void typeset_toc_notify (tree t, path ip);
   void typeset_specific (tree t, path ip);
   void typeset_flag (tree t, path ip);
 
@@ -127,6 +131,7 @@ class concater_rep {
   void typeset_anim_compose (tree t, path ip);
   void typeset_anim_repeat (tree t, path ip);
   void typeset_anim_constant (tree t, path ip);
+  void typeset_anim_accelerate (tree t, path ip);
   void typeset_anim_translate (tree t, path ip);
   void typeset_anim_progressive (tree t, path ip);
   void typeset_video (tree t, path ip);
@@ -137,9 +142,11 @@ class concater_rep {
   void typeset_graphics (tree t, path ip);
   void typeset_superpose (tree t, path ip);
   void typeset_gr_group (tree t, path ip);
-  void typeset_gr_linear_transform (tree t, path ip);
+  void typeset_gr_transform (tree t, path ip);
+  void typeset_gr_effect (tree t, path ip);
   void typeset_text_at (tree t, path ip);
   void typeset_math_at (tree t, path ip);
+  void typeset_document_at (tree t, path ip);
   void typeset_point (tree t, path ip);
   array<box> typeset_line_arrows (path ip);
   void typeset_line (tree t, path ip, bool close);
@@ -147,8 +154,10 @@ class concater_rep {
   void typeset_spline (tree t, path ip, bool close);
   void typeset_var_spline (tree t, path ip);
   void typeset_cspline (tree t, path ip);
+  void typeset_bezier (tree t, path ip);
   void typeset_fill (tree t, path ip);
   void typeset_image (tree t, path ip);
+  void typeset_graphics_3d (tree t, path ip);
 
   // markup for graphical user interface
   void typeset_canvas (tree t, path ip);

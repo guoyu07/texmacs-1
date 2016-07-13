@@ -1,4 +1,4 @@
-<TeXmacs|1.0.7.16>
+<TeXmacs|1.99.2>
 
 <style|<tuple|source|std>>
 
@@ -62,9 +62,9 @@
 
   <assign|math-imply|<macro|x|<syntax|<arg|x>|\<Rightarrow\>>>>
 
-  <assign|math-or|<macro|x|<syntax|<arg|x>|\<cap\>>>>
+  <assign|math-or|<macro|x|<syntax|<arg|x>|\<vee\>>>>
 
-  <assign|math-and|<macro|x|<syntax|<arg|x>|\<cup\>>>>
+  <assign|math-and|<macro|x|<syntax|<arg|x>|\<wedge\>>>>
 
   <assign|math-not|<macro|x|<syntax|<arg|x>|\<neg\>>>>
 
@@ -128,11 +128,11 @@
 
   <assign|choose|<value|binom>>
 
-  <assign|cfrac|<macro|x|y|<style-only*|<with|mode|math|<with|math-display|true|<frac|<arg|x>|<arg|y>>>>>>>
-
   <assign|tfrac|<macro|x|y|<with|mode|math|<with|math-display|false|<frac|<arg|x>|<arg|y>>>>>>
 
   <assign|dfrac|<macro|x|y|<with|mode|math|<with|math-display|true|<frac|<arg|x>|<arg|y>>>>>>
+
+  <assign|cfrac|<macro|x|y|<with|mode|math|<dfrac|<arg|x>|<resize|<arg|y>|||<plus|1r|-1sep>|>>>>>
 
   <assign|frac*|<macro|x|y|<move|<lsup|<arg|x>><resize|/|<plus|1l|0.15em>|<plus|1b|0.5em>|<minus|1r|0.15em>|<minus|1t|0.5em>><rsub|<arg|y>>||0.05em>>>
 
@@ -140,9 +140,25 @@
 
   <assign|separating-space|<macro|len|<space|<arg|len>>>>
 
+  <assign|application-space|<macro|len|<space|<arg|len>>>>
+
   <drd-props|separating-space|syntax|<macro|len|,>>
 
+  <drd-props|application-space|syntax|<macro|len| >>
+
   <assign|genfrac|<macro|left|right|sep|disp|x|y|<style-only*|<with|mode|math|<shrink-inline|<around*|<inactive*|<arg|left>>|<resize|<tabular*|<tformat|<cwith|1|-1|1|1|cell-lsep|0spc>|<cwith|1|-1|1|1|cell-rsep|0spc>|<cwith|1|1|1|-1|cell-bborder|sep>|<table|<row|<cell|<inactive*|<arg|x>>>>|<row|<cell|<inactive*|<arg|y>>>>>>>||<plus|1b|2.5sep>||<minus|1t|2.5sep>>|<inactive*|<arg|right>>>>>>>>
+
+  <assign|left-script|<macro|body|s|<active*|<tabular|<tformat|<cwith|1|1|1|-1|cell-lsep|0spc>|<cwith|1|1|1|-1|cell-rsep|0spc>|<cwith|1|1|1|-1|cell-bsep|0spc>|<cwith|1|1|1|-1|cell-tsep|0spc>|<cwith|1|1|1|-1|cell-vcorrect|n>|<cwith|1|1|1|-1|cell-valign|c>|<cwith|1|1|1|1|cell-halign|r>|<cwith|1|1|2|2|cell-halign|c>|<cwith|1|1|3|3|cell-halign|l>|<table|<row|<cell|<with|math-level|<plus|<value|math-level>|1>|<resize|<arg|s>|<minus|1r|1.5ex>||<minus|1r|0.5ex>|>>>|<cell|<arg|body>>|<cell|<with|math-level|<plus|<value|math-level>|1>|<resize||0ex||1ex|>>>>>>>>>>
+
+  <assign|right-script|<macro|body|s|<active*|<tabular|<tformat|<cwith|1|1|1|-1|cell-lsep|0spc>|<cwith|1|1|1|-1|cell-rsep|0spc>|<cwith|1|1|1|-1|cell-bsep|0spc>|<cwith|1|1|1|-1|cell-tsep|0spc>|<cwith|1|1|1|-1|cell-vcorrect|n>|<cwith|1|1|1|-1|cell-valign|c>|<cwith|1|1|2|2|cell-halign|c>|<table|<row|<cell|<with|math-level|<plus|<value|math-level>|1>|<resize||0ex||1ex|>>>|<cell|<arg|body>>|<cell|<with|math-level|<plus|<value|math-level>|1>|<resize|<arg|s>|<plus|1l|0.5ex>||<plus|1l|1.5ex>|>>>>>>>>>>
+
+  <assign|suppressed|<macro|x|<with|color|#e0b080|<arg|x>>>>
+
+  <drd-props|suppressed|arity|1|accessible|none>
+
+  <assign|tiny-box|<macro|<tiny|<with|font|roman|math-font|roman|<move|\<Box\>||0.05ex>>>>>
+
+  <assign|explicit-space|<macro|<syntax|\<short-underscore\>| >>>
 
   <\active*>
     <\src-comment>
@@ -153,6 +169,8 @@
   <assign|matrix*|<macro|x|<shrink-inline|<style-with|src-compact|none|<tformat|<cwith|1|-1|1|-1|cell-halign|c>|<arg|x>>>>>>
 
   <assign|matrix|<macro|x|<shrink-inline|<style-with|src-compact|none|<left|(><tformat|<cwith|1|-1|1|-1|cell-halign|c>|<arg|x>><right|)>>>>>
+
+  <assign|bmatrix|<macro|x|<shrink-inline|<style-with|src-compact|none|<left|[><tformat|<cwith|1|-1|1|-1|cell-halign|c>|<arg|x>><right|]>>>>>
 
   <assign|det|<macro|x|<shrink-inline|<style-with|src-compact|none|<left|\|><tformat|<cwith|1|-1|1|-1|cell-halign|c>|<arg|x>><right|\|>>>>>
 

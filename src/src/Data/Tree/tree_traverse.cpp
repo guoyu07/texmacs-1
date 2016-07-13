@@ -11,6 +11,7 @@
 
 #include "tree_traverse.hpp"
 #include "drd_std.hpp"
+#include "drd_mode.hpp"
 #include "analyze.hpp"
 #include "hashset.hpp"
 #include "scheme.hpp"
@@ -18,6 +19,21 @@
 /******************************************************************************
 * Accessability
 ******************************************************************************/
+
+bool
+is_macro (tree_label l) {
+  return the_drd->get_var_type (l) != VAR_PARAMETER;
+}
+
+bool
+is_parameter (tree_label l) {
+  return the_drd->get_var_type (l) != VAR_MACRO;
+}
+
+string
+get_tag_type (tree_label l) {
+  return drd_decode_type (the_drd->get_type (l));
+}
 
 int
 minimal_arity (tree_label l) {
@@ -86,6 +102,17 @@ none_accessible (tree t) {
   return the_drd->none_accessible (L(t));
 }
 
+bool
+exists_accessible_inside (tree t) {
+  if (is_atomic (t)) return true;
+  if (!the_drd->is_child_enforcing (t)) return true;
+  for (int i=0; i<N(t); i++)
+    if (the_drd->is_accessible_child (t, i) &&
+        exists_accessible_inside (t[i]))
+      return true;
+  return false;
+}
+
 /******************************************************************************
 * Further properties
 ******************************************************************************/
@@ -120,6 +147,16 @@ get_env_child (tree t, int i, string var, tree val) {
   return the_drd->get_env_child (t, i, var, val);
 }
 
+tree
+get_env_child (tree t, int i, tree env) {
+  return the_drd->get_env_child (t, i, env);
+}
+
+tree
+get_env_descendant (tree t, path p, tree env) {
+  return the_drd->get_env_descendant (t, p, env);  
+}
+
 /******************************************************************************
 * Traversal of a tree
 ******************************************************************************/
@@ -129,6 +166,10 @@ move_any (tree t, path p, bool forward) {
   path q = path_up (p);
   int  l = last_item (p);
   tree st= subtree (t, q);
+  if (!is_nil (q) && is_func (subtree (t, path_up (q)), RAW_DATA)) {
+    if (forward) return path_up (q) * 1;
+    else return path_up (q) * 0;
+  }
   if (is_atomic (st)) {
     string s= st->label;
     ASSERT (l >= 0 && l <= N(s), "out of range");
@@ -189,7 +230,7 @@ path previous_any (tree t, path p) {
 ******************************************************************************/
 
 static path
-move_valid (tree t, path p, bool forward) {
+move_valid_sub (tree t, path p, bool forward) {
   ASSERT (is_inside (t, p), "invalid cursor");
   path q= p;
   while (true) {
@@ -198,6 +239,16 @@ move_valid (tree t, path p, bool forward) {
     if (valid_cursor (t, r)) return r;
     q= r;
   }
+}
+
+static path
+move_valid (tree t, path p, bool forward) {
+  bool inside= the_drd->is_accessible_path (t, p);
+  if (inside) return move_valid_sub (t, p, forward);
+  bool old_mode= set_access_mode (DRD_ACCESS_SOURCE);
+  path r= move_valid_sub (t, p, forward);
+  set_access_mode (old_mode);
+  return r;
 }
 
 path next_valid (tree t, path p) {
@@ -252,7 +303,7 @@ next_is_word (tree t, path p) {
 static path
 move_word (tree t, path p, bool forward) {
   while (true) {
-    path q= move_valid (t, p, forward);
+    path q= move_accessible (t, p, forward);
     int l= last_item (q);
     if (q == p) return p;
     tree st= subtree (t, path_up (q));
@@ -261,12 +312,12 @@ move_word (tree t, path p, bool forward) {
       int n= N(s);
       if (s == "") return q;
       if (forward && l>0 &&
-	  (is_iso_alphanum (s[l-1]) ||
+	  (is_iso_alphanum (s[l-1]) || (l<n && s[l] == ' ') ||
 	   (l==n && at_border (t, path_up (q), forward))) &&
 	  (l==n || !is_iso_alphanum (s[l])))
 	return q;
       if (!forward && l<n &&
-	  (is_iso_alphanum (s[l]) ||
+	  (is_iso_alphanum (s[l]) || (l>0 && s[l-1] == ' ') ||
 	   (l==0 && at_border (t, path_up (q), forward))) &&
 	  (l==0 || !is_iso_alphanum (s[l-1])))
 	return q;
@@ -299,7 +350,11 @@ move_node (tree t, path p, bool forward) {
     if (forward) p= path_up (p) * N (st->label);
     else p= path_up (p) * 0;
   }
-  return move_valid (t, p, forward);
+  p= move_valid (t, p, forward);
+  st= subtree (t, path_up (p));
+  if (is_atomic (st) && last_item (p) > 0)
+    p= path_up (p) * N (st->label);
+  return p;
 }
 
 path next_node (tree t, path p) {
@@ -324,11 +379,13 @@ static bool
 distinct_tag_or_argument (tree t, path p, path q, hashset<int> labs) {
   path c= common (p, q);
   path r= path_up (q);
-  if (labs->contains ((int) L (subtree (t, r))) && tag_border (t, q) != 0)
+  if (labs->contains ((int) L (subtree (t, r))) && tag_border (t, q) > 0)
     return true;
   while (!is_nil (r) && (r != c)) {
     r= path_up (r);
-    if (labs->contains ((int) L (subtree (t, r)))) return true;
+    if (labs->contains ((int) L (subtree (t, r))) &&
+	!none_accessible (subtree (t, r)))
+      return true;
   }
   return false;
 }
@@ -338,7 +395,24 @@ acceptable_border (tree t, path p, path q, hashset<int> labs) {
   if (tag_border (t, q) == 0) return true;
   if (!labs->contains ((int) L (subtree (t, path_up (q))))) return true;
   if (tag_border (t, q) < 0) return false;
-  return tag_border (t, p) != 0;
+  return tag_border (t, p) > 0;
+}
+
+static bool
+acceptable_child (tree t, path p, hashset<int> labs) {
+  tree st= subtree (t, path_up (p));
+  if (is_compound (st) && labs->contains ((int) L(st)))
+    if (last_item (p) == 0 || last_item (p) == 1)
+      return true;
+  p= path_up (p);
+  while (!is_nil (p)) {
+    st= subtree (t, path_up (p));
+    if (labs->contains ((int) L(st)))
+      if (is_accessible_child (st, last_item (p)))
+        return true;
+    p= path_up (p);
+  }
+  return false;
 }
 
 static int
@@ -360,6 +434,7 @@ move_tag (tree t, path p, hashset<int> labs, bool forward, bool preserve) {
     if (r == q) return p;
     if (distinct_tag_or_argument (t, p, r, labs) &&
         acceptable_border (t, p, r, labs) &&
+        acceptable_child (t, r, labs) &&
 	(!preserve || tag_index (t, r, labs) == tag_index (t, p, labs)))
       return r;
     q= r;
@@ -442,6 +517,30 @@ more_inside (tree t, path p, path q, tree_label which) {
     search_upwards (t, path_up (p), which);
 }
 
+bool
+var_inside_same_sub (tree t, path p, path q, tree_label which) {
+  path pq= search_upwards (t, path_up (q), which);
+  path pp= search_upwards (t, path_up (p), which);
+  if (!(pq <= pp)) return false;
+  path c= common (p, q);
+  tree st= subtree (t, c);
+  path sp= p / c;
+  path sq= q / c;
+  if (N(sp) == 0 || N(sq) == 0) return false;
+  if (sp == path (0) || sp == path (1)) return true;
+  if (sq == path (0) || sq == path (1)) return true;
+  // TODO: maybe further adjustments will be necessary in the future
+  return false;
+}
+
+bool
+var_inside_same (tree t, path p, path q, tree_label which) {
+  return
+    inside_same (t, p, q, which) ||
+    var_inside_same_sub (t, p, q, which) ||
+    var_inside_same_sub (t, q, p, which);
+}
+
 /******************************************************************************
 * Find sections in document
 ******************************************************************************/
@@ -460,7 +559,7 @@ init_sections () {
     section_traverse_tags->insert (as_tree_label ("hide-part"));
   }
   if (N(section_tags) == 0) {
-    eval ("(use-modules (text std-text-drd))");
+    eval ("(use-modules (text text-drd))");
     object l= eval ("(append (section-tag-list) (section*-tag-list))");
     while (!is_null (l)) {
       section_tags->insert (as_tree_label (as_symbol (car (l))));

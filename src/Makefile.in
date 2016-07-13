@@ -19,6 +19,9 @@ mandir = @mandir@
 tmdir = @tmdir@
 tmbin = @tmbin@
 tmdata = @tmdata@
+svnrev = @SVNREV@
+verinfo = ${tmdir}/verinfo.txt
+tm_devel_version = @DEVEL_VERSION@
 tm_devel = @tm_devel@
 tm_devel_release = @tm_devel_release@
 tm_underscore_devel = @tm_underscore_devel@
@@ -28,8 +31,7 @@ tm_stable_release = @tm_stable_release@
 tm_underscore_stable = @tm_underscore_stable@
 tm_suffix = @CONFIG_OS_SUFFIX@
 so = @CONFIG_SO@
-GS_EXE= @GS_EXE@
-GS_DLL= @GS_DLL@
+
 DESTDIR =
 
 MKDIR = mkdir -p
@@ -41,13 +43,17 @@ CHMOD = @CONFIG_CHMOD@
 GZIP = gzip -f
 STRIP = @CONFIG_STRIP@
 TOUCH = touch
+SIGN = misc/admin/sign_update
+
+
+.NOTPARALLEL:
 
 ###############################################################################
 # Main makes
 ###############################################################################
 
-TEXMACS: EMPTY_DIRS
-	cd src; $(MAKE) -f makefile link=shared
+TEXMACS: EMPTY_DIRS 
+	cd src; $(MAKE) -r -f makefile link=shared
 	$(MAKE) -f Makefile PLUGINS
 	$(MAKE) -f Makefile EX_PLUGINS
 	$(CP) misc/scripts/fig2ps $(tmdir)/bin
@@ -60,8 +66,8 @@ TEXMACS: EMPTY_DIRS
 	@echo ----------------------------------------------------
 	@echo dynamic TeXmacs has been successfully compiled
 
-STATIC_TEXMACS: EMPTY_DIRS
-	cd src; $(MAKE) -f makefile link=static
+STATIC_TEXMACS: EMPTY_DIRS 
+	cd src; $(MAKE) -r -f makefile link=static CFLAGS=-D__TMSTATIC__
 	$(MAKE) -f Makefile PLUGINS
 	$(MAKE) -f Makefile EX_PLUGINS
 	$(CP) misc/scripts/fig2ps $(tmdir)/bin
@@ -294,21 +300,18 @@ SRC_PACKAGE: COPY_SOURCES
 ###############################################################################
 
 GENERIC_PACKAGE_DIR = ../distr/generic
-STATIC_QT = $(tm_devel)-$(tm_suffix)
+STATIC_QT = $(tm_devel)-$(svnrev)-$(tm_suffix)
 STATIC_X11 = $(tm_devel)-x11-$(tm_suffix)
 
-GENERIC_PACKAGE: COPY_SOURCES COPY_GUILE
-	cd $(BUILD_DIR); ./configure
-	cd $(BUILD_DIR); make STATIC_TEXMACS
-	cd $(BUILD_DIR); make ACCESS_FLAGS
-	$(MV) $(BUILD_DIR)/TeXmacs $(BUILD_DIR)/$(STATIC_QT)
-	cd $(BUILD_DIR); tar -czf $(STATIC_QT).tar.gz $(STATIC_QT)
+GENERIC_PACKAGE: STATIC_TEXMACS STRIP
 	$(MKDIR) $(GENERIC_PACKAGE_DIR)
-	$(MV) $(BUILD_DIR)/$(STATIC_QT).tar.gz $(GENERIC_PACKAGE_DIR)
-	$(RM) -r ../distr/build
+	-find `guile-config info pkgdatadir` -type d -name ice-9 -exec cp -R {} $(tmdir)/progs \; && \
+	   cp -R $(tmdir) $(STATIC_QT) && \
+	   tar -czhf $(GENERIC_PACKAGE_DIR)/$(STATIC_QT)-@CONFIG_STYPE@.tar.gz $(STATIC_QT) --exclude .svn --mode go=rX
+	$(RM) $(tmdir)/progs/ice-9  $(STATIC_QT)
 
 GENERIC_X11_PACKAGE: COPY_SOURCES COPY_GUILE
-	cd $(BUILD_DIR); ./configure --disable-qt
+	cd $(BUILD_DIR); ./configure --disable-qt --disable-pdf-renderer
 	cd $(BUILD_DIR); make STATIC_TEXMACS
 	cd $(BUILD_DIR); make ACCESS_FLAGS
 	$(MV) $(BUILD_DIR)/TeXmacs $(BUILD_DIR)/$(STATIC_X11)
@@ -443,12 +446,16 @@ UBUNTU_PACKAGE: COPY_SOURCES_TGZ
 
 QT_FRAMEWORKS_PATH = @QT_FRAMEWORKS_PATH@
 QT_PLUGINS_PATH = @QT_PLUGINS_PATH@
+QT_PLUGINS_LIST = @QT_PLUGINS_LIST@
+SPARKLE_FRAMEWORK_PATH = @SPARKLE_FRAMEWORK_PATH@
 
 MACOS_PACKAGE_SRC = packages/macos
 MACOS_PACKAGE_DIR = ../distr/macos
 
 MACOS_PACKAGE_APP = ../distr/$(tm_devel).app
-MACOS_PACKAGE_DMG = ../distr/$(tm_devel).dmg
+MACOS_PACKAGE_DMG = ../distr/$(tm_devel)-r$(svnrev)-os@MACOSX_DEPLOYMENT_TARGET@.dmg
+MACOS_PACKAGE_ZIP = ../distr/$(tm_devel).zip
+
 MACOS_PACKAGE_CONTENTS = $(MACOS_PACKAGE_APP)/Contents
 MACOS_PACKAGE_RESOURCES = $(MACOS_PACKAGE_CONTENTS)/Resources
 MACOS_PACKAGE_TEXMACS = $(MACOS_PACKAGE_RESOURCES)/share/TeXmacs
@@ -456,37 +463,32 @@ MACOS_PACKAGE_TEXMACS = $(MACOS_PACKAGE_RESOURCES)/share/TeXmacs
 MACOS_BUNDLE: TEXMACS
 	$(MKDIR) ../distr
 	$(RM) -r $(MACOS_PACKAGE_APP)
-	$(MKDIR) $(MACOS_PACKAGE_APP)
-	$(MKDIR) $(MACOS_PACKAGE_CONTENTS)
+	$(MKDIR) $(MACOS_PACKAGE_APP) $(MACOS_PACKAGE_CONTENTS) $(MACOS_PACKAGE_RESOURCES)
+	$(MKDIR) $(MACOS_PACKAGE_CONTENTS)/Frameworks $(MACOS_PACKAGE_CONTENTS)/Plugins \
+		$(MACOS_PACKAGE_CONTENTS)/MacOS
+	$(MKDIR) $(MACOS_PACKAGE_RESOURCES)/bin $(MACOS_PACKAGE_RESOURCES)/lib \
+		$(MACOS_PACKAGE_RESOURCES)/share
 	$(CP) $(MACOS_PACKAGE_SRC)/Info.plist $(MACOS_PACKAGE_CONTENTS)
 	$(CP) $(MACOS_PACKAGE_SRC)/PkgInfo $(MACOS_PACKAGE_CONTENTS)
-	$(MKDIR) $(MACOS_PACKAGE_CONTENTS)/MacOS
 	$(CP) TeXmacs/bin/texmacs.bin $(MACOS_PACKAGE_CONTENTS)/MacOS/TeXmacs
-	$(MKDIR) $(MACOS_PACKAGE_RESOURCES)
 	$(CP) $(MACOS_PACKAGE_SRC)/TeXmacs.icns $(MACOS_PACKAGE_RESOURCES)
 	$(CP) $(MACOS_PACKAGE_SRC)/TeXmacs-document.icns \
-	$(MACOS_PACKAGE_RESOURCES)
+	      $(MACOS_PACKAGE_RESOURCES)
 	$(CP) src/Plugins/Cocoa/English.lproj $(MACOS_PACKAGE_RESOURCES)
-	$(MKDIR) $(MACOS_PACKAGE_RESOURCES)/bin
-	$(MKDIR) $(MACOS_PACKAGE_RESOURCES)/lib
-	$(MKDIR) $(MACOS_PACKAGE_RESOURCES)/share
+	$(CP) misc/admin/texmacs_updates_dsa_pub.pem $(MACOS_PACKAGE_RESOURCES)
 	$(CP) TeXmacs $(MACOS_PACKAGE_RESOURCES)/share
 	$(RM) $(MACOS_PACKAGE_TEXMACS)/bin/texmacs.bin
-	GUILE_DATA_PATH=@GUILE_DATA_PATH@; \
-  	  $(CP) `find $$GUILE_DATA_PATH -type d | grep ice-9` $(MACOS_PACKAGE_TEXMACS)/progs/
+	find @GUILE_DATA_PATH@ -type d -name ice-9 -exec cp -R {} $(MACOS_PACKAGE_TEXMACS)/progs/ \;
 	$(CHMOD) -R go=rX $(MACOS_PACKAGE_TEXMACS)/progs/ice-9
-	$(RM) -r $(MACOS_PACKAGE_TEXMACS)/.svn
-	$(RM) -r $(MACOS_PACKAGE_TEXMACS)/*/.svn
-	$(RM) -r $(MACOS_PACKAGE_TEXMACS)/*/*/.svn
-	$(RM) -r $(MACOS_PACKAGE_TEXMACS)/*/*/*/.svn
-	$(RM) -r $(MACOS_PACKAGE_TEXMACS)/*/*/*/*/.svn
-	$(RM) -r $(MACOS_PACKAGE_TEXMACS)/*/*/*/*/*/.svn
-	$(RM) -r $(MACOS_PACKAGE_TEXMACS)/*/*/*/*/*/*/.svn
-	$(RM) -r $(MACOS_PACKAGE_TEXMACS)/*/*/*/*/*/*/*/.svn
-	# deploy libraries
-	QT_FRAMEWORKS_PATH=$(QT_FRAMEWORKS_PATH) QT_PLUGINS_PATH=$(QT_PLUGINS_PATH) \
-	  $(MACOS_PACKAGE_SRC)/bundle-libs.sh \
-	  $(MACOS_PACKAGE_CONTENTS)/MacOS/TeXmacs
+	find -d $(MACOS_PACKAGE_TEXMACS) -name .svn -exec rm -rf {} \;
+
+	@echo Deploying libraries into application bundle.
+	QT_PLUGINS_PATH="$(QT_PLUGINS_PATH)" QT_PLUGINS_LIST="$(QT_PLUGINS_LIST)" \
+	QT_FRAMEWORKS_PATH="$(QT_FRAMEWORKS_PATH)" \
+	  $(MACOS_PACKAGE_SRC)/bundle-libs.sh $(MACOS_PACKAGE_CONTENTS)/MacOS/TeXmacs
+	@echo ----------------------------------------------------
+	@echo TeXmacs has been bundled in $(MACOS_PACKAGE_APP)
+
 
 MACOS_PACKAGE: MACOS_BUNDLE
 	$(RM) $(MACOS_PACKAGE_DMG)
@@ -495,13 +497,23 @@ MACOS_PACKAGE: MACOS_BUNDLE
 	$(MV) $(MACOS_PACKAGE_DMG) $(MACOS_PACKAGE_DIR)
 	$(RM) -r $(MACOS_PACKAGE_APP)
 
+MACOS_RELEASE: MACOS_BUNDLE
+	$(RM) $(MACOS_PACKAGE_ZIP)
+	(cd ../distr; zip -r9Tq $(tm_devel).zip $(tm_devel).app)
+	$(SIGN) $(MACOS_PACKAGE_ZIP) $(svnrev) $(tm_devel_version)
+
 BUNDLE: MACOS_BUNDLE
 
-.PHONY: BUNDLE MACOS_BUNDLE MACOS_PACKAGE
+.PHONY: BUNDLE MACOS_BUNDLE MACOS_PACKAGE MACOS_RELEASE
 
 ###############################################################################
 # Make a Windows installer
 ###############################################################################
+
+GS_EXE = @GS_EXE@
+GS_DLL = @GS_DLL@
+WINSPARKLE_DLL = @WINSPARKLE_DLL@
+WINSPARKLE_PATH = @WINSPARKLE_PATH@
 
 WINDOWS_PACKAGE_SRC = packages/windows
 WINDOWS_PACKAGE_DIR = ../distr/windows
@@ -510,43 +522,32 @@ WINDOWS_BUILD_DIR = ../distr/TeXmacs-Windows
 WINDOWS_BUILD_BIN_DIR = $(WINDOWS_BUILD_DIR)/bin
 
 ## WARNING: the following path list needs to be adapted manually 
-DLLPATH = $(PATH)
+DLLPATH = $(PATH) $(WINSPARKLE_PATH)
 DLLS_IN_PATH = $(wildcard $(addsuffix /$(1),$(subst :, ,$(DLLPATH))))
-DLL_LIST = pthreadGC2.dll libgcc_s_dw2-1.dll QtCore4.dll QtGui4.dll QtSvg4.dll mingwm10.dll libgmp*.dll libguile*.dll libfreetype*.dll libltdl*.dll libiconv*.dll libintl-8.dll libstdc++*.dll $(GS_EXE) $(GS_DLL) wget.exe
+DLL_LIST = pthreadGC2.dll libgcc_s_dw2-1.dll QtCore4.dll QtGui4.dll QtXml4.dll \
+           mingwm10.dll libgmp*.dll libguile*.dll libfreetype*.dll libltdl*.dll libiconv*.dll \
+           libintl-8.dll libstdc++*.dll libpoppler*.dll libpng16*.dll zlib1.dll $(GS_EXE) $(GS_DLL) wget.exe $(WINSPARKLE_DLL)
 DLLS = $(foreach DLL,$(DLL_LIST),$(call DLLS_IN_PATH,$(DLL)))
 
 WINDOWS_BUNDLE: TEXMACS
 	$(MKDIR) ../distr
-	$(RM) -r $(WINDOWS_BUILD_DIR)
 	$(MKDIR) $(WINDOWS_BUILD_DIR)
-	$(CP) TeXmacs/* $(WINDOWS_BUILD_DIR)/.
-	$(MV) $(WINDOWS_BUILD_DIR)/bin/texmacs.bin \
-	$(WINDOWS_BUILD_DIR)/bin/texmacs.exe
+	$(CP)  -u TeXmacs/* $(WINDOWS_BUILD_DIR)/.
+	$(MV) $(WINDOWS_BUILD_DIR)/bin/texmacs.bin $(WINDOWS_BUILD_DIR)/bin/texmacs.exe
 	$(RM) -r $(WINDOWS_BUILD_DIR)/bin/texmacs
-	GUILE_DATA_PATH=`guile-config info pkgdatadir`; \
-	export GUILE_DATA_PATH; \
-	GUILE_LOAD_PATH=`find $$GUILE_DATA_PATH -type d | grep ice-9`; \
-	export GUILE_LOAD_PATH; \
-	for I in $$GUILE_LOAD_PATH ; \
-	do $(CP) $$I $(WINDOWS_BUILD_DIR)/progs/ ; done
-	$(CHMOD) -R go=rX $(WINDOWS_BUILD_DIR)/progs/ice-9
-	$(RM) -r $(WINDOWS_BUILD_DIR)/.svn
-	$(RM) -r $(WINDOWS_BUILD_DIR)/*/.svn
-	$(RM) -r $(WINDOWS_BUILD_DIR)/*/*/.svn
-	$(RM) -r $(WINDOWS_BUILD_DIR)/*/*/*/.svn
-	$(RM) -r $(WINDOWS_BUILD_DIR)/*/*/*/*/.svn
-	$(RM) -r $(WINDOWS_BUILD_DIR)/*/*/*/*/*/.svn
-	$(RM) -r $(WINDOWS_BUILD_DIR)/*/*/*/*/*/*/.svn
-	$(RM) -r $(WINDOWS_BUILD_DIR)/*/*/*/*/*/*/*/.svn
-	for DLL in $(DLLS) ; do $(CP) $$DLL $(WINDOWS_BUILD_BIN_DIR) ; done
-	$(CP) -r $(QT_PLUGINS_PATH)/* $(WINDOWS_BUILD_BIN_DIR)
-	$(CP) /local/share/gsv*/* $(WINDOWS_BUILD_BIN_DIR)
+	$(CP) misc/admin/texmacs_updates_dsa_pub.pem $(WINDOWS_BUILD_DIR)/bin
+	$(CP) $(WINDOWS_PACKAGE_SRC)/*.exe $(WINDOWS_BUILD_DIR)/bin
+	find `guile-config info pkgdatadir` -type d -name ice-9 -exec $(CP) {} $(WINDOWS_BUILD_DIR)/progs/ \; 
+	[ -d $(WINDOWS_BUILD_BIN_DIR) ] && cp -u  $(DLLS) $(WINDOWS_BUILD_BIN_DIR)
+	[ -d $(WINDOWS_BUILD_BIN_DIR) ] && $(CP) -u $(QT_PLUGINS_PATH)/* $(WINDOWS_BUILD_BIN_DIR)
 
-WINDOWS_PACKAGE: WINDOWS_BUNDLE
-	iscc $(WINDOWS_PACKAGE_SRC)/TeXmacs.iss
+$(WINDOWS_PACKAGE_DIR)/@tm_devel@.@SVNREV@-win-x86.exe: $(wilcard $(WINDOWS_BUILD_DIR)/*)
 	$(MKDIR) $(WINDOWS_PACKAGE_DIR)
-	$(MV) ../distr/$(tm_devel)-installer* $(WINDOWS_PACKAGE_DIR)
-	$(RM) -r $(WINDOWS_BUILD_DIR)
+	iscc $(WINDOWS_PACKAGE_SRC)/TeXmacs.iss
+
+WINDOWS_PACKAGE: WINDOWS_BUNDLE $(WINDOWS_PACKAGE_DIR)/@tm_devel@.@SVNREV@-win-x86.exe
+#	$(MV) ../distr/*-installer* $(WINDOWS_PACKAGE_DIR)
+#	$(RM) -r $(WINDOWS_BUILD_DIR)
 
 .PHONY: WINDOWS_BUNDLE WINDOWS_PACKAGE
 
@@ -555,24 +556,11 @@ WINDOWS_PACKAGE: WINDOWS_BUNDLE
 ###############################################################################
 
 RDISTR:
-	$(RM) $(tmdir)/TEX_PATHS
-	$(RM) *~
-	$(RM) */*~
-	$(RM) */*/*~
-	$(RM) */*/*/*~
-	$(RM) */*/*/*/*~
-	$(RM) */*/*/*/*/*~
-	$(RM) core
-	$(RM) */core
-	$(RM) src/*/core
-	$(RM) src/*/*/core
-	$(RM) src/*/*/*/core
-	$(RM) misc/*/core
-	$(RM) plugins/*/core
-	$(RM) plugins/*/*/core
-	$(RM) $(tmdir)/lib/*.a
-	$(RM) $(tmdir)/fonts/error/* 2>/dev/null || :
-	$(RM) -r autom*.cache
+	-$(RM) $(tmdir)/TEX_PATHS
+	find . -name '*~' -o -name core -delete
+	-$(RM) $(tmdir)/lib/*.a
+	-$(RM) $(tmdir)/fonts/error/* 2>/dev/null
+	-$(RM) -r autom*.cache
 
 DISTR: RDISTR
 	cd src; $(MAKE) -f makefile DISTR
@@ -601,10 +589,9 @@ DISTCLEAN: CLEAN
 	$(RM) src/System/tm_configure.hpp
 	$(RM) src/makefile
 	$(RM) TeXmacs/examples/plugins/dynlink/Makefile
-	$(RM) config.cache
-	$(RM) config.log
-	$(RM) config.status
-	$(RM) Makefile
+	$(RM) config.cache config.log config.status
+	$(RM) Makefile  ${verinfo} misc/admin/appcast.xml
+	$(RM) -r $(WINDOWS_BUILD_DIR)
 
 SVN_CLEAN:
 	$(RM) -r .svn
@@ -645,5 +632,13 @@ ACCESS_FLAGS:
 	$(CHMOD) -R go+rX *
 	$(CHMOD) -R go+x $(tmdir)/bin
 	$(CHMOD) -R go+x $(tmdir)/lib
+
+VERINFO:
+	@{ date; uname -srvn ; printf "\nRevision  ${svnrev}  "; \
+	egrep '\$$.+configure' config.log; \
+	gcc --version; \
+	svn -v st | misc/admin/verinfo.sh; \
+	printf "\n**** DIFF ****\n\n"; \
+	svn diff;  }> ${verinfo}
 
 .PHONY: TOUCH STRIP ACCESS_FLAGS

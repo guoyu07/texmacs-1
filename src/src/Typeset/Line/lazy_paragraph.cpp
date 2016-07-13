@@ -15,6 +15,7 @@
 #include "Format/format.hpp"
 #include "Line/lazy_vstream.hpp"
 #include "Boxes/construct.hpp"
+#include "analyze.hpp"
 
 array<line_item> typeset_concat (edit_env env, tree t, path ip);
 void hyphenate (line_item item, int pos, line_item& item1, line_item& item2);
@@ -55,7 +56,30 @@ lazy_paragraph_rep::lazy_paragraph_rep (edit_env env2, path ip):
   par_sep    = env->get_vspace (PAR_PAR_SEP);
   nr_cols    = env->get_int (PAR_COLUMNS);
 
-  tree dec   = env->read (ATOM_DECORATIONS);
+  string ks= as_string (env->read (PAR_KERNING_STRETCH));
+  if (ks == "auto") {
+    double cpl= min (max (((double) width) / max (env->fn->wfn, 1), 10.0), 40.0);
+    kstretch= 1.0 / cpl;
+  }
+  else if (ks == "tolerant") {
+    double cpl= min (max (((double) width) / max (env->fn->wfn, 1), 10.0), 40.0);
+    kstretch= 2.5 / cpl;
+  }
+  else if (is_double (ks)) kstretch= as_double (ks);
+  else kstretch= 0.0;
+
+  string ps= as_string (env->read (PAR_KERNING_MARGIN));
+  if (ps == "true") protrusion= WESTERN_PROTRUSION;
+  else protrusion= 0;
+
+  string sm= as_string (env->read (PAR_SPACING));
+  if (sm == "plain");
+  else if (sm == "quanjiao") protrusion += QUANJIAO;
+  else if (sm == "banjiao") protrusion += BANJIAO;
+  else if (sm == "hangmobanjiao") protrusion += HANGMOBANJIAO;
+  else if (sm == "kaiming") protrusion += KAIMING;
+
+  tree dec= env->read (ATOM_DECORATIONS);
   if (N(dec) > 0) decs << tuple ("0", dec);
 }
 
@@ -74,6 +98,7 @@ lazy_paragraph_rep::operator tree () {
 void
 lazy_paragraph_rep::line_print (line_item item) {
   // cout << "Printing: " << item << "\n";
+  // cout << "Printing: " << item << ", " << item->penalty << "\n";
   if (item->type == CONTROL_ITEM) {
     if (is_func (item->t, HTAB))
       tabs << tab (N(items), item->t);
@@ -89,6 +114,14 @@ lazy_paragraph_rep::line_print (line_item item) {
       sss->no_page_break_before ();
     else if (item->t == NO_PAGE_BREAK)
       sss->no_page_break_after ();
+    else if (item->t == VAR_NO_BREAK_HERE)
+      sss->no_break_before ();
+    else if (item->t == NO_BREAK_HERE)
+      sss->no_break_after ();
+    else if (item->t == NO_BREAK_START)
+      sss->no_break_start ();
+    else if (item->t == NO_BREAK_END)
+      sss->no_break_end ();
     else if (is_tuple (item->t, "env_page") ||
 	     (item->t == PAGE_BREAK) ||
 	     (item->t == NEW_PAGE) ||
@@ -103,6 +136,10 @@ lazy_paragraph_rep::line_print (line_item item) {
   }
   else if (item->type == FLOAT_ITEM) {
     fl << item->b->get_leaf_lazy ();
+    // REPLACE item by item without lazy attachment !
+  }
+  else if (item->type == NOTE_LINE_ITEM) {
+    notes << item;
     // REPLACE item by item without lazy attachment !
   }
 
@@ -141,6 +178,89 @@ lazy_paragraph_rep::line_print (path start, path end) {
 }
 
 /******************************************************************************
+* Adjustments for current line unit
+******************************************************************************/
+
+void
+lazy_paragraph_rep::find_first_last_text (int& first, int& last) {
+  int i;
+  first= last= -1;
+  for (i=cur_start; i<N(items); i++)
+    if (items[i]->w () != 0 || spcs[i] != space (0)) {
+      first= i;
+      break;
+    }
+  for (i=N(items)-1; i>=cur_start; i--)
+    if (items[i]->w () != 0 || (i > cur_start && spcs[i-1] != space (0))) {
+      last= i;
+      break;
+    }
+}
+
+void
+lazy_paragraph_rep::protrude (bool lf, bool rf) {
+  int first, last;
+  find_first_last_text (first, last);
+  for (int i=cur_start; i<N(items); i++) {
+    int mode= 0;
+    if (lf && i == first) mode += START_OF_LINE;
+    if (rf && i == last ) mode += END_OF_LINE;
+    if (mode != 0 || (protrusion & CJK_PROTRUSION_MASK) != 0)
+      mode += protrusion;
+    if (mode != 0) {
+      box pro= items[i]->adjust_kerning (mode, 0.0);
+      cur_w += pro->w() - items[i]->w();
+      items[i]= pro;
+    }
+  }
+}
+
+array<box>
+lazy_paragraph_rep::adjusted (double factor, int first, int last) {
+  array<box> bs;
+  for (int i=cur_start; i<N(items); i++) {
+    int mode= 0;
+    if (i == first) mode += START_OF_LINE;
+    if (i == last ) mode += END_OF_LINE;
+    bs << items[i]->adjust_kerning (mode, factor);
+  }
+  return bs;
+}
+
+static SI
+total_width (array<box> bs) {
+  SI r= 0;
+  for (int i=0; i<N(bs); i++)
+    r += bs[i]->w ();
+  return r;
+}
+
+void
+lazy_paragraph_rep::adjust_kerning (SI dw, SI the_width) {
+  // attempt to add dw space by adjusting the kerning of the current line unit
+  SI tot_spc= 0;
+  for (int i=cur_start; i<N(items)-1; i++)
+    tot_spc += spcs[i]->max;
+  dw= (((long int) dw) * (the_width - tot_spc)) / the_width;
+
+  int first, last;
+  find_first_last_text (first, last);
+  SI ref_w= total_width (range (items, cur_start, N(items)));
+  SI obj_w= ref_w + dw;
+  SI def_w= total_width (adjusted (0.0, first, last));
+  SI max_w= total_width (adjusted (kstretch, first, last));
+  if (obj_w >= def_w && max_w > def_w) {
+    double ratio= ((double) (obj_w - def_w)) / ((double) (max_w - def_w));
+    ratio= min (ratio, 1.0);
+    array<box> bs= adjusted (kstretch * ratio, first, last);
+    for (int i=0; i<N(bs); i++) {
+      cur_w += bs[i]->w() - items[cur_start + i]->w();
+      items[cur_start + i]= bs[i];
+    }
+  }
+}
+
+/******************************************************************************
 * Typesetting a line
 ******************************************************************************/
 
@@ -151,6 +271,9 @@ lazy_paragraph_rep::make_unit (string mode, SI the_width, bool break_flag) {
   // format tabs
   //cout << "      " << N(tabs) << "] " << (cur_w->def/PIXEL)
   //     << " < " << (the_width/PIXEL) << "? (" << break_flag << ")\n";
+  //cout << mode << ", " << break_flag << ", " << N(tabs)
+  //     << ", " << cur_w->def << " -- " << cur_w->max
+  //     << ", " << the_width << "\n";
   if (break_flag && (N(tabs)>0) && (cur_w->def<the_width)) {
     double tot_weight= 0.0;
     int pos_first= -1, pos_last=-1;
@@ -181,26 +304,51 @@ lazy_paragraph_rep::make_unit (string mode, SI the_width, bool break_flag) {
     return;
   }
 
+  // protrusion
+  if (cur_w->def > the_width) break_flag= false;
+  bool protrude_left = (mode == "justify" || mode == "left");
+  bool protrude_right= (mode == "justify" || mode == "right");
+  if (mode == "justify" && cur_w->def < the_width && break_flag)
+    protrude_right= false;
+  if (protrusion != 0)
+    protrude (protrude_left, protrude_right);
+
   // stretching case
-  if (mode == "justify") {
-    if ((cur_w->def < the_width) &&
-	(cur_w->max > cur_w->def) &&
-	(!break_flag)) {
-      double f=
-	((double) (the_width - cur_w->def)) /
-	((double) (cur_w->max - cur_w->def));
-      if (f <= flexibility) {
-        for (i=cur_start; i<N(items)-1; i++)
-          items_sp <<
-            (spcs[i]->def+ ((SI) (f*((double) spcs[i]->max- spcs[i]->def))));
-        return;
+  if (mode == "justify" &&
+      cur_w->def < the_width &&
+      !break_flag) {
+    double f= 2 * flexibility + 1.0;
+    if (cur_w->max > cur_w->def)
+      f= ((double) (the_width - cur_w->def)) /
+         ((double) (cur_w->max - cur_w->def));
+    if (f > 1.0 && kstretch > 0.0) {
+      space backup_cur_w= cur_w;
+      double backup_f= f;
+      array<box> backup= range (items, cur_start, N(items));
+      adjust_kerning (the_width - cur_w->max, the_width);
+      if (cur_w->max > cur_w->def)
+        f= ((double) (the_width - cur_w->def)) /
+           ((double) (cur_w->max - cur_w->def));
+      else if (cur_w->max >= the_width - PIXEL)
+        f= 1.0;
+      if (f < 0 || f > flexibility) {
+        cur_w= backup_cur_w;
+        f= backup_f;
+        for (i=0; i<N(backup); i++)
+          items[cur_start + i]= backup[i];
       }
+    }
+    if (f >= 0 && f <= flexibility) {
+      for (i=cur_start; i<N(items)-1; i++)
+        items_sp <<
+          (spcs[i]->def+ ((SI) (f*((double) spcs[i]->max- spcs[i]->def))));
+      return;
     }
   }
   
   // shrinking case
-  if ((cur_w->def > the_width) &&
-      (cur_w->def > cur_w->min)) {
+  if (cur_w->def > the_width &&
+      cur_w->def > cur_w->min) {
     double f=
       ((double) (cur_w->def - the_width)) /
       ((double) (cur_w->def - cur_w->min));
@@ -318,6 +466,7 @@ lazy_paragraph_rep::line_start () {
   items_sp= array<SI> ();
   spcs    = array<space> ();
   fl      = array<lazy> ();
+  notes   = array<line_item> ();
 
   cur_r    = 0;
   cur_start= 0;
@@ -349,6 +498,17 @@ lazy_paragraph_rep::line_end (space spc, int penalty) {
   if (N(items) == 0) return;
   if (N(decs) != 0) handle_decorations ();
   // cout << items << ", " << spc << ", " << penalty << LF;
+  if (N(notes) != 0) {
+    for (int i=0; i<N(notes); i++) {
+      box note= notes[i]->b->get_leaf_box ();
+      SI  x   = as_int (notes[i]->t[0]);
+      SI  y   = as_int (notes[i]->t[1]);
+      box sb  = move_box (note->ip, note, x, y);
+      box nb  = resize_box (note->ip, sb, 0, 0, 0, 0);
+      items= ::append (nb, items);
+      items_sp= ::append (0, items_sp);
+    }
+  }
   box b= phrase_box (sss->ip, items, items_sp);
   sss->print (b, fl, nr_cols);
   sss->print (spc);

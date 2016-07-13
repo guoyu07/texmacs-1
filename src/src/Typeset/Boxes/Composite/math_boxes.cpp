@@ -13,6 +13,7 @@
 #include "Boxes/composite.hpp"
 #include "Boxes/construct.hpp"
 #include "Boxes/Composite/italic_correct.hpp"
+#include "analyze.hpp"
 
 /******************************************************************************
 * Miscellaneous routines
@@ -27,6 +28,11 @@ SI
 italic_correction (box L, box R) {
   double slope_L= L->right_slope ();
   double slope_R= R->left_slope ();
+  //cout << L << ", " << slope_L << " | " << R << ", " << slope_R << LF;
+  if (L->get_type () == BIG_OP_BOX)
+    if (1.5 * slope_L >= slope_R && slope_L > 0)
+      if (R->get_type () != BIG_OP_BOX)
+        return L->right_correction () + R->left_correction ();
   if (slope_L == slope_R) return 0;
   if (slope_L * slope_R == 0.0)
     return L->right_correction () + R->left_correction ();
@@ -42,14 +48,17 @@ italic_correction (box L, box R) {
 ******************************************************************************/
 
 struct frac_box_rep: public composite_box_rep {
-  frac_box_rep (path ip, box b1, box b2, font fn, font sfn, color c);
+  font fn, sfn;
+  pencil pen;
+  frac_box_rep (path ip, box b1, box b2, font fn, font sfn, pencil pen);
   operator tree () { return tree (TUPLE, "frac", bs[0], bs[1]); }
+  box adjust_kerning (int mode, double factor);
   int find_child (SI x, SI y, SI delta, bool force);
 };
 
 frac_box_rep::frac_box_rep (
-  path ip, box b1, box b2, font fn, font sfn, color c):
-    composite_box_rep (ip)
+  path ip, box b1, box b2, font fn2, font sfn2, pencil pen2):
+    composite_box_rep (ip), fn (fn2), sfn (sfn2), pen (pen2)
 {
   // Italic correction does not lead to nicer results,
   // because right correction is not equilibrated w.r.t. left correction
@@ -62,9 +71,10 @@ frac_box_rep::frac_box_rep (
   SI w     = max (b1->w (), b2->w()) + 2*sep;
   SI d     = sep >> 1;
 
+  pencil bar_pen= pen->set_width (bar_w);
   insert (b1, (w>>1) - (b1->x2>>1), bar_y+ sep+ (bar_w>>1)- b1_y);
   insert (b2, (w>>1) - (b2->x2>>1), bar_y- sep- (bar_w>>1)- b2_y);
-  insert (line_box (decorate_middle (ip), d, 0, w-d, 0, bar_w, c), 0, bar_y);
+  insert (line_box (decorate_middle (ip), d, 0, w-d, 0, bar_pen), 0, bar_y);
 
   italic_correct (b1);
   italic_correct (b2);
@@ -75,6 +85,14 @@ frac_box_rep::frac_box_rep (
   x2= max (w, x2);
   left_justify ();
   finalize ();
+}
+
+box
+frac_box_rep::adjust_kerning (int mode, double factor) {
+  (void) mode;
+  box num= bs[0]->adjust_kerning (0, factor);
+  box den= bs[1]->adjust_kerning (0, factor);
+  return frac_box (ip, num, den, fn, sfn, pen);
 }
 
 int
@@ -93,14 +111,17 @@ frac_box_rep::find_child (SI x, SI y, SI delta, bool force) {
 ******************************************************************************/
 
 struct sqrt_box_rep: public composite_box_rep {
-  sqrt_box_rep (path ip, box b1, box b2, box sqrtb, font fn, color c);
+  font fn;
+  pencil pen;
+  sqrt_box_rep (path ip, box b1, box b2, box sqrtb, font fn, pencil pen);
   operator tree () { return tree (TUPLE, "sqrt", bs[0]); }
+  box adjust_kerning (int mode, double factor);
   int find_child (SI x, SI y, SI delta, bool force);
 };
 
 sqrt_box_rep::sqrt_box_rep (
-  path ip, box b1, box b2, box sqrtb, font fn, color c):
-    composite_box_rep (ip)
+  path ip, box b1, box b2, box sqrtb, font fn2, pencil pen2):
+    composite_box_rep (ip), fn (fn2), pen (pen2)
 {
   right_italic_correct (b1);
 
@@ -109,6 +130,7 @@ sqrt_box_rep::sqrt_box_rep (
   SI dx   = -fn->wfn/36, dy= -fn->wfn/36; // correction
   SI by   = sqrtb->y2+ dy;
 
+  pencil rpen= pen->set_width (wline);
   insert (b1, 0, 0);
   if (!is_nil (b2)) {
     SI X = - sqrtb->w();
@@ -121,7 +143,7 @@ sqrt_box_rep::sqrt_box_rep (
     insert (b2, min (X, M- b2->x2), Y- b2->y1+ sep);
   }
   insert (sqrtb, -sqrtb->x2, 0);
-  insert (line_box (decorate_middle (ip), dx, by, b1->x2, by, wline, c), 0, 0);
+  insert (line_box (decorate_middle (ip), dx, by, b1->x2, by, rpen), 0, 0);
   
   position ();
   left_justify ();
@@ -131,6 +153,15 @@ sqrt_box_rep::sqrt_box_rep (
 
   right_italic_restore (b1);
   finalize ();
+}
+
+box
+sqrt_box_rep::adjust_kerning (int mode, double factor) {
+  (void) mode;
+  box body = bs[0]->adjust_kerning (0, factor);
+  box ramif= (N(bs) == 3? box (): bs[1]->adjust_kerning (0, factor/2));
+  box sqrtb= (N(bs) == 3? bs[1]: bs[2]);
+  return sqrt_box (ip, body, ramif, sqrtb, fn, pen);
 }
 
 int
@@ -150,13 +181,16 @@ sqrt_box_rep::find_child (SI x, SI y, SI delta, bool force) {
 ******************************************************************************/
 
 struct neg_box_rep: public composite_box_rep {
-  neg_box_rep (path ip, box b1, font fn, color c);
+  font fn;
+  pencil pen;
+  neg_box_rep (path ip, box b1, font fn, pencil pen);
   operator tree () { return tree (TUPLE, "neg", bs[0]); }
+  box adjust_kerning (int mode, double factor);
   int find_child (SI x, SI y, SI delta, bool force);
 };
 
-neg_box_rep::neg_box_rep (path ip, box b, font fn, color c):
-  composite_box_rep (ip)
+neg_box_rep::neg_box_rep (path ip, box b, font fn2, pencil pen2):
+  composite_box_rep (ip), fn (fn2), pen (pen2)
 {
   SI wline= fn->wline;
   SI delta= fn->wfn/6;
@@ -164,6 +198,7 @@ neg_box_rep::neg_box_rep (path ip, box b, font fn, color c):
   SI Y    = (b->y1 + b->y2) >> 1;
   SI DX, DY;
 
+  pencil npen= pen->set_width (wline);
   insert (b, 0, 0);
   if ((3*(b->x2-b->x1)) > (2*(b->y2-b->y1))) {
     DY= delta + ((b->y2 - b->y1)>>1);
@@ -173,13 +208,18 @@ neg_box_rep::neg_box_rep (path ip, box b, font fn, color c):
     DX= delta + ((b->x2 - b->x1)>>1);
     DY= DX;
   }
-  insert (line_box (decorate_middle (ip),
-		    X+DX, Y+DY, X-DX, Y-DY, wline, c), 0, 0);
+  insert (line_box (decorate_middle (ip), X+DX, Y+DY, X-DX, Y-DY, npen), 0, 0);
   
   italic_correct (b);
   position ();
   italic_restore (b);
   finalize ();
+}
+
+box
+neg_box_rep::adjust_kerning (int mode, double factor) {
+  box body= bs[0]->adjust_kerning (mode, factor);
+  return neg_box (ip, body, fn, pen);
 }
 
 int
@@ -195,14 +235,17 @@ neg_box_rep::find_child (SI x, SI y, SI delta, bool force) {
 ******************************************************************************/
 
 struct tree_box_rep: public composite_box_rep {
+  font fn;
+  pencil pen;
   SI  border;
-  tree_box_rep (path ip, array<box> bs, font fn, color line_c);
+  tree_box_rep (path ip, array<box> bs, font fn, pencil pen);
   operator tree () { return "tree box"; }
+  box adjust_kerning (int mode, double factor);
   int find_child (SI x, SI y, SI delta, bool force);
 };
 
-tree_box_rep::tree_box_rep (path ip, array<box> bs, font fn, color line_c):
-  composite_box_rep (ip)
+tree_box_rep::tree_box_rep (path ip, array<box> bs, font fn2, pencil pen2):
+  composite_box_rep (ip), fn (fn2), pen (pen2)
 {
   SI sep   = fn->sep;
   SI hsep  = 2*fn->spc->def;
@@ -225,6 +268,7 @@ tree_box_rep::tree_box_rep (path ip, array<box> bs, font fn, color line_c):
     x += bs[i]->w()+ hsep;
   }
 
+  pencil tpen= pen->set_width (line_w);
   for (x=x_0, i=1; i<n; i++) {
     SI x_i= x + (bs[i]->w()>>1);
     SI y_i= up + max (bs[i]->y2, fn->y2) + sep - h;
@@ -232,14 +276,23 @@ tree_box_rep::tree_box_rep (path ip, array<box> bs, font fn, color line_c):
     SI bw = min (bs[0]->w(), cw>>1);
     SI bx = bm + ((2*i-n) * bw) / (2*n-2);
     SI by = min (bs[0]->y1, fn->y1) - sep;
-    insert (line_box (decorate_middle (ip),
-		      bx, by, x_i, y_i, line_w, line_c), 0, 0);
+    insert (line_box (decorate_middle (ip), bx, by, x_i, y_i, tpen), 0, 0);
     x += bs[i]->w()+ hsep;
   }
 
   position ();
   border= up+ (vsep>>1);
   finalize ();
+}
+
+box
+tree_box_rep::adjust_kerning (int mode, double factor) {
+  (void) mode;
+  int n= (N(bs)+1)>>1;
+  array<box> adj (n);
+  for (int i=0; i<n; i++)
+    adj[i]= bs[i]->adjust_kerning (0, factor);
+  return tree_box (ip, adj, fn, pen);
 }
 
 int
@@ -260,15 +313,133 @@ tree_box_rep::find_child (SI x, SI y, SI delta, bool force) {
 }
 
 /******************************************************************************
+* Computation of wide accent
+******************************************************************************/
+
+bool
+compute_wide_accent (path ip, box b, string s,
+                     font fn, pencil pen, bool request_wide, bool above,
+                     box& wideb, SI& sep) {
+  bool stix= starts (fn->res_name, "stix-");
+  bool wide= (b->w() >= (fn->wfn)) || request_wide;
+  if (ends (s, "dot>") || (s == "<acute>") ||
+      (s == "<grave>") || (s == "<abovering>")) wide= false;
+  bool very_wide= false;
+  SI   accw= fn->wfn;
+  if (wide) {
+    if (true || stix) very_wide= true;
+    else if (s == "^" || s == "<hat>" || s == "~" || s == "<tilde>" ||
+             s == "<bar>" || s == "<vect>" || s == "<check>" ||
+             s == "<breve>" || s == "<invbreve>") {
+      box wb= text_box (decorate_middle (ip), 0, s, fn, pen);
+      accw= wb->x4 - wb->x3;
+      if (b->w() >= 16*accw) very_wide= true;
+    }
+    else very_wide= true;
+  }
+  if (wide && stix) {
+    if (s == "^") s= "<hat>";
+    if (s == "~") s= "<tilde>";
+    if (s == "<hat>" || s == "<tilde>" || s == "<check>" ||
+        ends (s, "brace>") || ends (s, "brace*>")) {
+      font wfn= rubber_font (fn);
+      SI width= b->x2- b->x1 - fn->wfn/2;
+      wideb= wide_stix_box (decorate_middle (ip),
+                            "<rubber-" * s (1, N(s)-1) * ">",
+                            wfn, pen, width);
+      if (wideb->w() >= width) {
+        if (b->right_slope () != 0)
+          wideb= shift_box (decorate_middle (ip), wideb,
+                            (SI) (-0.5 * b->right_slope () * fn->yx), 0);
+        sep= above? -fn->yx: fn->sep;
+        if (above) {
+          if (s == "<overbrace>" || s == "<squnderbrace*>") sep= 2 * fn->sep;
+          if (s == "<poverbrace>") sep= 3 * fn->sep;
+        }
+        return wide;
+      }
+    }
+  }
+  if (very_wide) {
+    SI w= fn->wline;
+    if (stix) w= (SI) (1.189 * w);
+    pencil wpen= pen->set_width (w);
+    if ((s == "^") || (s == "<hat>"))
+      wideb= wide_hat_box   (decorate_middle (ip), b->x1, b->x2, wpen);
+    else if ((s == "~") || (s == "<tilde>"))
+      wideb= wide_tilda_box (decorate_middle (ip), b->x1, b->x2, wpen);
+    else if (s == "<bar>")
+      wideb= wide_bar_box   (decorate_middle (ip), b->x1, b->x2, wpen);
+    else if (s == "<vect>")
+      wideb= wide_vect_box  (decorate_middle (ip), b->x1, b->x2, wpen);
+    else if (s == "<check>")
+      wideb= wide_check_box (decorate_middle (ip), b->x1, b->x2, wpen);
+    else if (s == "<breve>" || s == "<punderbrace>" || s == "<punderbrace*>")
+      wideb= wide_breve_box (decorate_middle (ip), b->x1, b->x2, wpen);
+    else if (s == "<invbreve>" || s == "<poverbrace>" || s == "<poverbrace*>")
+      wideb= wide_invbreve_box(decorate_middle (ip), b->x1, b->x2, wpen);
+    else if (s == "<squnderbrace>" || s == "<squnderbrace*>")
+      wideb= wide_squbr_box (decorate_middle (ip), b->x1, b->x2, wpen);
+    else if (s == "<sqoverbrace>" || s == "<sqoverbrace*>")
+      wideb= wide_sqobr_box (decorate_middle (ip), b->x1, b->x2, wpen);
+    else wideb= wide_box (decorate_middle (ip),
+                          "<rubber-" * s (1, N(s)-1) * ">",
+                          fn, pen, b->x2- b->x1);
+    sep= fn->sep;
+    if (stix) sep= (SI) (1.5 * sep);
+  }
+  else if (wide) {
+    SI pad= fn->wfn - accw;
+    pad= (SI) ((0.75 * accw * pad) / (b->w() - pad));
+    double sx= ((double) (b->w() - pad)) / ((double) accw);
+    sx= floor (4.0*sx) / 4.0;
+    double sy= sqrt (sqrt (sx));
+    font sfn= fn->magnify (sx, sy);
+    wideb= text_box (decorate_middle (ip), 0, s, sfn, pen);
+    wideb= resize_box (decorate_middle (ip), wideb,
+                       max (wideb->x1, wideb->x3), wideb->y1,
+                       min (wideb->x2, wideb->x4), wideb->y2);
+    if (fn->type == FONT_TYPE_UNICODE && b->right_slope () != 0)
+      wideb= shift_box (decorate_middle (ip), wideb,
+                        (SI) (-0.5 * b->right_slope () * fn->yx), 0);
+    sep= above? -fn->yx: fn->sep;
+    if (above) sep -= 3 * (sy - 1.0) * fn->sep;
+  }
+  else {
+    wideb= text_box (decorate_middle (ip), 0, s, fn, pen);
+    if (fn->type == FONT_TYPE_UNICODE && b->right_slope () != 0) {
+      double factor= (stix? 0.2: 0.5);
+      wideb= shift_box (decorate_middle (ip), wideb,
+                        (SI) (-factor * b->right_slope () * fn->yx), 0);
+    }
+    sep= above? -fn->yx: fn->sep;
+  }
+  if (above && fn->type == FONT_TYPE_UNICODE) {
+    SI min_d= fn->yx / 8;
+    SI max_d= fn->yx / 3;
+    if (wideb->y1 + sep <  min_d) sep= min_d - wideb->y1;
+    if (wideb->y1 + sep >= max_d) sep= max_d - wideb->y1;
+  }
+  return wide;
+}
+
+/******************************************************************************
 * wide hats, tildas, etc...
 ******************************************************************************/
 
 struct wide_box_rep: public composite_box_rep {
-  box ref;
-  SI  dw, dh, dd;
-  bool above;
-  wide_box_rep (path ip, box ref, box hi, font fn, SI sep, bool above);
+  box    ref;
+  string s;
+  font   fn;
+  pencil pen;
+  bool   request_wide;
+  bool   wide;
+  bool   above;
+  SI     sep;
+  SI     dw, dh, dd;
+  wide_box_rep (path ip, box b, string s, font fn, pencil p, bool wf, bool af);
   operator tree () { return tree (TUPLE, "wide", bs[0]); }
+  box adjust_kerning (int mode, double factor);
   int find_child (SI x, SI y, SI delta, bool force);
   double left_slope ();
   double right_slope ();
@@ -276,11 +447,13 @@ struct wide_box_rep: public composite_box_rep {
   SI left_correction () {
     return ref->left_correction (); }
   SI right_correction () {
+    /*
     if (above) {
       SI rc= ref->right_correction () + dw;
       if (sx4 (1) >= (sx2 (1) - (dd>>1))) // corrects buggy extents wide chars
 	rc= max (rc, sx2(1)- x2+ dd);
       return rc; }
+    */
     return ref->right_correction (); }
   SI lsub_correction () {
     return ref->lsub_correction (); }
@@ -289,12 +462,14 @@ struct wide_box_rep: public composite_box_rep {
   SI rsub_correction () {
     return ref->rsub_correction (); }
   SI rsup_correction () {
+    /*
     if (above) {
       SI rc= ref->rsup_correction () + dw;
       if (sx4 (1) >= (sx2 (1) - (dd>>1))) // corrects buggy extents wide chars
 	rc= max (rc, sx2(1)- x2+ dd);
       return rc; }
-    return ref->rsub_correction (); }
+    */
+    return ref->rsup_correction (); }
   SI sub_lo_base (int level) {
     return ref->sub_lo_base (level); }
   SI sub_hi_lim  (int level) {
@@ -309,24 +484,31 @@ struct wide_box_rep: public composite_box_rep {
     if (above)
       return min (ref->sup_hi_lim (level) + dh, box_rep::sup_hi_lim (level));
     return ref->sup_hi_lim (level); }
+  void get_bracket_extents (SI& lo, SI& hi);
 };
 
 wide_box_rep::wide_box_rep (
-  path ip, box ref2, box hi, font fn, SI sep, bool above2):
-    composite_box_rep (ip), ref (ref2), above (above2)
+  path ip, box ref2, string s2, font fn2, pencil pen2,
+  bool request_wide2, bool above2):
+    composite_box_rep (ip), ref (ref2), s (s2), fn (fn2), pen (pen2),
+    request_wide (request_wide2), above (above2)
 {
+  box hi;
+  wide= compute_wide_accent (ip, ref, s, fn, pen, request_wide, above, hi, sep);
   SI X, Y, dx;
   SI hw= max (ref->w(), hi->w()) >> 1;
   SI m = (ref->x1 + ref->x2) >> 1;
   insert (ref, 0, 0);
   if (above) {
     Y= ref->y2;
-    X= ((SI) (ref->right_slope () * Y)) + m;
+    X= m + ref->rsup_correction () + ((SI) (ref->right_slope () * fn->yx * 0.5));
+    //X= ((SI) (ref->right_slope () * (Y - fn->yx))) + m;
     insert (hi, X- ((hi->x1 + hi->x2)>>1), Y+ sep);
   }
   else {
     Y= ref->y1 - hi->y2;
-    X= ((SI) (ref->right_slope () * (Y - sep))) + m;
+    X= m - ((SI) (ref->right_slope () * sep));
+    //X= ((SI) (ref->right_slope () * (Y - sep))) + m;
     insert (hi, X- ((hi->x1 + hi->x2)>>1), Y- sep);
   }
   position ();
@@ -340,6 +522,13 @@ wide_box_rep::wide_box_rep (
   x2= m+ hw- dx;
   if (!above) y1 += fn->sep - sep;
   finalize ();
+}
+
+box
+wide_box_rep::adjust_kerning (int mode, double factor) {
+  (void) mode;
+  box body= ref->adjust_kerning (START_OF_LINE + END_OF_LINE, factor);
+  return wide_box (ip, body, s, fn, pen, request_wide, above);
 }
 
 int
@@ -360,31 +549,40 @@ wide_box_rep::right_slope () {
   return ref->right_slope ();
 }
 
+void
+wide_box_rep::get_bracket_extents (SI& lo, SI& hi) {
+  if (wide) box_rep::get_bracket_extents (lo, hi);
+  else {
+    lo= ref->y1;
+    hi= ref->y2;
+  }
+}
+
 /******************************************************************************
 * box construction routines
 ******************************************************************************/
 
 box
-frac_box (path ip, box b1, box b2, font fn, font sfn, color c) {
-  return tm_new<frac_box_rep> (ip, b1, b2, fn, sfn, c);
+frac_box (path ip, box b1, box b2, font fn, font sfn, pencil pen) {
+  return tm_new<frac_box_rep> (ip, b1, b2, fn, sfn, pen);
 }
 
 box
-sqrt_box (path ip, box b1, box b2, box sqrtb, font fn, color c) {
-  return tm_new<sqrt_box_rep> (ip, b1, b2, sqrtb, fn, c);
+sqrt_box (path ip, box b1, box b2, box sqrtb, font fn, pencil pen) {
+  return tm_new<sqrt_box_rep> (ip, b1, b2, sqrtb, fn, pen);
 }
 
 box
-neg_box (path ip, box b, font fn, color c) {
-  return tm_new<neg_box_rep> (ip, b, fn, c);
+neg_box (path ip, box b, font fn, pencil pen) {
+  return tm_new<neg_box_rep> (ip, b, fn, pen);
 }
 
 box
-tree_box (path ip, array<box> bs, font fn, color line_c) {
-  return tm_new<tree_box_rep> (ip, bs, fn, line_c);
+tree_box (path ip, array<box> bs, font fn, pencil pen) {
+  return tm_new<tree_box_rep> (ip, bs, fn, pen);
 }
 
 box
-wide_box (path ip, box ref, box hi, font fn, SI sep, bool above) {
-  return tm_new<wide_box_rep> (ip, ref, hi, fn, sep, above);
+wide_box (path ip, box ref, string s, font fn, pencil pen, bool wf, bool af) {
+  return tm_new<wide_box_rep> (ip, ref, s, fn, pen, wf, af);
 }

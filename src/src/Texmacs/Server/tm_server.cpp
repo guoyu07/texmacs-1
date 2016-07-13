@@ -16,10 +16,12 @@
 #include "connect.hpp"
 #include "sys_utils.hpp"
 #include "file.hpp"
+#include "analyze.hpp"
 #include "dictionary.hpp"
 #include "tm_link.hpp"
 #include "socket_notifier.hpp"
 #include "new_style.hpp"
+#include "Database/database.hpp"
 
 server* the_server= NULL;
 bool texmacs_started= false;
@@ -52,6 +54,8 @@ texmacs_wait_handler (string message, string arg, int level) {
   (void) level;
   if (texmacs_started && the_server != NULL)
     (*the_server)->wait_handler (message, arg);
+  else
+    cout << "TeXmacs] Please wait: " << message << " " << arg << "\n";
 }
 
 server
@@ -160,11 +164,15 @@ tm_server_rep::interpose_handler () {
   }
 
   windows_refresh ();
+  sync_databases ();
 }
 
 void
 tm_server_rep::wait_handler (string message, string arg) {
-  show_wait_indicator (concrete_window () -> win, translate (message), arg);
+  if (has_current_window ())
+    show_wait_indicator (concrete_window () -> win, translate (message), arg);
+  else
+    cout << "TeXmacs] Please wait: " << message << " " << arg << "\n";
 }
 
 void
@@ -194,8 +202,8 @@ tm_server_rep::set_printer_dpi (string dpi) {
 
 void
 tm_server_rep::set_default_zoom_factor (double zoom) {
-  if (zoom >= 10.0) zoom= 10.0;
-  if (zoom <=  0.1) zoom=  0.1;
+  if (zoom >= 25.0 ) zoom= 25.0;
+  if (zoom <=  0.04) zoom=  0.04;
   zoom= normal_zoom (zoom);
   def_zoomf= zoom;
 }
@@ -203,12 +211,6 @@ tm_server_rep::set_default_zoom_factor (double zoom) {
 double
 tm_server_rep::get_default_zoom_factor () {
   return def_zoomf;
-}
-
-void
-tm_server_rep::image_gc (string which) {
-  ::image_gc (which);
-  typeset_update_all ();
 }
 
 void
@@ -232,13 +234,11 @@ tm_server_rep::typeset_update_all () {
     view_to_editor (vs[i]) -> typeset_invalidate_all ();
 }
 
-#include "dictionary.hpp"
-
 bool
 tm_server_rep::is_yes (string s) {
   s= locase_all (s);
   string st= locase_all (translate ("yes"));
-  return s == st || (N(st)>0 && s == st[0]); //FIXME: fails for multibyte chars?
+  return tm_forward_access (s, 0) == tm_forward_access (st, 0) || s == st;
 }
 
 void

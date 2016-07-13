@@ -52,10 +52,18 @@
 ;; Dynamic menu for recent files
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(define (short-menu-name u)
+  (if (not (url-rooted-tmfs? u))
+      (url->system (url-tail u))
+      (tmfs-title u `(document ""))))
+
+(define (long-menu-name u)
+  (url->system u))
+
 (tm-menu (file-list-menu l)
   (for (name l)
-    (let* ((short-name `(verbatim ,(url->system (url-tail name))))
-           (long-name `(verbatim ,(url->system name))))
+    (let* ((short-name `(verbatim ,(short-menu-name name)))
+           (long-name `(verbatim ,(long-menu-name name))))
       ((balloon (eval short-name) (eval long-name))
        (load-buffer name)))))
 
@@ -133,9 +141,9 @@
   (link export-top-menu)
   ---
   ((eval '(concat "Export as " "Pdf"))
-   (choose-file print-to-file "Save pdf file" "pdf"))
+   (choose-file wrapped-print-to-file "Save pdf file" "pdf"))
   ((eval '(concat "Export as " "PostScript"))
-   (choose-file print-to-file "Save postscript file" "postscript"))
+   (choose-file wrapped-print-to-file "Save postscript file" "postscript"))
   (when (selection-active-any?)
     ("Export selection as image" ;; FIXME: no warning on overwrite!
      (choose-file export-selection-as-graphics
@@ -144,8 +152,10 @@
 (menu-bind print-menu
   ("Preview" (preview-buffer))
   ---
-  ("Print all" (print-buffer))
-  ("Print page selection" (interactive print-pages))
+  (if (os-mingw?) ("Print" (print-buffer)))
+  (if (not (os-mingw?)) 
+     ("Print all" (print-buffer))
+     ("Print page selection" (interactive print-pages)))
   ("Print all to file"
    (choose-file print-to-file "Print all to file" "postscript"))
   ("Print page selection to file"
@@ -173,20 +183,20 @@
   ("Save" (save-buffer))
   ("Save as" (choose-file save-buffer-as "Save TeXmacs file" "texmacs"))
   ---
-   (if (experimental-qt-gui?)
-       ("Preview" (preview-buffer))
-       ("Print" (interactive-print-buffer)))
-  (if (not (experimental-qt-gui?))
+  (if (use-print-dialog?)
+      ("Preview" (preview-buffer))
+      ("Print" (interactive-print-buffer)))
+  (if (not (use-print-dialog?))
       (-> "Print" (link print-menu)))
-  (-> "Page setup" (link page-setup-menu))
+  (if (not (os-mingw?)) (-> "Page setup" (link page-setup-menu)))
   (-> "Import"
       (link import-import-menu))
   (-> "Export"
       (link export-export-menu)
       ---
-      ("Pdf" (choose-file print-to-file "Save pdf file" "pdf"))
+      ("Pdf" (choose-file wrapped-print-to-file "Save pdf file" "pdf"))
       ("Postscript"
-       (choose-file print-to-file "Save postscript file" "postscript"))
+       (choose-file wrapped-print-to-file "Save postscript file" "postscript"))
       (when (selection-active-any?)
         ("Export selection as image"
          (choose-file ;; no warning on overwrite!
