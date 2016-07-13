@@ -197,10 +197,13 @@ QTMWidget::event (QEvent* event) {
   switch (event->type()) {
     case QEvent::Resize:
     {
-      bool res = QAbstractScrollArea::event(event);
+      bool res = QTMScrollView::event(event);
       QResizeEvent *re = static_cast<QResizeEvent*> (event);
-      coord2 s = from_qsize (re->size());
-      the_gui -> process_resize (tm_widget(), s.x1, s.x2);
+      if (tm_widget())  {
+        tm_widget()->updateScrollBars();
+        coord2 s = from_qsize (re->size());
+        the_gui -> process_resize (tm_widget(), s.x1, s.x2);
+      }
       return res;
     }
     case QEvent::KeyPress:
