@@ -10,11 +10,11 @@
 ******************************************************************************/
 
 #include "mac_cocoa.h"
-#include "ns_simple_widget.h"
+#include "aqua_simple_widget.h"
 
 @interface TMView : NSView  <NSTextInput>
 {
-	simple_widget_rep *wid;
+  simple_widget_rep *wid;
   NSString *workingText;
   BOOL processingCompose;
   NSMutableArray *delayed_rects;

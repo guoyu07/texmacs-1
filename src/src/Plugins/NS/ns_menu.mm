@@ -138,7 +138,7 @@ public:
     img = [[[NSImage alloc] initWithSize:s] autorelease];
     [img lockFocus];
     
-    basic_renderer r = the_aqua_renderer();
+    basic_renderer r = the_ns_renderer();
     int x1 = 0;
     int y1 = s.height;
     int x2 = s.width;
@@ -149,7 +149,7 @@ public:
     r -> encode (x1,y1);
     r -> encode (x2,y2);
     r -> set_clipping (x1,y1,x2,y2);
-    wid -> handle_repaint (x1,y1,x2,y2);
+    wid -> handle_repaint (r,x1,y1,x2,y2);
     r->end();
     [img unlockFocus];
     //[img setFlipped:YES];
@@ -177,7 +177,10 @@ public:
 	forced = NO;
 	[self setDelegate:self];
 }
-- (void)dealloc { [self setPromise:NULL]; [super dealloc]; }
+- (void)dealloc {
+    if (pm) { DEC_COUNT_NULL(pm); pm = NULL; }
+    [super dealloc];
+}
 
 - (void)menuNeedsUpdate:(NSMenu *)menu
 {
@@ -385,11 +388,11 @@ TMMenuItem * ns_text_widget_rep::as_menuitem()
 TMMenuItem * ns_image_widget_rep::as_menuitem()
 {
 #if 0
-  CGImageRef cgi = the_aqua_renderer()->xpm_image(image);
+  CGImageRef cgi = the_ns_renderer()->xpm_image(image);
   NSImage *img = [[[NSImage alloc] init] autorelease];
   [img addRepresentation:[[NSBitmapImageRep alloc ] initWithCGImage: cgi]];
 #else
-  NSImage *img = the_aqua_renderer()->xpm_image(image);
+  NSImage *img = the_ns_renderer()->xpm_image(image);
 #endif
   //	TMMenuItem *mi = [[[TMMenuItem alloc] initWithTitle:to_nsstring(as_string(file_name)) action:NULL keyEquivalent:@""] autorelease];
   TMMenuItem *mi = [[[TMMenuItem alloc] initWithTitle:@"" action:NULL keyEquivalent:@""] autorelease];
@@ -453,7 +456,7 @@ widget xpm_widget (url file_name)// { return widget(); }
 {
   return tm_new <ns_image_widget_rep> (file_name);
 #if 0  
-	NSImage *image = the_aqua_renderer()->xpm_image(file_name);
+	NSImage *image = the_ns_renderer()->xpm_image(file_name);
 //	TMMenuItem *mi = [[[TMMenuItem alloc] initWithTitle:to_nsstring(as_string(file_name)) action:NULL keyEquivalent:@""] autorelease];
 	TMMenuItem *mi = [[[TMMenuItem alloc] initWithTitle:@"" action:NULL keyEquivalent:@""] autorelease];
 	[mi setRepresentedObject:image];
@@ -469,9 +472,17 @@ NSMenu* to_nsmenu(widget w)
     ns_menu_rep *ww = ((ns_menu_rep*)w.rep);
 	NSMenu *m =[[[ww->item submenu] retain] autorelease];
 	[ww->item setSubmenu:nil];
+      if (!m) {
+        debug_aqua << "unexpected nil menu\n";
+        return [[NSMenu alloc] init];
+        //FIXME: something wrong going on here.
+      }
 	return m;
   }
-  else return nil;
+  else {
+      debug_aqua << "unexpected type in to_nsmenu!\n";
+   return nil;
+  }
 }
 
 NSMenuItem* to_nsmenuitem(widget w)

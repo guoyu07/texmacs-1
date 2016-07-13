@@ -27,7 +27,7 @@ public:
 	TMWidgetHelper *wh;
 	NSToolbar *toolbar;
 	
-  
+  ns_widget main_widget;
   ns_widget int_prompt;
   ns_widget int_input;
 

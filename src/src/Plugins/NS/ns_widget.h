@@ -39,6 +39,16 @@ public:
 };
 
 
+class ns_widget {
+public:
+  ABSTRACT_NULL(ns_widget);
+  inline bool operator == (ns_widget w) { return rep == w.rep; }
+  inline bool operator != (ns_widget w) { return rep != w.rep; }
+};
+ABSTRACT_NULL_CODE(ns_widget);
+
+inline widget abstract (ns_widget w) { return widget (w.rep); }
+inline ns_widget concrete (widget w) { return ns_widget ((ns_widget_rep*) w.rep); }
 
 
 class ns_view_widget_rep: public ns_widget_rep {
@@ -68,17 +78,8 @@ public:
 
 };
 
-class ns_widget {
-public:
-	ABSTRACT_NULL(ns_widget);
-  inline bool operator == (ns_widget w) { return rep == w.rep; }
-  inline bool operator != (ns_widget w) { return rep != w.rep; }
-};
-ABSTRACT_NULL_CODE(ns_widget);
-
-inline widget abstract (ns_widget w) { return widget (w.rep); }
-inline ns_widget concrete (widget w) { return ns_widget ((ns_widget_rep*) w.rep); }
 
 extern widget the_keyboard_focus;
+
 
 #endif // defined NS_WIDGET_H
