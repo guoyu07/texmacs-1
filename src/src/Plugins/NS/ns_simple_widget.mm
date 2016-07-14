@@ -64,7 +64,7 @@ simple_widget_rep::send (slot s, blackbox val) {
 
 blackbox
 simple_widget_rep::query (slot s, int type_id) {
-  get_impl()->query (s, type_id);
+  return get_impl()->query (s, type_id);
 }
 
 void
