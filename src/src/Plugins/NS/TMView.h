@@ -10,7 +10,7 @@
 ******************************************************************************/
 
 #include "mac_cocoa.h"
-#include "aqua_simple_widget.h"
+#include "ns_simple_widget.h"
 
 @interface TMView : NSView  <NSTextInput>
 {

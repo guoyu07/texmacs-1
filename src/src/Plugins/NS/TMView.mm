@@ -12,10 +12,10 @@
 #import "TMView.h"
 #include "converter.hpp"
 #include "message.hpp"
-#include "aqua_renderer.h"
-#include "aqua_gui.h"
+#include "ns_renderer.h"
+#include "ns_gui.h"
 
-extern bool aqua_update_flag;
+extern bool ns_update_flag;
 extern int time_credit;
 extern int timeout_time;
 
@@ -262,7 +262,7 @@ void initkeymap()
 
 - (void)drawRect:(NSRect)rect 
 {
-  if (aqua_update_flag) {
+  if (ns_update_flag) {
     [delayed_rects addObject:[[[TMRect alloc] initWithRect:rect] autorelease]];
     return;
   }
@@ -279,7 +279,7 @@ void initkeymap()
 //	NSRect bounds = [self bounds];
 	
   {
-    aqua_renderer_rep* r = the_aqua_renderer();
+    ns_renderer_rep* r = the_ns_renderer();
     int x1 = rect.origin.x;
     int y1 = rect.origin.y+rect.size.height;
     int x2 = rect.origin.x+rect.size.width;
@@ -295,11 +295,11 @@ void initkeymap()
     wid->handle_repaint (r, x1, y1, x2, y2);
     r -> end ();
     if (gui_interrupted ())
-      aqua_update_flag= true;
+      ns_update_flag= true;
   }
 //	debug_events << "END DRAWING" << "\n";
  
-  if (aqua_update_flag) {
+  if (ns_update_flag) {
     if (DEBUG_EVENTS)
       debug_events << "Postponed redrawing\n"; 
     [self performSelector:@selector(delayedUpdate) withObject: nil afterDelay: 10];
