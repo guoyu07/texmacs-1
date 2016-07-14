@@ -21,6 +21,8 @@ NSSize to_nssize(coord2 p);
 coord4 from_nsrect(NSRect rect);
 coord2 from_nspoint(NSPoint pt);
 coord2 from_nssize(NSSize s);
+NSColor *to_nscolor(color c);
+color to_color (NSColor *c);
 NSString *to_nsstring(string s);
 NSString *to_nsstring_utf8(string s);
 string from_nsstring(NSString *s);
@@ -38,6 +40,15 @@ check_type_void (blackbox bb, string s) {
     FAILED ("type mismatch");
   }
 }
+
+template<class T> inline void
+check_type_id (int type_id, slot s) {
+  if (type_id != type_helper<T>::id) {
+    failed_error << "slot type= " << as_string(s) << LF;
+    FAILED ("type mismatch");
+  }
+}
+
 
 template<class T> void
 check_type (blackbox bb, string s) {

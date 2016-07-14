@@ -13,6 +13,7 @@
 #include "dictionary.hpp"
 #include "converter.hpp"
 #include "analyze.hpp"
+#include "colors.hpp" 
 
 NSRect to_nsrect(coord4 p)
 {
@@ -57,6 +58,22 @@ coord2 from_nssize(NSSize s)
 	c1 = s.width*PIXEL;
 	c2 = s.height*PIXEL;
 	return coord2 (c1,c2)	;
+}
+
+
+NSColor *to_nscolor(color c) {
+  int r, g, b, a;
+  get_rgb_color (c, r, g, b, a);
+  if (get_reverse_colors ()) reverse (r, g, b);
+  return [NSColor colorWithDeviceRed: r/255.0 green:g/255.0 blue:b/255.0 alpha:a/255.0];
+}
+
+color to_color (NSColor *c) {
+    float rr, gg, bb, aa;
+    [c getRed:&rr green:&gg blue:&bb alpha:&aa];
+    int r = rr*255.0, g=gg*255.0, b=bb*255.0, a=aa*255.0;
+    if (get_reverse_colors ()) reverse (r, g, b);
+    return rgb_color (r, g, b, a);
 }
 
 NSString *to_nsstring(string s)

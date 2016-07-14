@@ -547,25 +547,38 @@ ns_tm_widget_rep::query (slot s, int type_id) {
       case SLOT_ZOOM_FACTOR:
           return main_widget->query(s, type_id);
 
-  case SLOT_USER_ICONS_VISIBILITY:
-    TYPE_CHECK (type_id == type_helper<bool>::id);
-    return close_box<bool> (visibility[3]);
-        
-  case SLOT_MODE_ICONS_VISIBILITY:
-    TYPE_CHECK (type_id == type_helper<bool>::id);
-    return close_box<bool> (visibility[2]);
-    
-  case SLOT_MAIN_ICONS_VISIBILITY:
-    TYPE_CHECK (type_id == type_helper<bool>::id);
-    return close_box<bool> (visibility[1]);
-    
-  case SLOT_HEADER_VISIBILITY:
-    TYPE_CHECK (type_id == type_helper<bool>::id);
-    return close_box<bool> (visibility[0]);
-    
-  case SLOT_FOOTER_VISIBILITY:
-    TYPE_CHECK (type_id == type_helper<bool>::id);
-    return close_box<bool> (visibility[4]);
+    case SLOT_HEADER_VISIBILITY:
+      check_type_id<bool> (type_id, s);
+      return close_box<bool> (visibility[0]);
+      
+    case SLOT_MAIN_ICONS_VISIBILITY:
+      check_type_id<bool> (type_id, s);
+      return close_box<bool> (visibility[1]);
+      
+    case SLOT_MODE_ICONS_VISIBILITY:
+      check_type_id<bool> (type_id, s);
+      return close_box<bool> (visibility[2]);
+      
+    case SLOT_FOCUS_ICONS_VISIBILITY:
+      check_type_id<bool> (type_id, s);
+      return close_box<bool> (visibility[3]);
+      
+    case SLOT_USER_ICONS_VISIBILITY:
+      check_type_id<bool> (type_id, s);
+      return close_box<bool> (visibility[4]);
+      
+    case SLOT_FOOTER_VISIBILITY:
+      check_type_id<bool> (type_id, s);
+      return close_box<bool> (visibility[5]);
+      
+    case SLOT_SIDE_TOOLS_VISIBILITY:
+      check_type_id<bool> (type_id, s);
+      return close_box<bool> (visibility[6]);
+      
+    case SLOT_BOTTOM_TOOLS_VISIBILITY:
+      check_type_id<bool> (type_id, s);
+      return close_box<bool> (visibility[7]);
+      
     
   case SLOT_INTERACTIVE_INPUT:
     {
@@ -938,11 +951,13 @@ ns_simple_widget_rep::send (slot s, blackbox val) {
           coord2 p= open_box<coord2> (val);
           NSPoint pt = to_nspoint(p);
           NSSize sz = [view bounds].size;
-          if (DEBUG_EVENTS) debug_events << "Scroll position :" << pt.x << "," << pt.y << LF;
-          pt.y -= sz.height/2;
-          pt.x -= sz.width/2;
-          //[view scrollPoint:pt];
-          [view scrollRectToVisible:NSMakeRect(pt.x,pt.y,1.0,1.0)];
+          if (DEBUG_EVENTS)
+            debug_events << "Scroll position :" << pt.x << "," << pt.y << LF;
+//          pt.y -= sz.height/2;
+//          pt.x -= sz.width/2;
+        debug_events << "Scroll position :" << pt.x << "," << pt.y << LF;
+          [view scrollPoint:pt];
+//          [view scrollRectToVisible:NSMakeRect(pt.x,pt.y,1.0,1.0)];
       }
           break;
           

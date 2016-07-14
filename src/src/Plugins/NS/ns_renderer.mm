@@ -103,16 +103,37 @@ ns_renderer_rep::end () {
 }
 
 void
+ns_renderer_rep::ensure_context () {
+  if (context) [NSGraphicsContext setCurrentContext:context];
+}
+
+
+void
+ns_renderer_rep::get_extents (int& w2, int& h2) {
+    if (view) {
+        NSSize sz = [view bounds].size;
+        w2 = sz.width; h2 = sz.height;
+    } else {
+        w2 = w; h2 = h;
+    }
+}
+
+void
+ns_renderer_rep::set_zoom_factor (double zoom) {
+    renderer_rep::set_zoom_factor (retina_factor * zoom);
+    retina_pixel= pixel * retina_factor;
+}
+
+void
 ns_set_color (color col) {
-    int r, g, b, a;
-    get_rgb_color (col, r, g, b, a);
-    [[NSColor colorWithDeviceRed: r/255.0 green:g/255.0 blue:b/255.0 alpha:a/255.0] set];
+    [to_nscolor(col) set];
 }
 
 
 void
 ns_renderer_rep::set_pencil (pencil p) {
   basic_renderer_rep::set_pencil (p);
+  ensure_context ();
   ns_set_color (pen->get_color ());
   double pw= (((double) pen->get_width ()) / ((double) pixel));
 #if 0
@@ -149,9 +170,11 @@ ns_renderer_rep::set_pencil (pencil p) {
 
 void
 ns_renderer_rep::line (SI x1, SI y1, SI x2, SI y2) {
-    double rx1, ry1, rx2, ry2;
-    decode (x1, y1, rx1, ry1);
-    decode (x2, y2, rx2, ry2);
+  double rx1, ry1, rx2, ry2;
+  decode (x1, y1, rx1, ry1);
+  decode (x2, y2, rx2, ry2);
+
+  ensure_context ();
  // y1--; y2--; // top-left origin to bottom-left origin conversion
   [NSBezierPath strokeLineFromPoint:NSMakePoint(rx1,ry1) toPoint:NSMakePoint(rx2,ry2)];
 }
@@ -161,6 +184,7 @@ ns_renderer_rep::lines (array<SI> x, array<SI> y) {
   int i, n= N(x);
   if ((N(y) != n) || (n<1)) return;
   STACK_NEW_ARRAY (pnt, NSPoint, n);
+  ensure_context ();
   for (i=0; i<n; i++) {
     double xx, yy;
     decode (x[i], y[i], xx, yy);
@@ -179,6 +203,7 @@ ns_renderer_rep::clear (SI x1, SI y1, SI x2, SI y2) {
   decode (x2, y2);
 	  if ((x1>=x2) || (y1<=y2)) return;
 	NSRect rect = NSMakeRect (x1, y2, x2-x1, y1-y2);
+  ensure_context ();
   ns_set_color (bg_brush->get_color ());
   [NSBezierPath fillRect:rect];
   ns_set_color (pen->get_color ());
@@ -204,6 +229,7 @@ ns_renderer_rep::fill (SI x1, SI y1, SI x2, SI y2) {
   
   decode (x1, y1);
   decode (x2, y2);
+  ensure_context ();
   [NSBezierPath fillRect:NSMakeRect(x1,y2,x2-x1,y1-y2)];
 }
 
@@ -213,6 +239,7 @@ ns_renderer_rep::arc (SI x1, SI y1, SI x2, SI y2, int alpha, int delta) {
   double rx1, ry1, rx2, ry2;
   decode (x1, y1, rx1, ry1);
   decode (x2, y2, rx2, ry2);
+  ensure_context ();
   //FIXME: XDrawArc (dpy, win, gc, x1, y2, x2-x1, y1-y2, alpha, delta);
 }
 
@@ -222,6 +249,7 @@ ns_renderer_rep::fill_arc (SI x1, SI y1, SI x2, SI y2, int alpha, int delta) {
   double rx1, ry1, rx2, ry2;
   decode (x1, y1, rx1, ry1);
   decode (x2, y2, rx2, ry2);
+  ensure_context ();
   //FIXME: XFillArc (dpy, win, gc, x1, y2, x2-x1, y1-y2, alpha, delta);
 }
 
@@ -236,6 +264,7 @@ ns_renderer_rep::polygon (array<SI> x, array<SI> y, bool convex) {
     pnt[i] = NSMakePoint(xx,yy);
   }
   
+  ensure_context ();
   NSBezierPath *path = [NSBezierPath bezierPath];
   [path  appendBezierPathWithPoints:pnt count:n];
   [path setWindingRule:(convex? NSEvenOddWindingRule : NSNonZeroWindingRule)];
@@ -245,22 +274,23 @@ ns_renderer_rep::polygon (array<SI> x, array<SI> y, bool convex) {
 
 void
 ns_renderer_rep::draw_triangle (SI x1, SI y1, SI x2, SI y2, SI x3, SI y3) {
-    array<SI> x (3), y (3);
-    x[0]= x1; y[0]= y1;
-    x[1]= x2; y[1]= y2;
-    x[2]= x3; y[2]= y3;
-    NSPoint pnt[3];
-    int i, n= N(x);
-    if ((N(y) != n) || (n<1)) return;
-    for (i=0; i<n; i++) {
-        double xx,yy;
-        decode (x[i], y[i], xx, yy);
-        pnt[i] = NSMakePoint(xx,yy);
-    }
-    NSBezierPath *path = [NSBezierPath bezierPath];
-    [path  appendBezierPathWithPoints:pnt count:n];
-    [path setWindingRule: NSEvenOddWindingRule];
-    [path fill];
+  array<SI> x (3), y (3);
+  x[0]= x1; y[0]= y1;
+  x[1]= x2; y[1]= y2;
+  x[2]= x3; y[2]= y3;
+  NSPoint pnt[3];
+  int i, n= N(x);
+  if ((N(y) != n) || (n<1)) return;
+  for (i=0; i<n; i++) {
+     double xx,yy;
+     decode (x[i], y[i], xx, yy);
+     pnt[i] = NSMakePoint(xx,yy);
+  }
+  ensure_context ();
+  NSBezierPath *path = [NSBezierPath bezierPath];
+  [path  appendBezierPathWithPoints:pnt count:n];
+  [path setWindingRule: NSEvenOddWindingRule];
+  [path fill];
 }
 
 
@@ -279,6 +309,8 @@ ns_renderer_rep::image (url u, SI w, SI h, SI x, SI y, int alpha) {
   w= w/pixel; h= h/pixel;
   decode (x, y);
   
+  ensure_context ();
+
   //painter.setRenderHints (0);
   //painter.drawRect (QRect (x, y-h, w, h));
   
@@ -315,6 +347,7 @@ void
 ns_renderer_rep::draw_clipped (NSImage *im, int w, int h, SI x, SI y) {
   decode (x , y );
   y--; // top-left origin to bottom-left origin conversion
+  ensure_context ();
   [im drawAtPoint:NSMakePoint(x,y) fromRect:NSMakeRect(0,0,w,h) operation:NSCompositeSourceAtop fraction:1.0];
 }  
 
@@ -343,6 +376,7 @@ MyCreateBitmapContext (int pixelsWide, int pixelsHigh) {
 void
 ns_renderer_rep::draw (int c, font_glyphs fng, SI x, SI y) {
 	// get the pixmap
+  ensure_context ();
 	basic_character xc (c, fng, std_shrinkf, 0, 0);
 	cg_image mi = character_image [xc];
 	if (is_nil(mi)) {
@@ -396,6 +430,7 @@ ns_renderer_rep::draw (int c, font_glyphs fng, SI x, SI y) {
 #if 0
 void ns_renderer_rep::draw (int c, font_glyphs fng, SI x, SI y) {
   // get the pixmap
+  ensure_context ();
   basic_character xc (c, fng, std_shrinkf, 0, 0);
   cg_image mi = character_image [xc];
   if (is_nil(mi)) {
@@ -529,6 +564,7 @@ NSImage* xpm_init(url file_name)
 NSImage *
 ns_renderer_rep::xpm_image(url file_name)
 { 
+  ensure_context ();
 	NSImage *image = nil;
   ns_image mi = images [as_string(file_name)];
   if (is_nil(mi)) {    
@@ -599,8 +635,8 @@ public:
     ns_renderer_rep *base;
     
 public:
-    ns_proxy_renderer_rep (ns_renderer_rep *_base)
-    : ns_renderer_rep(w, h), base(_base) { }
+    ns_proxy_renderer_rep (ns_renderer_rep *_base, int ww, int hh)
+    : ns_renderer_rep (ww, hh), base (_base) { context = base->context; }
     ~ns_proxy_renderer_rep () { };
     
     void new_shadow (renderer& ren);
@@ -610,6 +646,7 @@ public:
 
 void
 ns_renderer_rep::new_shadow (renderer& ren) {
+  ren = this; return;
     SI mw, mh, sw, sh;
     get_extents (mw, mh);
     if (ren != NULL) {
@@ -618,11 +655,11 @@ ns_renderer_rep::new_shadow (renderer& ren) {
             delete_shadow (ren);
             ren= NULL;
         } else
-            static_cast<ns_shadow_renderer_rep*>(ren)->end();
+            static_cast<ns_renderer_rep*>(ren)->end();
         // cout << "Old: " << sw << ", " << sh << "\n";
     }
 
-    if (ren == NULL)  ren= (renderer) tm_new<ns_proxy_renderer_rep> (this);
+    if (ren == NULL)  ren= (renderer) tm_new<ns_proxy_renderer_rep> (this, mw, mh);
   
     if (ren) static_cast<ns_renderer_rep*>(ren)->begin(context);
 
@@ -631,6 +668,7 @@ ns_renderer_rep::new_shadow (renderer& ren) {
 
 void
 ns_renderer_rep::delete_shadow (renderer& ren)  {
+  return;
     if (ren != NULL) {
         tm_delete (ren);
         ren= NULL;
@@ -781,7 +819,7 @@ ns_proxy_renderer_rep::get_shadow (renderer ren, SI x1, SI y1, SI x2, SI y2) {
 //        shadow->painter->setClipRect(rect);
         
         //    shadow->painter->setCompositionMode(QPainter::CompositionMode_Source);
-        NSBitmapImageRep *img = [view bitmapImageRepForCachingDisplayInRect:rect];
+        NSBitmapImageRep *img = [base->view bitmapImageRepForCachingDisplayInRect:rect];
 //        QPixmap *_pixmap = static_cast<QPixmap*>(painter->device());
         if (img) {
             [img drawInRect:rect];

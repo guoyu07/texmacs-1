@@ -22,6 +22,10 @@ public:
   ns_renderer_rep (int w = 0, int h = 0);
   virtual ~ns_renderer_rep ();
 
+  void ensure_context ();
+  void get_extents (int& w2, int& h2);
+  void set_zoom_factor (double zoom);
+
   void  draw (int char_code, font_glyphs fn, SI x, SI y);
   void  set_pencil (pencil p);
   void  line (SI x1, SI y1, SI x2, SI y2);
