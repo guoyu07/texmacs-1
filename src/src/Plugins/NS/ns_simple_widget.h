@@ -14,9 +14,10 @@
 
 #include "widget.hpp"
 
-#include "ns_widget.h"
-
-class simple_widget_rep: public ns_view_widget_rep {
+class simple_widget_rep: public widget_rep {
+  
+  widget impl;
+  
 public:
   simple_widget_rep ();
 	
@@ -38,9 +39,9 @@ public:
   virtual void write (slot s, blackbox index, widget w);
 	// abstract write access (of type s) of a subwidget at position index
   virtual void notify (slot s, blackbox new_val);
-
-
-  virtual TMMenuItem *as_menuitem();
+  
+  widget get_impl (); //{ return impl; }
+ // void set_impl (widget _impl) { impl = _impl; }
 };
 
 #endif // defined NS_SIMPLE_WIDGET_H

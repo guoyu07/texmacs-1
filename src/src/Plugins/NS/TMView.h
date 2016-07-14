@@ -10,16 +10,18 @@
 ******************************************************************************/
 
 #include "mac_cocoa.h"
-#include "ns_simple_widget.h"
+#include "ns_widget.h"
+
+class ns_simple_widget_rep;
 
 @interface TMView : NSView  <NSTextInput>
 {
-  simple_widget_rep *wid;
+  ns_simple_widget_rep *wid;
   NSString *workingText;
   BOOL processingCompose;
   NSMutableArray *delayed_rects;
 }
-- (void) setWidget:(widget_rep*) w;
-- (widget_rep*) widget;
+- (void) setWidget:(ns_simple_widget_rep*) w;
+- (ns_simple_widget_rep*) widget;
 - (void) deleteWorkingText;
 @end

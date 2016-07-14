@@ -667,8 +667,12 @@ ns_tm_widget_rep::write (slot s, blackbox index, widget w) {
   case SLOT_SCROLLABLE: 
     {
       check_type_void (index, "SLOT_SCROLLABLE");
-      main_widget = concrete(w);
-      NSView *v = ((ns_view_widget_rep*) w.rep)->view;
+      if (simple_widget_rep *ww = dynamic_cast<simple_widget_rep*>(w.rep)) {
+        main_widget = concrete(ww->get_impl());
+      } else {
+        main_widget = concrete(((ns_view_widget_rep*)w.rep));
+      }
+      NSView *v = ((ns_view_widget_rep*) main_widget.rep)->view;
       [sv setDocumentView: v];
       [[sv window] makeFirstResponder:v];
     }
@@ -890,15 +894,15 @@ ns_window_widget_rep::write (slot s, blackbox index, widget w) {
 
 
 /******************************************************************************
-* simple_widget_rep
+* ns_simple_widget_rep
 ******************************************************************************/
-#pragma mark simple_widget_rep
+#pragma mark ns_simple_widget_rep
 
 /******************************************************************************
 * Constructor
 ******************************************************************************/
 
-simple_widget_rep::simple_widget_rep ()
+ns_simple_widget_rep::ns_simple_widget_rep ()
 : ns_view_widget_rep ([[[TMView alloc] initWithFrame:NSMakeRect(0,0,1000,1000)] autorelease]) 
 { 
   [(TMView*)view setWidget:this];
@@ -910,48 +914,8 @@ simple_widget_rep::simple_widget_rep ()
 ******************************************************************************/
 
 void
-simple_widget_rep::handle_get_size_hint (SI& w, SI& h) {
-  gui_root_extents (w, h);  
-}
-
-void
-simple_widget_rep::handle_notify_resize (SI w, SI h) {
-  (void) w; (void) h; 
-}
-
-void
-simple_widget_rep::handle_keypress (string key, time_t t) {
-  (void) key; (void) t;
-}
-
-void
-simple_widget_rep::handle_keyboard_focus (bool has_focus, time_t t) {
-  (void) has_focus; (void) t;
-}
-
-void
-simple_widget_rep::handle_mouse (string kind, SI x, SI y, int mods, time_t t) {
-  (void) kind; (void) x; (void) y; (void) mods; (void) t;
-}
-
-void
-simple_widget_rep::handle_set_zoom_factor (double zoom) {
-  (void) zoom;
-}
-
-void
-simple_widget_rep::handle_clear (renderer ren, SI x1, SI y1, SI x2, SI y2) {
-  (void) ren; (void) x1; (void) y1; (void) x2; (void) y2;
-}
-
-void
-simple_widget_rep::handle_repaint (renderer ren, SI x1, SI y1, SI x2, SI y2) {
-  (void) ren; (void) x1; (void) y1; (void) x2; (void) y2;
-}
-
-void
-simple_widget_rep::send (slot s, blackbox val) {
-  if (DEBUG_AQUA) debug_aqua << "ns_simple_widget_rep::send " << slot_name(s) << LF;
+ns_simple_widget_rep::send (slot s, blackbox val) {
+  if (DEBUG_AQUA) debug_aqua << "ns_ns_simple_widget_rep::send " << slot_name(s) << LF;
   switch (s) {
     case SLOT_CURSOR:
     {
@@ -960,7 +924,7 @@ simple_widget_rep::send (slot s, blackbox val) {
         NSPoint pt = to_nspoint(p);
         
         //FIXME: implement this!!!
-//      debug_aqua << "simple_widget_rep::send SLOT_POSITION - TO BE IMPLEMENTED (" << pt.x << "," << pt.y << ")\n";
+//      debug_aqua << "ns_simple_widget_rep::send SLOT_POSITION - TO BE IMPLEMENTED (" << pt.x << "," << pt.y << ")\n";
      // [view scrollPoint:to_nspoint(p)];
 
       //QPoint pt = to_qpoint(p);
@@ -1002,21 +966,21 @@ simple_widget_rep::send (slot s, blackbox val) {
           TYPE_CHECK (type_box (val) == type_helper<double>::id);
           double new_zoom = open_box<double> (val);
           if (DEBUG_EVENTS) debug_events << "New zoom factor :" << new_zoom << LF;
-          handle_set_zoom_factor (new_zoom);
+          counterpart()->handle_set_zoom_factor (new_zoom);
           break;
       }
           
 
 
     default:
-      if (DEBUG_AQUA) debug_aqua << "[ns_simple_widget_rep] ";
+      if (DEBUG_AQUA) debug_aqua << "[ns_ns_simple_widget_rep] ";
       ns_view_widget_rep::send (s, val);
       //      FAILED ("unhandled slot type");
   }
 }
 
 blackbox
-simple_widget_rep::query (slot s, int type_id) {
+ns_simple_widget_rep::query (slot s, int type_id) {
   switch (s) {
     case SLOT_INVALID:
     {
@@ -1075,7 +1039,7 @@ simple_widget_rep::query (slot s, int type_id) {
 }
 
 void
-simple_widget_rep::notify (slot s, blackbox new_val) {
+ns_simple_widget_rep::notify (slot s, blackbox new_val) {
   ns_view_widget_rep::notify (s, new_val);
 }
 
@@ -1084,12 +1048,12 @@ simple_widget_rep::notify (slot s, blackbox new_val) {
  ******************************************************************************/
 
 widget
-simple_widget_rep::read (slot s, blackbox index) {
+ns_simple_widget_rep::read (slot s, blackbox index) {
   return ns_view_widget_rep::read(s,index);
 }
 
 void
-simple_widget_rep::write (slot s, blackbox index, widget w) {
+ns_simple_widget_rep::write (slot s, blackbox index, widget w) {
   ns_view_widget_rep::write(s,index,w);
 }
 

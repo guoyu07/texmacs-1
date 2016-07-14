@@ -13,17 +13,12 @@
 #define NS_WIDGET_H
 
 #include "widget.hpp"
+#include "ns_simple_widget.h"
+#include "TMView.h"
 
-#ifndef MAC_COCOA_H
-typedef struct TeXmacs_NSView {
-  void * isa;
-}  NSView ; // hack to allow inclusion in pure C++ sources
-//#else
-//typedef NSView * NSViewPtr ; 
-typedef void *TMMenuItem;
-#else
 @class TMMenuItem;
-#endif
+@class TMView;
+
 
 
 class ns_widget_rep : public widget_rep {
@@ -35,7 +30,7 @@ public:
 	virtual widget popup_window_widget (string s); 
  
   virtual TMMenuItem *as_menuitem();
-
+  
 };
 
 
@@ -77,6 +72,41 @@ public:
 	virtual widget plain_window_widget (string s); 
 
 };
+
+
+class ns_simple_widget_rep: public ns_view_widget_rep {
+  widget p_counterpart;
+  
+public:
+  ns_simple_widget_rep ();
+  
+  virtual void send (slot s, blackbox val);
+  // send a message val to the slot s
+  virtual blackbox query (slot s, int type_id);
+  // obtain information of a given type from the slot s
+  virtual widget read (slot s, blackbox index);
+  // abstract read access (of type s) of a subwidget at position index
+  virtual void write (slot s, blackbox index, widget w);
+  // abstract write access (of type s) of a subwidget at position index
+  virtual void notify (slot s, blackbox new_val);
+  
+  TMView*         canvas () { return (TMView*)(view); }
+  simple_widget_rep *counterpart ()  { return dynamic_cast<simple_widget_rep*>(p_counterpart.rep); }
+  void setCounterpart (simple_widget_rep *w)  { p_counterpart = w; }
+  
+  NSRect    p_extents;   // The size of the virtual area where things are drawn.
+  NSPoint    p_origin;   // The offset into that area
+  
+  NSPoint       backing_pos;
+
+  
+  void scrollContentsBy ( int dx, int dy );
+  void updateScrollBars (void);
+  void setExtents ( NSRect newExtents );
+  
+  virtual TMMenuItem *as_menuitem();
+};
+
 
 
 extern widget the_keyboard_focus;

@@ -98,10 +98,10 @@ public:
 @interface TMMenuItem : NSMenuItem
 {
 	command_rep *cmd;
-	simple_widget_rep* wid;// an eventual box widget (see tm_button.cpp)
+	ns_simple_widget_rep* wid;// an eventual box widget (see tm_button.cpp)
 }
 - (void)setCommand:(command_rep *)_c;
-- (void)setWidget:(simple_widget_rep *)_w;
+- (void)setWidget:(ns_simple_widget_rep *)_w;
 - (void)doit;
 @end
 
@@ -115,7 +115,7 @@ public:
 	  [self setTarget:self];
 	}
 }
-- (void)setWidget:(simple_widget_rep *)_w
+- (void)setWidget:(ns_simple_widget_rep *)_w
 {  
 	if (wid) { DEC_COUNT_NULL(wid); } wid = _w; 
 	if (wid) {
@@ -132,7 +132,7 @@ public:
   if ((!img)&&(wid))
   {
     SI width, height;
-    wid->handle_get_size_hint (width,height);
+    wid->counterpart()->handle_get_size_hint (width,height);
     NSSize s = NSMakeSize(width/PIXEL,height/PIXEL);
     
     img = [[[NSImage alloc] initWithSize:s] autorelease];
@@ -149,7 +149,7 @@ public:
     r -> encode (x1,y1);
     r -> encode (x2,y2);
     r -> set_clipping (x1,y1,x2,y2);
-    wid -> handle_repaint (r,x1,y1,x2,y2);
+    wid ->counterpart()-> handle_repaint (r,x1,y1,x2,y2);
     r->end();
     [img unlockFocus];
     //[img setFlipped:YES];
@@ -419,7 +419,7 @@ widget menu_button (widget w, command cmd, string pre, string ks, int style)
   
   if (typeid(*(w.rep)) == typeid(simple_widget_rep)) {
     mi = [[[TMMenuItem alloc] init] autorelease];
-    [mi setWidget:(simple_widget_rep*)w.rep];
+    [mi setWidget:(ns_simple_widget_rep*)(((simple_widget_rep*)w.rep)->get_impl().rep)];
   } else  {
     mi = ((ns_widget_rep*)w.rep)->as_menuitem();
   }
@@ -490,7 +490,7 @@ NSMenuItem* to_nsmenuitem(widget w)
 	return ((ns_menu_rep*)w.rep)->item;
 }
 
- TMMenuItem *simple_widget_rep::as_menuitem()
+ TMMenuItem *ns_simple_widget_rep::as_menuitem()
 {
   TMMenuItem *mi = [[[TMMenuItem alloc] init] autorelease];
   [mi setWidget:this];

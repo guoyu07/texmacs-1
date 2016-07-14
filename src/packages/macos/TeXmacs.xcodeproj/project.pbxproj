@@ -416,6 +416,7 @@
 		9C066E6612849FD900DE2F84 /* QTMInteractivePrompt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4931F77F127ED5B3007C92CC /* QTMInteractivePrompt.cpp */; };
 		9C088F7612B1BAD000A18E04 /* qt_color_picker_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C088F7312B1BAD000A18E04 /* qt_color_picker_widget.cpp */; };
 		9C08C97610D19EB20070A0B7 /* QTMPipeLink.hpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C1D126710D102B300232476 /* QTMPipeLink.hpp */; };
+		9C0A500D1D38006D005032CE /* ns_simple_widget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9CA9DE091D37FB9B00F5FBCF /* ns_simple_widget.mm */; };
 		9C0B09AB14FF0A1C004ABDCE /* learn_handwriting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C0B09A714FF0A1C004ABDCE /* learn_handwriting.cpp */; };
 		9C0B09AC14FF0A1C004ABDCE /* poly_line.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C0B09A814FF0A1C004ABDCE /* poly_line.cpp */; };
 		9C0B09AD14FF0A1C004ABDCE /* recognize_handwriting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C0B09AA14FF0A1C004ABDCE /* recognize_handwriting.cpp */; };
@@ -2735,9 +2736,7 @@
 		9C3D2E5712B0D662009E33AD /* tree_select.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tree_select.cpp; sourceTree = "<group>"; };
 		9C3D2E5812B0D662009E33AD /* tree_select.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tree_select.hpp; sourceTree = "<group>"; };
 		9C3DA71E12932990009617C4 /* extend_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = extend_widget.cpp; sourceTree = "<group>"; };
-		9C3F65761D37D4A100742895 /* TeXmacsQt copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "TeXmacsQt copy-Info.plist"; path = "/Users/mgubi/t/lab/ns/src/packages/macos/TeXmacsQt copy-Info.plist"; sourceTree = "<absolute>"; };
 		9C3F66DC1D37D4B400742895 /* TeXmacsNS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TeXmacsNS.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		9C3F66DD1D37D4B400742895 /* TeXmacsCocoa copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "TeXmacsCocoa copy-Info.plist"; path = "/Users/mgubi/t/lab/ns/src/packages/macos/TeXmacsCocoa copy-Info.plist"; sourceTree = "<absolute>"; };
 		9C3F66E01D37D4D100742895 /* AutoLayoutCommonInclude.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoLayoutCommonInclude.h; sourceTree = "<group>"; };
 		9C3F66E11D37D4D100742895 /* GNUstep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GNUstep.h; sourceTree = "<group>"; };
 		9C3F66E21D37D4D100742895 /* GSAutoLayoutBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSAutoLayoutBox.h; sourceTree = "<group>"; };
@@ -2856,6 +2855,7 @@
 		9C855ABF12BEB4EC00DCBE1D /* QTMPrinterSettings.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = QTMPrinterSettings.hpp; sourceTree = "<group>"; };
 		9C99F04510AD84DE00B2113D /* QTMScrollView.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = QTMScrollView.hpp; sourceTree = "<group>"; };
 		9C99F04610AD84DE00B2113D /* QTMScrollView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = QTMScrollView.cpp; sourceTree = "<group>"; };
+		9CA9DE091D37FB9B00F5FBCF /* ns_simple_widget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ns_simple_widget.mm; sourceTree = "<group>"; };
 		9CC6148B10A998BC0055F808 /* MOCs.o */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.objfile"; includeInIndex = 0; path = MOCs.o; sourceTree = BUILT_PRODUCTS_DIR; };
 		9CCC738D12A7D6DA006EDBDA /* HIDRemote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HIDRemote.h; sourceTree = "<group>"; };
 		9CCC738E12A7D6DA006EDBDA /* HIDRemote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HIDRemote.m; sourceTree = "<group>"; };
@@ -2966,8 +2966,6 @@
 				9C0B475B10A8CBE40097A335 /* Resources */,
 				29B97315FDCFA39411CA2CEA /* Sources */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
-				9C3F65761D37D4A100742895 /* TeXmacsQt copy-Info.plist */,
-				9C3F66DD1D37D4B400742895 /* TeXmacsCocoa copy-Info.plist */,
 			);
 			name = TeXmacs;
 			sourceTree = "<group>";
@@ -4856,6 +4854,7 @@
 				9C3F670A1D37D4D100742895 /* ns_renderer.h */,
 				9C3F670B1D37D4D100742895 /* ns_renderer.mm */,
 				9C3F670C1D37D4D100742895 /* ns_simple_widget.h */,
+				9CA9DE091D37FB9B00F5FBCF /* ns_simple_widget.mm */,
 				9C3F670D1D37D4D100742895 /* ns_utilities.h */,
 				9C3F670E1D37D4D100742895 /* ns_utilities.mm */,
 				9C3F670F1D37D4D100742895 /* ns_widget.h */,
@@ -6222,6 +6221,7 @@
 				9C3F66CC1D37D4B400742895 /* tm_winsparkle.cpp in Sources */,
 				9C3F66CD1D37D4B400742895 /* latex_preview.cpp in Sources */,
 				9C3F66CE1D37D4B400742895 /* highlight_boxes.cpp in Sources */,
+				9C0A500D1D38006D005032CE /* ns_simple_widget.mm in Sources */,
 				9C3F66CF1D37D4B400742895 /* parse_vernac.cpp in Sources */,
 				9C3F66D01D37D4B400742895 /* font_protrusion.cpp in Sources */,
 				9C3F66D11D37D4B400742895 /* tree_search.cpp in Sources */,
@@ -7150,7 +7150,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INFOPLIST_FILE = "TeXmacsCocoa copy-Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/Info-Xcode.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -7164,7 +7164,7 @@
 			buildSettings = {
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
-				INFOPLIST_FILE = "TeXmacsCocoa copy-Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/Info-Xcode.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;

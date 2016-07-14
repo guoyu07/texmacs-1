@@ -186,14 +186,14 @@ void initkeymap()
   [super dealloc];
 }
 
-- (void) setWidget:(widget_rep*) w
+- (void) setWidget:(ns_simple_widget_rep*) w
 {
-	wid = (simple_widget_rep*)w;
+	wid = w;
 }
 
-- (widget_rep*)widget
+- (ns_simple_widget_rep*)widget
 {
-	return  (widget_rep*)wid;
+	return  wid;
 }
 
 - (void)setNeedsDisplayInTMRect:(TMRect*)r
@@ -205,7 +205,7 @@ void initkeymap()
 {
   // query widget preferred size
   SI w,h;
-  wid->handle_get_size_hint (w,h);
+  wid->counterpart()->handle_get_size_hint (w,h);
   NSSize s = NSMakeSize(w,h);
   unscaleSize(s);
   [self setFrameSize:s];
@@ -231,12 +231,11 @@ void initkeymap()
 }
 
 
-
 - (void) focusIn
 {
   if (DEBUG_EVENTS) debug_events << "FOCUSIN" << LF;
   if (wid) {
-    wid -> handle_keyboard_focus (true, texmacs_time ());
+    wid ->counterpart()->handle_keyboard_focus (true, texmacs_time ());
   }
 }
 
@@ -244,7 +243,7 @@ void initkeymap()
 {
   if (DEBUG_EVENTS)   debug_events << "FOCUSOUT" << LF;
   if (wid) {
-    wid -> handle_keyboard_focus (false, texmacs_time ());
+    wid ->counterpart()->handle_keyboard_focus (false, texmacs_time ());
   }
 }
 
@@ -292,7 +291,7 @@ void initkeymap()
     r -> encode (x2,y2);
  //    debug_events << "DRAWING RECT " << x1 << "," << y1 << "," << x2 << "," << y2 << LF;
     r -> set_clipping (x1, y1, x2, y2);
-    wid->handle_repaint (r, x1, y1, x2, y2);
+    wid->counterpart()->handle_repaint (r, x1, y1, x2, y2);
     r -> end ();
     if (gui_interrupted ())
       ns_update_flag= true;
@@ -406,7 +405,7 @@ void initkeymap()
           r = ((mods & NSShiftKeyMask)? "S-" * modstr: modstr) * r;          
           debug_events << "function key press: " << r << LF;
           [self deleteWorkingText];
-          wid -> handle_keypress (r, texmacs_time());    
+          wid ->counterpart()->handle_keypress (r, texmacs_time());
           return;
         } else if (mods & (NSControlKeyMask  | NSCommandKeyMask | NSHelpKeyMask))
         {
@@ -418,7 +417,7 @@ void initkeymap()
           string s ( modstr * r);
           debug_events << "modified  key press: " << s << LF;
           [self deleteWorkingText];
-          wid -> handle_keypress (s, texmacs_time());    
+          wid ->counterpart()->handle_keypress (s, texmacs_time());
           the_gui->update (); // FIXME: remove this line when
           // edit_typeset_rep::get_env_value will be faster
 
@@ -469,7 +468,7 @@ mouse_decode (unsigned int mstate) {
 	scale(point);
     unsigned int mstate= mouse_state (theEvent, false);
     string s= "press-" * mouse_decode (mstate);
-    wid -> handle_mouse (s, point.x , point.y , mstate, texmacs_time ());
+    wid ->counterpart()->handle_mouse (s, point.x , point.y , mstate, texmacs_time ());
     if (DEBUG_EVENTS)
       debug_events << "mouse event: " << s << " at "
       << point.x << ", " << point.y  << LF;
@@ -483,7 +482,7 @@ mouse_decode (unsigned int mstate) {
 	scale(point);
     unsigned int mstate= mouse_state (theEvent, true);
     string s= "release-" * mouse_decode (mstate);
-    wid -> handle_mouse (s, point.x , point.y , mstate, texmacs_time ());
+    wid ->counterpart()->handle_mouse (s, point.x , point.y , mstate, texmacs_time ());
     if (DEBUG_EVENTS)
       debug_events << "mouse event: " << s << " at "
       << point.x  << ", " << point.y  << LF;
@@ -497,7 +496,7 @@ mouse_decode (unsigned int mstate) {
 		scale(point);
     unsigned int mstate= mouse_state (theEvent, false);
     string s= "move";
-    wid -> handle_mouse (s, point.x , point.y , mstate, texmacs_time ());
+    wid ->counterpart()->handle_mouse (s, point.x , point.y , mstate, texmacs_time ());
     if (DEBUG_EVENTS)
       debug_events << "mouse event: " << s << " at "
       << point.x  << ", " << point.y  << LF;
@@ -511,7 +510,7 @@ mouse_decode (unsigned int mstate) {
 		scale(point);
     unsigned int mstate= mouse_state (theEvent, false);
     string s= "move";
-    wid -> handle_mouse (s, point.x , point.y , mstate, texmacs_time ());
+    wid ->counterpart()->handle_mouse (s, point.x , point.y , mstate, texmacs_time ());
     if (DEBUG_EVENTS)
       debug_events << "mouse event: " << s << " at "
       << point.x  << ", " << point.y  << LF;
@@ -534,7 +533,7 @@ mouse_decode (unsigned int mstate) {
   if (wid)  {
     NSSize size = [self bounds].size;
     scaleSize (size);
-    wid-> handle_notify_resize (size.width, size.height);
+    wid->counterpart()->handle_notify_resize (size.width, size.height);
   }
 }
 
@@ -568,7 +567,7 @@ mouse_decode (unsigned int mstate) {
     string rr (buf, strlen(buf));
     string s= utf8_to_cork (rr);          
     debug_events << "key press: " << s << LF;
-    wid -> handle_keypress (s, texmacs_time());        
+    wid ->counterpart()->handle_keypress (s, texmacs_time());        
   }
 }
 
