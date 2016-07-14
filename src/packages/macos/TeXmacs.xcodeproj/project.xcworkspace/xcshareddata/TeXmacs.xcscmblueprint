@@ -1,0 +1,25 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "64cb5145-927a-446d-8aed-2fb7b4773692++1556",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+    "64cb5145-927a-446d-8aed-2fb7b4773692++1556" : {
+
+    }
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "64cb5145-927a-446d-8aed-2fb7b4773692++1556" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "E7044F7B-C060-455D-B197-58D2BBB2285F",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "64cb5145-927a-446d-8aed-2fb7b4773692++1556" : "clean\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "TeXmacs",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "packages\/macos\/TeXmacs.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "svn+ssh:\/\/svn.sv.gnu.org\/texmacs",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Subversion",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "64cb5145-927a-446d-8aed-2fb7b4773692++1556"
+    }
+  ]
+}
