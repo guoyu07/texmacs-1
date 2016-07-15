@@ -1203,7 +1203,6 @@
 		9CCC746410D303D900E88D90 /* tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C0B484310A8CC100097A335 /* tree.cpp */; };
 		9CCC746510D303D900E88D90 /* tree_label.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C0B484510A8CC100097A335 /* tree_label.cpp */; };
 		9CCC746610D303D900E88D90 /* bibtex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C0B484C10A8CC100097A335 /* bibtex.cpp */; };
-		9CCC746710D303D900E88D90 /* TMButtonsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C0B486D10A8CC100097A335 /* TMButtonsController.m */; };
 		9CCC746810D303D900E88D90 /* free_type.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C0B487110A8CC100097A335 /* free_type.cpp */; };
 		9CCC746910D303D900E88D90 /* tt_face.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C0B487310A8CC100097A335 /* tt_face.cpp */; };
 		9CCC746A10D303D900E88D90 /* tt_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C0B487510A8CC100097A335 /* tt_file.cpp */; };
@@ -1328,13 +1327,6 @@
 		9CCC750410D303D900E88D90 /* table.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C0B49ED10A8CC110097A335 /* table.cpp */; };
 		9CCC750C10D303D900E88D90 /* unix_sys_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C722C0D10D2F88800C41915 /* unix_sys_utils.cpp */; };
 		9CCC751010D303D900E88D90 /* TeXmacs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9C0B430010A8CB4E0097A335 /* TeXmacs */; };
-		9CCC751E10D304EB00E88D90 /* aqua_dialogues.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C0B485710A8CC100097A335 /* aqua_dialogues.mm */; };
-		9CCC751F10D304EB00E88D90 /* aqua_gui.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C0B485910A8CC100097A335 /* aqua_gui.mm */; };
-		9CCC752010D304EB00E88D90 /* aqua_menu.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C0B485B10A8CC100097A335 /* aqua_menu.mm */; };
-		9CCC752110D304EB00E88D90 /* aqua_renderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C0B485E10A8CC100097A335 /* aqua_renderer.mm */; };
-		9CCC752210D304EB00E88D90 /* aqua_utilities.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C0B486110A8CC100097A335 /* aqua_utilities.mm */; };
-		9CCC752310D304EB00E88D90 /* aqua_widget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C0B486310A8CC100097A335 /* aqua_widget.mm */; };
-		9CCC752510D304EB00E88D90 /* TMView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C0B486F10A8CC100097A335 /* TMView.mm */; };
 		9CD1513B15A72D0F006F2205 /* metadata.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9CD1513A15A72D0F006F2205 /* metadata.cpp */; };
 		9CD1513C15A72D0F006F2205 /* metadata.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9CD1513A15A72D0F006F2205 /* metadata.cpp */; };
 		9CD1513D15A72D0F006F2205 /* metadata.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9CD1513A15A72D0F006F2205 /* metadata.cpp */; };
@@ -2386,29 +2378,6 @@
 		9C0B485110A8CC100097A335 /* munge.pl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; path = munge.pl; sourceTree = "<group>"; };
 		9C0B485210A8CC100097A335 /* tm_cairo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tm_cairo.cpp; sourceTree = "<group>"; };
 		9C0B485310A8CC100097A335 /* tm_cairo.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tm_cairo.hpp; sourceTree = "<group>"; };
-		9C0B485510A8CC100097A335 /* aqua_basic_widgets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aqua_basic_widgets.h; sourceTree = "<group>"; };
-		9C0B485610A8CC100097A335 /* aqua_dialogues.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aqua_dialogues.h; sourceTree = "<group>"; };
-		9C0B485710A8CC100097A335 /* aqua_dialogues.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = aqua_dialogues.mm; sourceTree = "<group>"; };
-		9C0B485810A8CC100097A335 /* aqua_gui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aqua_gui.h; sourceTree = "<group>"; };
-		9C0B485910A8CC100097A335 /* aqua_gui.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = aqua_gui.mm; sourceTree = "<group>"; };
-		9C0B485A10A8CC100097A335 /* aqua_menu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aqua_menu.h; sourceTree = "<group>"; };
-		9C0B485B10A8CC100097A335 /* aqua_menu.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = aqua_menu.mm; sourceTree = "<group>"; };
-		9C0B485C10A8CC100097A335 /* aqua_other_widgets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aqua_other_widgets.h; sourceTree = "<group>"; };
-		9C0B485D10A8CC100097A335 /* aqua_renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aqua_renderer.h; sourceTree = "<group>"; };
-		9C0B485E10A8CC100097A335 /* aqua_renderer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = aqua_renderer.mm; sourceTree = "<group>"; };
-		9C0B485F10A8CC100097A335 /* aqua_simple_widget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aqua_simple_widget.h; sourceTree = "<group>"; };
-		9C0B486010A8CC100097A335 /* aqua_utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aqua_utilities.h; sourceTree = "<group>"; };
-		9C0B486110A8CC100097A335 /* aqua_utilities.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = aqua_utilities.mm; sourceTree = "<group>"; };
-		9C0B486210A8CC100097A335 /* aqua_widget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aqua_widget.h; sourceTree = "<group>"; };
-		9C0B486310A8CC100097A335 /* aqua_widget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = aqua_widget.mm; sourceTree = "<group>"; };
-		9C0B486510A8CC100097A335 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		9C0B486710A8CC100097A335 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		9C0B486910A8CC100097A335 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Window.nib; sourceTree = "<group>"; };
-		9C0B486A10A8CC100097A335 /* mac_cocoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mac_cocoa.h; sourceTree = "<group>"; };
-		9C0B486C10A8CC100097A335 /* TMButtonsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMButtonsController.h; sourceTree = "<group>"; };
-		9C0B486D10A8CC100097A335 /* TMButtonsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TMButtonsController.m; sourceTree = "<group>"; };
-		9C0B486E10A8CC100097A335 /* TMView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMView.h; sourceTree = "<group>"; };
-		9C0B486F10A8CC100097A335 /* TMView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TMView.mm; sourceTree = "<group>"; };
 		9C0B487110A8CC100097A335 /* free_type.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = free_type.cpp; sourceTree = "<group>"; };
 		9C0B487210A8CC100097A335 /* free_type.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = free_type.hpp; sourceTree = "<group>"; };
 		9C0B487310A8CC100097A335 /* tt_face.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tt_face.cpp; sourceTree = "<group>"; };
@@ -3920,7 +3889,6 @@
 				9C0B484810A8CC100097A335 /* Axel */,
 				9C0B484B10A8CC100097A335 /* Bibtex */,
 				9C0B484E10A8CC100097A335 /* Cairo */,
-				9C0B485410A8CC100097A335 /* Cocoa */,
 				49C0960A1B0F944100E038BA /* Database */,
 				9C0B487010A8CC100097A335 /* Freetype */,
 				9C0B487910A8CC100097A335 /* Ghostscript */,
@@ -3973,36 +3941,6 @@
 				9C0B485310A8CC100097A335 /* tm_cairo.hpp */,
 			);
 			path = Cairo;
-			sourceTree = "<group>";
-		};
-		9C0B485410A8CC100097A335 /* Cocoa */ = {
-			isa = PBXGroup;
-			children = (
-				9C0B485510A8CC100097A335 /* aqua_basic_widgets.h */,
-				9C0B485610A8CC100097A335 /* aqua_dialogues.h */,
-				9C0B485710A8CC100097A335 /* aqua_dialogues.mm */,
-				9C0B485810A8CC100097A335 /* aqua_gui.h */,
-				9C0B485910A8CC100097A335 /* aqua_gui.mm */,
-				9C0B485A10A8CC100097A335 /* aqua_menu.h */,
-				9C0B485B10A8CC100097A335 /* aqua_menu.mm */,
-				9C0B485C10A8CC100097A335 /* aqua_other_widgets.h */,
-				9C0B485D10A8CC100097A335 /* aqua_renderer.h */,
-				9C0B485E10A8CC100097A335 /* aqua_renderer.mm */,
-				9C0B485F10A8CC100097A335 /* aqua_simple_widget.h */,
-				9C0B486010A8CC100097A335 /* aqua_utilities.h */,
-				9C0B486110A8CC100097A335 /* aqua_utilities.mm */,
-				9C0B486210A8CC100097A335 /* aqua_widget.h */,
-				9C0B486310A8CC100097A335 /* aqua_widget.mm */,
-				9C0B486410A8CC100097A335 /* InfoPlist.strings */,
-				9C0B486610A8CC100097A335 /* MainMenu.nib */,
-				9C0B486810A8CC100097A335 /* Window.nib */,
-				9C0B486A10A8CC100097A335 /* mac_cocoa.h */,
-				9C0B486C10A8CC100097A335 /* TMButtonsController.h */,
-				9C0B486D10A8CC100097A335 /* TMButtonsController.m */,
-				9C0B486E10A8CC100097A335 /* TMView.h */,
-				9C0B486F10A8CC100097A335 /* TMView.mm */,
-			);
-			path = Cocoa;
 			sourceTree = "<group>";
 		};
 		9C0B487010A8CC100097A335 /* Freetype */ = {
@@ -6360,7 +6298,6 @@
 				9CCC746410D303D900E88D90 /* tree.cpp in Sources */,
 				9CCC746510D303D900E88D90 /* tree_label.cpp in Sources */,
 				9CCC746610D303D900E88D90 /* bibtex.cpp in Sources */,
-				9CCC746710D303D900E88D90 /* TMButtonsController.m in Sources */,
 				9C4A740E1D22BEF600572468 /* player.cpp in Sources */,
 				9CCC746810D303D900E88D90 /* free_type.cpp in Sources */,
 				9CCC746910D303D900E88D90 /* tt_face.cpp in Sources */,
@@ -6505,13 +6442,6 @@
 				9CCC750310D303D900E88D90 /* cell.cpp in Sources */,
 				9CCC750410D303D900E88D90 /* table.cpp in Sources */,
 				9CCC750C10D303D900E88D90 /* unix_sys_utils.cpp in Sources */,
-				9CCC751E10D304EB00E88D90 /* aqua_dialogues.mm in Sources */,
-				9CCC751F10D304EB00E88D90 /* aqua_gui.mm in Sources */,
-				9CCC752010D304EB00E88D90 /* aqua_menu.mm in Sources */,
-				9CCC752110D304EB00E88D90 /* aqua_renderer.mm in Sources */,
-				9CCC752210D304EB00E88D90 /* aqua_utilities.mm in Sources */,
-				9CCC752310D304EB00E88D90 /* aqua_widget.mm in Sources */,
-				9CCC752510D304EB00E88D90 /* TMView.mm in Sources */,
 				9C060A9E10FC6D8B00C51583 /* tm_ostream.cpp in Sources */,
 				9C6061EC112442BD00054149 /* gs_utilities.cpp in Sources */,
 				9CFEB3F811D79783005C12C4 /* bibtex_functions.cpp in Sources */,
@@ -7008,30 +6938,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		9C0B486410A8CC100097A335 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				9C0B486510A8CC100097A335 /* English */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		9C0B486610A8CC100097A335 /* MainMenu.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				9C0B486710A8CC100097A335 /* English */,
-			);
-			name = MainMenu.nib;
-			sourceTree = "<group>";
-		};
-		9C0B486810A8CC100097A335 /* Window.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				9C0B486910A8CC100097A335 /* English */,
-			);
-			name = Window.nib;
-			sourceTree = "<group>";
-		};
 		9C3F66FB1D37D4D100742895 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
