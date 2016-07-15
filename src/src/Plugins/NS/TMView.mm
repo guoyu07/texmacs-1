@@ -278,7 +278,7 @@ void initkeymap()
 //	NSRect bounds = [self bounds];
 	
   {
-    ns_renderer_rep* r = the_ns_renderer();
+    ns_renderer_rep* r = the_ns_renderer ();
     int x1 = rect.origin.x;
     int y1 = rect.origin.y+rect.size.height;
     int x2 = rect.origin.x+rect.size.width;

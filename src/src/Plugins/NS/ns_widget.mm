@@ -86,13 +86,11 @@ ns_view_widget_rep::~ns_view_widget_rep()  {
   [view release]; 
 }
 
-
-
 void
 ns_view_widget_rep::send (slot s, blackbox val) {
   switch (s) {
-  case SLOT_NAME:
-    {	
+    case SLOT_NAME:
+    {
       check_type<string> (val, s);
       string name = open_box<string> (val);
       NSWindow *win = [view window];
@@ -100,48 +98,63 @@ ns_view_widget_rep::send (slot s, blackbox val) {
         [win setTitle:to_nsstring(name)];
       }
     }
-    break;
-  case SLOT_INVALIDATE:
+      break;
+    case SLOT_INVALIDATE:
     {
       TYPE_CHECK (type_box (val) == type_helper<coord4>::id);
       coord4 p= open_box<coord4> (val);
-//      NSRect rect = to_nsrect(p);
+      NSRect rect = to_nsrect(p);
+      [view setNeedsDisplayInRect: rect];
+#if 0
       if (DEBUG_AQUA)
-         debug_aqua << "Invalidating rect " << rectangle(p.x1,p.x2,p.x3,p.x4) << LF;
-      ns_renderer_rep* ren = the_ns_renderer();
+        debug_aqua << "Invalidating rect " << rectangle(p.x1,p.x2,p.x3,p.x4) << LF;
+      ns_renderer_rep* ren = the_ns_renderer ();
       ren->set_origin(0,0);
       SI x1 = p.x1, y1 = p.x2, x2 = p.x3, y2 = p.x4;
       ren->outer_round (x1, y1, x2, y2);
       ren->decode (x1, y1);
       ren->decode (x2, y2);
-      [view setNeedsDisplayInRect:NSMakeRect(x1, y2, x2-x1, y1-y2)];
+      [view setNeedsDisplayInRect: NSMakeRect(x1, y2, x2-x1, y1-y2)];
+#endif
     }
-    break;
-  case SLOT_INVALIDATE_ALL:
+      break;
+      
+    case SLOT_INVALIDATE_ALL:
     {
       ASSERT (is_nil (val), "type mismatch");
       [view setNeedsDisplay:YES];
     }
-    break;
-  case SLOT_MOUSE_GRAB:
-    NOT_IMPLEMENTED;
-    //			send_mouse_grab (THIS, val);
-    break;
-  case SLOT_MOUSE_POINTER:
-    NOT_IMPLEMENTED;
-    //			send_mouse_pointer (THIS, val);
-    break;
-    
-  case SLOT_KEYBOARD_FOCUS:
-    //			send_keyboard_focus (THIS, val);
+      break;
+      
+    case SLOT_MOUSE_GRAB:
+      NOT_IMPLEMENTED;
+      //			send_mouse_grab (THIS, val);
+      break;
+      
+    case SLOT_MOUSE_POINTER:
+      NOT_IMPLEMENTED;
+      //			send_mouse_pointer (THIS, val);
+      break;
+      
+    case SLOT_KEYBOARD_FOCUS:
+      //			send_keyboard_focus (THIS, val);
     {
-      TYPE_CHECK (type_box (val) == type_helper<bool>::id);
-      if (open_box<bool>(val)) the_keyboard_focus = this;
+      check_type<bool> (val, s);
+      bool focus = open_box<bool> (val);
+      if (focus) {
+        the_keyboard_focus = this;
+        //FIXME: implement SLOT_KEYBOARD_FOCUS
+      }
     }
-    break;
-  case SLOT_KEYBOARD_FOCUS_ON:
-    NOT_IMPLEMENTED;
-    break;
+      break;
+      
+    case SLOT_KEYBOARD_FOCUS_ON:
+    {
+      string field = open_box<string>(val);
+      //FIXME: implement SLOT_KEYBOARD_FOCUS_ON
+    }
+      break;
+      
     case SLOT_MODIFIED:
     {
       check_type<bool> (val, s);
@@ -152,7 +165,7 @@ ns_view_widget_rep::send (slot s, blackbox val) {
       }
     }
       break;
-
+      
     case SLOT_SCROLL_POSITION:
     {
       //check_type<coord2>(val, s);
@@ -164,43 +177,36 @@ ns_view_widget_rep::send (slot s, blackbox val) {
       [view scrollPoint: qp];
     }
       break;
-        
-  default:
-    if (DEBUG_AQUA_WIDGETS)
-       debug_widgets << "slot type= " << slot_name (s) << "\n";
-    FAILED ("cannot handle slot type");
+      
+    default:
+      if (DEBUG_AQUA_WIDGETS)
+        debug_widgets << "slot type= " << slot_name (s) << "\n";
+      FAILED ("cannot handle slot type");
   }
 }
 
 /******************************************************************************
 * Querying
 ******************************************************************************/
-
 blackbox
 ns_view_widget_rep::query (slot s, int type_id) {
   switch (s) {
-  case SLOT_IDENTIFIER:
-    TYPE_CHECK (type_id == type_helper<int>::id);
-    return close_box<int> ([view window] ? 1 : 0);
-#if 0
-  case SLOT_RENDERER:
-    TYPE_CHECK (type_id == type_helper<renderer>::id);
-    return close_box<renderer> ((renderer) the_ns_renderer());
-#endif
-  case SLOT_POSITION:
+    case SLOT_IDENTIFIER:
+      check_type_id<int> (type_id, s);
+      return close_box<int> ([view window] ? 1 : 0);
+      
+    case SLOT_POSITION:
     {
-      typedef pair<SI,SI> coord2;
-      TYPE_CHECK (type_id == type_helper<coord2>::id);
+      check_type_id<coord2> (type_id, s);
       NSPoint pos = [view frame].origin;
       return close_box<coord2> (from_nspoint(pos));
     }
-    
-  default:
-    FAILED ("cannot handle slot type");
-    return blackbox ();
+      
+    default:
+      FAILED ("cannot handle slot type");
+      return blackbox ();
   }
 }
-
 /******************************************************************************
  * Notification of state changes
  ******************************************************************************/
@@ -233,7 +239,6 @@ ns_view_widget_rep::write (slot s, blackbox index, widget w) {
     FAILED ("cannot handle slot type");
   }
 }
-
 
 widget 
 ns_view_widget_rep::plain_window_widget (string s)
@@ -949,59 +954,70 @@ ns_simple_widget_rep::send (slot s, blackbox val) {
     {
       TYPE_CHECK (type_box (val) == type_helper<coord2>::id);
       coord2 p= open_box<coord2> (val);
-        NSPoint pt = to_nspoint(p);
-        
-        //FIXME: implement this!!!
-//      debug_aqua << "ns_simple_widget_rep::send SLOT_POSITION - TO BE IMPLEMENTED (" << pt.x << "," << pt.y << ")\n";
-     // [view scrollPoint:to_nspoint(p)];
-
+      NSPoint pt = to_nspoint(p);
+      
+      //FIXME: implement this!!!
+      //      debug_aqua << "ns_simple_widget_rep::send SLOT_POSITION - TO BE IMPLEMENTED (" << pt.x << "," << pt.y << ")\n";
+      // [view scrollPoint:to_nspoint(p)];
+      
       //QPoint pt = to_qpoint(p);
       //tm_canvas() -> setCursorPos(pt);
     }
       break;
-          
-      case SLOT_SCROLL_POSITION:
-      {
-          TYPE_CHECK (type_box (val) == type_helper<coord2>::id);
-          coord2 p= open_box<coord2> (val);
-          NSPoint pt = to_nspoint(p);
-          NSSize sz = [view bounds].size;
-          if (DEBUG_EVENTS)
-            debug_events << "Scroll position :" << pt.x << "," << pt.y << LF;
-//          pt.y -= sz.height/2;
-//          pt.x -= sz.width/2;
+      
+    case SLOT_SCROLL_POSITION:
+    {
+      TYPE_CHECK (type_box (val) == type_helper<coord2>::id);
+      coord2 p= open_box<coord2> (val);
+      NSPoint pt = to_nspoint(p);
+      NSSize sz = [view bounds].size;
+      sz = [[view enclosingScrollView] documentVisibleRect].size;
+      if (DEBUG_EVENTS)
         debug_events << "Scroll position :" << pt.x << "," << pt.y << LF;
-          [view scrollPoint:pt];
-//          [view scrollRectToVisible:NSMakeRect(pt.x,pt.y,1.0,1.0)];
-      }
-          break;
-          
-          
-      case SLOT_EXTENTS:
-      {
-          TYPE_CHECK (type_box (val) == type_helper<coord4>::id);
-          coord4 p= open_box<coord4> (val);
-          NSRect rect = to_nsrect(p);
-//          NSSize ws = [sv contentSize];
-          NSSize sz = rect.size;
- //         sz.height = max (sz.height, ws.height );
-          //			[[view window] setContentSize:rect.size];
-          [view setFrameSize: sz];
-      }
-          break;
-
-       
-      case SLOT_ZOOM_FACTOR:
-      {
-          TYPE_CHECK (type_box (val) == type_helper<double>::id);
-          double new_zoom = open_box<double> (val);
-          if (DEBUG_EVENTS) debug_events << "New zoom factor :" << new_zoom << LF;
-          counterpart()->handle_set_zoom_factor (new_zoom);
-          break;
-      }
-          
-
-
+          pt.y -= sz.height/2;
+          pt.x -= sz.width/2;
+      debug_events << "Scroll position :" << pt.x << "," << pt.y << LF;
+      [view scrollPoint:pt];
+      //          [view scrollRectToVisible:NSMakeRect(pt.x,pt.y,1.0,1.0)];
+    }
+      break;
+      
+      
+    case SLOT_EXTENTS:
+    {
+      TYPE_CHECK (type_box (val) == type_helper<coord4>::id);
+      coord4 p= open_box<coord4> (val);
+      NSRect rect = to_nsrect(p);
+      //          NSSize ws = [sv contentSize];
+      NSSize sz = rect.size;
+      //         sz.height = max (sz.height, ws.height );
+      //			[[view window] setContentSize:rect.size];
+      [view setFrameSize: sz];
+    }
+      break;
+      
+      
+    case SLOT_ZOOM_FACTOR:
+    {
+      TYPE_CHECK (type_box (val) == type_helper<double>::id);
+      double new_zoom = open_box<double> (val);
+      if (DEBUG_EVENTS) debug_events << "New zoom factor :" << new_zoom << LF;
+      counterpart()->handle_set_zoom_factor (new_zoom);
+      break;
+    }
+      
+    case SLOT_SCROLLBARS_VISIBILITY:
+    {
+      check_type<int>(val, s);
+      int flag= open_box<int> (val);
+      if (DEBUG_QT)
+        debug_qt << "scrollbars visibility :" << flag << LF;
+      //FIXME: scrollbars
+//      canvas()->setHorizontalScrollBarPolicy(flag ? Qt::ScrollBarAsNeeded : Qt::ScrollBarAlwaysOff);
+//      canvas()->setVerticalScrollBarPolicy(flag ? Qt::ScrollBarAsNeeded : Qt::ScrollBarAlwaysOff);
+    }
+      break;
+      
     default:
       if (DEBUG_AQUA) debug_aqua << "[ns_ns_simple_widget_rep] ";
       ns_view_widget_rep::send (s, val);
@@ -1044,7 +1060,7 @@ ns_simple_widget_rep::query (slot s, int type_id) {
         << ")" << LF;
       return close_box<coord4> (c);
     }
-    
+      
       
     case SLOT_VISIBLE_PART:
     {
@@ -1058,13 +1074,13 @@ ns_simple_widget_rep::query (slot s, int type_id) {
         << ")" << LF;
       return close_box<coord4> (c);
     }
-          
-          
+      
+      
       
     default:
       return ns_view_widget_rep::query(s, type_id);
   }
-
+  
   return ns_view_widget_rep::query(s,type_id);
 }
 

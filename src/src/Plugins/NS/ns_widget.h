@@ -47,30 +47,30 @@ inline ns_widget concrete (widget w) { return ns_widget ((ns_widget_rep*) w.rep)
 
 
 class ns_view_widget_rep: public ns_widget_rep {
-public:	
-	NSView *view;
-
+public:
+  NSView *view;
+  
 public:
   ns_view_widget_rep (NSView *v);
   ~ns_view_widget_rep ();
-
-    virtual void send (slot s, blackbox val);
-    // send a message val to the slot s
+  
+  virtual void send (slot s, blackbox val);
+  // send a message val to the slot s
   virtual blackbox query (slot s, int type_id);
-    // obtain information of a given type from the slot s
+  // obtain information of a given type from the slot s
   virtual widget read (slot s, blackbox index);
-    // abstract read access (of type s) of a subwidget at position index
+  // abstract read access (of type s) of a subwidget at position index
   virtual void write (slot s, blackbox index, widget w);
-    // abstract write access (of type s) of a subwidget at position index
+  // abstract write access (of type s) of a subwidget at position index
   virtual void notify (slot s, blackbox new_val);
-    // notification of a change on a slot s which contains a state variable
-//  virtual void connect (slot s, widget w2, slot s2);
-    // connect a state slot s to another slot s2 of another widget w2
-//  virtual void deconnect (slot s, widget w2, slot s2);
-    // deconnect a state slot s from another slot s2 of another widget w2
-
-	virtual widget plain_window_widget (string s); 
-
+  // notification of a change on a slot s which contains a state variable
+  //  virtual void connect (slot s, widget w2, slot s2);
+  // connect a state slot s to another slot s2 of another widget w2
+  //  virtual void deconnect (slot s, widget w2, slot s2);
+  // deconnect a state slot s from another slot s2 of another widget w2
+  
+  virtual widget plain_window_widget (string s);
+  
 };
 
 

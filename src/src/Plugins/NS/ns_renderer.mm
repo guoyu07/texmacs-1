@@ -582,18 +582,15 @@ ns_renderer_rep::xpm_image(url file_name)
 }
 
 /******************************************************************************
- * main cocoa renderer
+ * main NS renderer
  ******************************************************************************/
-
 
 ns_renderer_rep*
 the_ns_renderer () {
-  static ns_renderer_rep* the_renderer= NULL;
+  static ns_renderer_rep* the_renderer = NULL;
 	if (!the_renderer) the_renderer= tm_new <ns_renderer_rep> ();
 	return the_renderer;
 }
-
-
 
 /******************************************************************************
  * Shadow management methods
