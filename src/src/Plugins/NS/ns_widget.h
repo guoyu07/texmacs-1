@@ -75,10 +75,23 @@ public:
 
 
 class ns_simple_widget_rep: public ns_view_widget_rep {
+  
   widget p_counterpart;
   
+  simple_widget_rep *counterpart ()  { return dynamic_cast<simple_widget_rep*>(p_counterpart.rep); }
+  void setCounterpart (simple_widget_rep *w)  { p_counterpart = w; }
+
 public:
-  ns_simple_widget_rep ();
+  ns_simple_widget_rep (simple_widget_rep *w);
+  
+  virtual void handle_get_size_hint (SI& w, SI& h);
+  virtual void handle_notify_resize (SI w, SI h);
+  virtual void handle_keypress (string key, time_t t);
+  virtual void handle_keyboard_focus (bool has_focus, time_t t);
+  virtual void handle_mouse (string kind, SI x, SI y, int mods, time_t t);
+  virtual void handle_set_zoom_factor (double zoom);
+  virtual void handle_clear (renderer ren, SI x1, SI y1, SI x2, SI y2);
+  virtual void handle_repaint (renderer ren, SI x1, SI y1, SI x2, SI y2);
   
   virtual void send (slot s, blackbox val);
   // send a message val to the slot s
@@ -91,8 +104,6 @@ public:
   virtual void notify (slot s, blackbox new_val);
   
   TMView*         canvas () { return (TMView*)(view); }
-  simple_widget_rep *counterpart ()  { return dynamic_cast<simple_widget_rep*>(p_counterpart.rep); }
-  void setCounterpart (simple_widget_rep *w)  { p_counterpart = w; }
   
   NSRect    p_extents;   // The size of the virtual area where things are drawn.
   NSPoint    p_origin;   // The offset into that area

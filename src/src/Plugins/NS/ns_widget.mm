@@ -939,20 +939,12 @@ ns_window_widget_rep::write (slot s, blackbox index, widget w) {
 ******************************************************************************/
 #pragma mark ns_simple_widget_rep
 
-/******************************************************************************
-* Constructor
-******************************************************************************/
-
-ns_simple_widget_rep::ns_simple_widget_rep ()
+ns_simple_widget_rep::ns_simple_widget_rep (simple_widget_rep *w)
 : ns_view_widget_rep ([[[TMView alloc] initWithFrame:NSMakeRect(0,0,1000,1000)] autorelease]) 
-{ 
+{
+  setCounterpart(w);
   [(TMView*)view setWidget:this];
 }
-
-
-/******************************************************************************
-* Empty handlers for redefinition later on
-******************************************************************************/
 
 void
 ns_simple_widget_rep::send (slot s, blackbox val) {
@@ -1095,10 +1087,6 @@ ns_simple_widget_rep::notify (slot s, blackbox new_val) {
   ns_view_widget_rep::notify (s, new_val);
 }
 
-/******************************************************************************
- * Read and write access of subwidgets
- ******************************************************************************/
-
 widget
 ns_simple_widget_rep::read (slot s, blackbox index) {
   return ns_view_widget_rep::read(s,index);
@@ -1109,7 +1097,47 @@ ns_simple_widget_rep::write (slot s, blackbox index, widget w) {
   ns_view_widget_rep::write(s,index,w);
 }
 
+// forwarding
 
+void
+ns_simple_widget_rep::handle_get_size_hint (SI& w, SI& h) {
+  counterpart()->handle_get_size_hint(w, h);
+}
+
+void
+ns_simple_widget_rep::handle_notify_resize (SI w, SI h) {
+  counterpart()->handle_notify_resize(w, h);
+}
+
+void
+ns_simple_widget_rep::handle_keypress (string key, time_t t) {
+  counterpart()->handle_keypress(key, t);
+}
+
+void
+ns_simple_widget_rep::handle_keyboard_focus (bool has_focus, time_t t) {
+  counterpart()->handle_keyboard_focus(has_focus, t);
+}
+
+void
+ns_simple_widget_rep::handle_mouse (string kind, SI x, SI y, int mods, time_t t) {
+  counterpart()->handle_mouse(kind, x, y, mods, t);
+}
+
+void
+ns_simple_widget_rep::handle_set_zoom_factor (double zoom) {
+  counterpart()->handle_set_zoom_factor(zoom);
+}
+
+void
+ns_simple_widget_rep::handle_clear (renderer ren, SI x1, SI y1, SI x2, SI y2) {
+  counterpart()->handle_clear(ren, x1, y1, x2, y2);
+}
+
+void
+ns_simple_widget_rep::handle_repaint (renderer ren, SI x1, SI y1, SI x2, SI y2) {
+  counterpart()->handle_repaint(ren, x1, y1, x2, y2);
+}
 
 
 /******************************************************************************

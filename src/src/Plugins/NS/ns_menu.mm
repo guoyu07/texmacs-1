@@ -132,7 +132,7 @@ public:
   if ((!img)&&(wid))
   {
     SI width, height;
-    wid->counterpart()->handle_get_size_hint (width,height);
+    wid->handle_get_size_hint (width,height);
     NSSize s = NSMakeSize(width/PIXEL,height/PIXEL);
     
     img = [[[NSImage alloc] initWithSize:s] autorelease];
@@ -149,7 +149,7 @@ public:
     r -> encode (x1,y1);
     r -> encode (x2,y2);
     r -> set_clipping (x1,y1,x2,y2);
-    wid ->counterpart()-> handle_repaint (r,x1,y1,x2,y2);
+    wid-> handle_repaint (r,x1,y1,x2,y2);
     r->end();
     [img unlockFocus];
     //[img setFlipped:YES];

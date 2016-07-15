@@ -85,8 +85,7 @@ simple_widget_rep::write (slot s, blackbox index, widget w) {
 widget
 simple_widget_rep::get_impl () {
   if (is_nil(impl)) {
-    ns_simple_widget_rep *p = tm_new<ns_simple_widget_rep>();
-    p->setCounterpart(this);
+    ns_simple_widget_rep *p = tm_new<ns_simple_widget_rep>(this);
     impl = p;
   }
   return impl;
