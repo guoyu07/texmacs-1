@@ -25,3 +25,15 @@ class ns_simple_widget_rep;
 - (ns_simple_widget_rep*) widget;
 - (void) deleteWorkingText;
 @end
+
+// centering view from
+// http://bergdesign.com/developer/index_files/88a764e343ce7190c4372d1425b3b6a3-0.html
+
+@interface TMCenteringClipView : NSClipView
+{
+  NSPoint _lookingAt; // the proportion up and across the view, not coordinates.
+}
+
+-(void)centerDocument;
+
+@end

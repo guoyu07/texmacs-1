@@ -350,7 +350,7 @@ ns_tm_widget_rep::ns_tm_widget_rep(int mask) : ns_view_widget_rep([[[NSView allo
   NSRect r1 = r; r1.origin.y += s.height; r1.size.height -= s.height;
   NSRect r2 = r; r2.size.height = s.height;
   NSRect r3 = r2; 
-  r2.size.width -= s.width; r3.origin.x =+ r2.size.width;
+  r2.size.width -= s.width; r3.origin.x += r2.size.width;
   sv = [[[NSScrollView alloc] initWithFrame:r1] autorelease];
   [sv setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
   [sv setHasVerticalScroller:YES];
@@ -358,6 +358,12 @@ ns_tm_widget_rep::ns_tm_widget_rep(int mask) : ns_view_widget_rep([[[NSView allo
   [sv setBorderType:NSNoBorder];
   //  [sv setBackgroundColor:[NSColor redColor]];
   [sv setBackgroundColor:[NSColor grayColor]];
+
+  id newClipView = [[[TMCenteringClipView alloc] initWithFrame:[[sv contentView] frame]] autorelease];
+  [newClipView setBackgroundColor:[NSColor windowBackgroundColor]];
+  [sv setContentView:(NSClipView *)newClipView];
+
+  
   [sv setDocumentView:[[[NSView alloc] initWithFrame: NSMakeRect(0,0,100,100)] autorelease]];
   [view addSubview:sv];
   
@@ -974,11 +980,9 @@ ns_simple_widget_rep::send (slot s, blackbox val) {
       sz = [[view enclosingScrollView] documentVisibleRect].size;
       if (DEBUG_EVENTS)
         debug_events << "Scroll position :" << pt.x << "," << pt.y << LF;
-          pt.y -= sz.height/2;
-          pt.x -= sz.width/2;
-      debug_events << "Scroll position :" << pt.x << "," << pt.y << LF;
+      pt.y -= sz.height/2;
+      pt.x -= sz.width/2;
       [view scrollPoint:pt];
-      //          [view scrollRectToVisible:NSMakeRect(pt.x,pt.y,1.0,1.0)];
     }
       break;
       
