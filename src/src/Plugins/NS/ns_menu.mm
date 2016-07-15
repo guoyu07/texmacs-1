@@ -466,22 +466,22 @@ widget xpm_widget (url file_name)// { return widget(); }
 #endif
 }
 
-NSMenu* to_nsmenu(widget w)
+NSMenu*
+to_nsmenu (widget w)
 {
   if (typeid(*w.rep) == typeid(ns_menu_rep)) {
     ns_menu_rep *ww = ((ns_menu_rep*)w.rep);
-	NSMenu *m =[[[ww->item submenu] retain] autorelease];
-	[ww->item setSubmenu:nil];
-      if (!m) {
-        debug_aqua << "unexpected nil menu\n";
-        return [[NSMenu alloc] init];
-        //FIXME: something wrong going on here.
-      }
-	return m;
+    NSMenu *m = [ww->item submenu];
+    if (!m) {
+      debug_aqua << "unexpected nil menu\n";
+      return [[NSMenu alloc] init];
+      //FIXME: something wrong going on here.
+    }
+    return m;
   }
   else {
-      debug_aqua << "unexpected type in to_nsmenu!\n";
-   return nil;
+    debug_aqua << "unexpected type in to_nsmenu!\n";
+    return nil;
   }
 }
 

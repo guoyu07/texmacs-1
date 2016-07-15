@@ -194,6 +194,11 @@
   [menuArray replaceObjectAtIndex: idx withObject: menu];
   {
     NSMutableArray *arr = [barArray objectAtIndex: idx];
+    for (unsigned i = 0; i < [arr count]; i++) {
+      id el = [arr objectAtIndex:i];
+      if ([el respondsToSelector:@selector(removeFromSuperview)])
+        [el removeFromSuperview];
+    }
     [arr removeAllObjects];
     unsigned c = [menu numberOfItems];
     for (unsigned i = 0; i < c; i++) {
@@ -211,7 +216,6 @@
         [b setToolTip: [mi toolTip]];
         
         [[b cell] setRepresentedObject: mi];
-//        [[b cell] setTrackingMode: NSSegmentSwitchTrackingMomentary];
         [b setTarget: self];
         [b setAction:@selector(buttonsAction:)];
 
