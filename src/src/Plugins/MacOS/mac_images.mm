@@ -12,7 +12,7 @@
 #include "MacOS/mac_images.h"
 #include "converter.hpp" // hack: remove as soon as possible
 
-#include "Cocoa/mac_cocoa.h"
+#include "NS/mac_cocoa.h"
 #include "ApplicationServices/ApplicationServices.h"
 
 static NSString *
