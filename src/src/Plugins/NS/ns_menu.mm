@@ -64,14 +64,14 @@ void ns_menu_rep::send (slot s, blackbox val) {
     break;
   case SLOT_VISIBILITY:
     {	
-      check_type<bool> (val, "SLOT_VISIBILITY");
+      check_type<bool> (val, s);
       bool flag = open_box<bool> (val);
       (void) flag;
     }	
     break;
   case SLOT_MOUSE_GRAB:
     {	
-      check_type<bool> (val, "SLOT_MOUSE_GRAB");
+      check_type<bool> (val, s);
       bool flag = open_box<bool> (val);
       (void) flag;
       [NSMenu popUpContextMenu:[item submenu] withEvent:[NSApp currentEvent] forView:( (ns_view_widget_rep*)(the_keyboard_focus.rep))->view ];

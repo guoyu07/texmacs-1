@@ -47,9 +47,9 @@ public:
 	//  virtual void deconnect (slot s, widget w2, slot s2);
 	virtual widget plain_window_widget (string s);
 	
-	void layout();
-  void updateVisibility();
-  void do_interactive_prompt();
+	void layout ();
+  void update_visibility ();
+  void do_interactive_prompt ();
 };
 
 

@@ -93,7 +93,7 @@ ns_view_widget_rep::send (slot s, blackbox val) {
   switch (s) {
   case SLOT_NAME:
     {	
-      check_type<string> (val, "SLOT_NAME");
+      check_type<string> (val, s);
       string name = open_box<string> (val);
       NSWindow *win = [view window];
       if (win) {
@@ -144,7 +144,7 @@ ns_view_widget_rep::send (slot s, blackbox val) {
     break;
     case SLOT_MODIFIED:
     {
-      check_type<bool> (val, "SLOT_MODIFIED");
+      check_type<bool> (val, s);
       bool flag = open_box<bool> (val);
       NSWindow *win = [view window];
       if (win) {
@@ -218,7 +218,7 @@ widget
 ns_view_widget_rep::read (slot s, blackbox index) {
   switch (s) {
   case SLOT_WINDOW:
-    check_type_void (index, "SLOT_WINDOW");
+    check_type_void (index, s);
     return [(TMWindowController*)[[view window] windowController] widget];
   default:
     FAILED ("cannot handle slot type");
@@ -388,7 +388,7 @@ ns_tm_widget_rep::ns_tm_widget_rep(int mask) : ns_view_widget_rep([[[NSView allo
   toolbar = [[NSToolbar alloc] initWithIdentifier:TMToolbarIdentifier ];
   [toolbar setDelegate:wh];
   
-  updateVisibility();
+  update_visibility ();
   
 }
 
@@ -422,8 +422,8 @@ void ns_tm_widget_rep::layout()
   [NSApp setWindowsNeedUpdate:YES];
 }
 
-
-void ns_tm_widget_rep::updateVisibility()
+void
+ns_tm_widget_rep::update_visibility ()
 {
   //FIXME: this implementation is from the Qt port. to be adapted.
 #if 0
@@ -437,104 +437,119 @@ void ns_tm_widget_rep::updateVisibility()
 #endif
 }
 
-
-
 void
 ns_tm_widget_rep::send (slot s, blackbox val) {
   switch (s) {
-      case SLOT_INVALIDATE:
-      case SLOT_INVALIDATE_ALL:
-      case SLOT_EXTENTS:
-      case SLOT_SCROLL_POSITION:
-      case SLOT_ZOOM_FACTOR:
-      case SLOT_MOUSE_GRAB:
-          main_widget->send(s, val);
-          return;
- case SLOT_HEADER_VISIBILITY:
+    case SLOT_INVALIDATE:
+    case SLOT_INVALIDATE_ALL:
+    case SLOT_EXTENTS:
+    case SLOT_SCROLL_POSITION:
+    case SLOT_ZOOM_FACTOR:
+    case SLOT_MOUSE_GRAB:
+    case SLOT_KEYBOARD_FOCUS:
+    case SLOT_SCROLLBARS_VISIBILITY:
+       main_widget->send(s, val);
+        return;
+      
+    case SLOT_HEADER_VISIBILITY:
     {
-      TYPE_CHECK (type_box (val) == type_helper<bool>::id);
-      bool f= open_box<bool> (val);
-      visibility[0] = f;
-      updateVisibility();
+      check_type<bool>(val, s);
+      visibility[0] = open_box<bool> (val);
+      update_visibility();
     }
-    break;
-  case SLOT_MAIN_ICONS_VISIBILITY:
+      break;
+    case SLOT_MAIN_ICONS_VISIBILITY:
     {
-      TYPE_CHECK (type_box (val) == type_helper<bool>::id);
-      bool f= open_box<bool> (val);
-      visibility[1] = f;
-      updateVisibility();
+      check_type<bool>(val, s);
+      visibility[1] = open_box<bool> (val);
+      update_visibility();
     }
-    break;
-  case SLOT_MODE_ICONS_VISIBILITY:
+      break;
+    case SLOT_MODE_ICONS_VISIBILITY:
     {
-      TYPE_CHECK (type_box (val) == type_helper<bool>::id);
-      bool f= open_box<bool> (val);
-      visibility[2] = f;
-      updateVisibility();
+      check_type<bool>(val, s);
+      visibility[2] = open_box<bool> (val);
+      update_visibility();
     }
-    break;
-  case SLOT_USER_ICONS_VISIBILITY:
+      break;
+    case SLOT_FOCUS_ICONS_VISIBILITY:
     {
-      TYPE_CHECK (type_box (val) == type_helper<bool>::id);
-      bool f= open_box<bool> (val);
-      visibility[3] = f;
-      updateVisibility();
+      check_type<bool>(val, s);
+      visibility[3] = open_box<bool> (val);
+      update_visibility();
     }
-    break;
-  case SLOT_FOOTER_VISIBILITY:
+      break;
+    case SLOT_USER_ICONS_VISIBILITY:
     {
-      TYPE_CHECK (type_box (val) == type_helper<bool>::id);
-      bool f= open_box<bool> (val);
-      visibility[4] = f;
-      updateVisibility();
+      check_type<bool>(val, s);
+      visibility[4] = open_box<bool> (val);
+      update_visibility();
     }
-    break;
-    
-  case SLOT_LEFT_FOOTER:
+      break;
+      
+    case SLOT_FOOTER_VISIBILITY:
+    {
+      check_type<bool>(val, s);
+      visibility[5] = open_box<bool> (val);
+      update_visibility();
+    }
+      break;
+
+    case SLOT_SIDE_TOOLS_VISIBILITY:
+    {
+      check_type<bool>(val, s);
+      visibility[6] = open_box<bool> (val);
+      update_visibility();
+    }
+      break;
+
+    case SLOT_BOTTOM_TOOLS_VISIBILITY:
+    {
+      check_type<bool>(val, s);
+      visibility[7] = open_box<bool> (val);
+      update_visibility();
+    }
+      break;
+
+    case SLOT_LEFT_FOOTER:
     {
       TYPE_CHECK (type_box (val) == type_helper<string>::id);
       string msg = open_box<string> (val);
       [leftField setStringValue:to_nsstring_utf8 (tm_var_encode (msg))];
       [leftField displayIfNeeded];
     }
-    break;
-  case SLOT_RIGHT_FOOTER:
+      break;
+      
+    case SLOT_RIGHT_FOOTER:
     {
       TYPE_CHECK (type_box (val) == type_helper<string>::id);
       string msg = open_box<string> (val);
       [rightField setStringValue:to_nsstring_utf8 (tm_var_encode (msg))];
       [rightField displayIfNeeded];
     }
-    break;
-    
-  case SLOT_SCROLLBARS_VISIBILITY:
-    // ignore this: cocoa handles scrollbars independently
-    //			send_int (THIS, "scrollbars", val);
-    break;
-    
-  case SLOT_INTERACTIVE_MODE:
+      break;
+      
+    case SLOT_INTERACTIVE_MODE:
     {
       TYPE_CHECK (type_box (val) == type_helper<bool>::id);
       if (open_box<bool>(val) == true) {
         //FIXME: to postpone once we return to the runloop
-	    do_interactive_prompt();
+        do_interactive_prompt();
       }
     }
-    break;
-    
-  case SLOT_FILE:
+      break;
+      
+    case SLOT_FILE:
     {
       TYPE_CHECK (type_box (val) == type_helper<string>::id);
       string file = open_box<string> (val);
       if (DEBUG_EVENTS) debug_events << "File: " << file << LF;
-//      view->window()->setWindowFilePath(to_qstring(file));
+      //      view->window()->setWindowFilePath(to_qstring(file));
     }
       break;
-      
-      
-  default:
-    ns_view_widget_rep::send(s,val);
+    
+    default:
+      ns_view_widget_rep::send(s,val);
   }
 }
 
@@ -603,8 +618,8 @@ ns_tm_widget_rep::read (slot s, blackbox index) {
   widget ret;
   switch (s) {
     case SLOT_CANVAS:
-      //FIXME: check_type_void (index, s);
-      ret= abstract (main_widget);
+      check_type_void (index, s);
+      ret = abstract (main_widget);
       break;
       
   default:
@@ -679,7 +694,7 @@ ns_tm_widget_rep::write (slot s, blackbox index, widget w) {
   switch (s) {
   case SLOT_SCROLLABLE: 
     {
-      check_type_void (index, "SLOT_SCROLLABLE");
+      check_type_void (index, s);
       if (simple_widget_rep *ww = dynamic_cast<simple_widget_rep*>(w.rep)) {
         main_widget = concrete(ww->get_impl());
       } else {
@@ -691,40 +706,40 @@ ns_tm_widget_rep::write (slot s, blackbox index, widget w) {
     }
     break;
   case SLOT_MAIN_MENU:
-    check_type_void (index, "SLOT_MAIN_MENU");
+    check_type_void (index, s);
     [[TMMenuHelper sharedHelper] setMenu:to_nsmenu(w)];
     break;
   case SLOT_MAIN_ICONS:
-    check_type_void (index, "SLOT_MAIN_ICONS");
+    check_type_void (index, s);
     [bc setMenu:to_nsmenu(w) forRow:0];
     layout();
     break;
   case SLOT_MODE_ICONS:
-    check_type_void (index, "SLOT_MODE_ICONS");
+    check_type_void (index, s);
     [bc setMenu:to_nsmenu(w) forRow:1];
     layout();
     break;
   case SLOT_FOCUS_ICONS:
-    check_type_void (index, "SLOT_FOCUS_ICONS");
+    check_type_void (index, s);
     [bc setMenu:to_nsmenu(w) forRow:2];
     layout();
     break;
   case SLOT_USER_ICONS:
-    check_type_void (index, "SLOT_USER_ICONS");
+    check_type_void (index, s);
     [bc setMenu:to_nsmenu(w) forRow:3];
     layout();
     break;
   case SLOT_BOTTOM_TOOLS:
-    check_type_void (index, "SLOT_BOTTOM_TOOLS");
+    check_type_void (index, s);
     //FIXME: implement this
     break;
   case SLOT_INTERACTIVE_PROMPT:
-    check_type_void (index, "SLOT_INTERACTIVE_PROMPT");
-    int_prompt = concrete(w); 
+    check_type_void (index, s);
+    int_prompt = concrete(w);
     //			THIS << set_widget ("interactive prompt", concrete (w));
     break;
   case SLOT_INTERACTIVE_INPUT:
-    check_type_void (index, "SLOT_INTERACTIVE_INPUT");
+    check_type_void (index, s);
     int_input = concrete(w);
     //			THIS << set_widget ("interactive input", concrete (w));
     break;
@@ -798,7 +813,7 @@ ns_window_widget_rep::send (slot s, blackbox val) {
     break;
   case SLOT_VISIBILITY:
     {	
-      check_type<bool> (val, "SLOT_VISIBILITY");
+      check_type<bool> (val, s);
       bool flag = open_box<bool> (val);
       NSWindow *win = [wc window];
       if (win) {
@@ -825,7 +840,7 @@ ns_window_widget_rep::send (slot s, blackbox val) {
 
   case SLOT_NAME:
     {	
-      check_type<string> (val, "SLOT_NAME");
+      check_type<string> (val, s);
       string name = open_box<string> (val);
       NSWindow *win = [wc window];
       if (win) {
@@ -836,7 +851,7 @@ ns_window_widget_rep::send (slot s, blackbox val) {
     break;
     case SLOT_MODIFIED:
     {
-      check_type<bool> (val, "SLOT_MODIFIED");
+      check_type<bool> (val, s);
       bool flag = open_box<bool> (val);
       NSWindow *win = [wc window];
       if (win) [win setDocumentEdited:flag];

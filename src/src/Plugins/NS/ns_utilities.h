@@ -34,9 +34,9 @@ string ns_translate (string s);
 #pragma mark type checking
 
 inline void
-check_type_void (blackbox bb, string s) {
+check_type_void (blackbox bb, slot s) {
   if (!is_nil (bb)) {
-    failed_error << "slot type= " << s << "\n";
+    failed_error << "slot type= " << as_string(s) << "\n";
     FAILED ("type mismatch");
   }
 }
@@ -51,9 +51,9 @@ check_type_id (int type_id, slot s) {
 
 
 template<class T> void
-check_type (blackbox bb, string s) {
+check_type (blackbox bb, slot s) {
   if (type_box (bb) != type_helper<T>::id) {
-    failed_error << "slot type= " << s << "\n";
+    failed_error << "slot type= " << as_string(s) << "\n";
     FAILED ("type mismatch");
   }
 }
