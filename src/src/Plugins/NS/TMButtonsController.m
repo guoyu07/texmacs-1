@@ -49,7 +49,7 @@
 - (NSSegmentedControl*) newSegment
 {
   NSSegmentedControl *ret =  [[[NSSegmentedControl alloc] init] autorelease];
-  [ret setSegmentStyle: NSSegmentStyleTexturedSquare];
+  [ret setSegmentStyle: NSSegmentStyleSmallSquare];
   return ret; 
 }
 

@@ -31,7 +31,7 @@ public:
   ns_widget int_prompt;
   ns_widget int_input;
 
-  bool visibility[5]; 
+  bool visibility[8];
 
 public:
   ns_tm_widget_rep (int mask = 0);

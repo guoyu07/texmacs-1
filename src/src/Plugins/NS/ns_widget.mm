@@ -285,7 +285,7 @@ NSString *TMButtonsIdentifier = @"TMButtonsIdentifier";
 
 
 
-@interface TMWidgetHelper : NSObject
+@interface TMWidgetHelper : NSObject<NSToolbarDelegate>
 {
 @public
   ns_tm_widget_rep *wid;
@@ -411,7 +411,8 @@ ns_tm_widget_rep::~ns_tm_widget_rep()
 }
 
 
-void ns_tm_widget_rep::layout()
+void
+ns_tm_widget_rep::layout()
 {
   NSSize s = NSMakeSize(100,20); // size of the right footer;
   NSRect r = [view bounds];
@@ -425,7 +426,8 @@ void ns_tm_widget_rep::layout()
   NSRect r3 = r2; 
   r2.size.width -= s.width;
   r3.origin.x += r2.size.width;
-  r3.size.width -= r2.size.width + 15.0;
+//  r3.size.width -= r2.size.width + 15.0;
+  r3.size.width -= r2.size.width;
   [sv setFrame:r1];
   [leftField setFrame:r2];
   [rightField setFrame:r3];

@@ -31,7 +31,7 @@ public:
   bool interrupted;
   time_t interrupt_time;
   
-    char*                        selection;
+  char*                        selection;
   hashmap<string,tree>         selection_t;
   hashmap<string,string>       selection_s;
 
