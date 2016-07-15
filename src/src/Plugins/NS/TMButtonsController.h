@@ -24,3 +24,17 @@
 - (NSSegmentedControl*) newSegment;
 
 @end
+
+
+
+@interface TMBarsController : NSObject {
+  NSMutableArray *menuArray;
+  NSMutableArray *barArray;
+  NSView *view;
+}
+- (void) setMenu:(NSMenu *)menu forRow:(unsigned) idx;
+- (void) layout;
+- (NSView*) bar;
+@end
+
+

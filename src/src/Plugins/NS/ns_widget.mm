@@ -381,7 +381,7 @@ ns_tm_widget_rep::ns_tm_widget_rep(int mask) : ns_view_widget_rep([[[NSView allo
   [view addSubview:leftField];
   [view addSubview:rightField];
   
-  bc = [[TMButtonsController alloc] init];
+  bc = [[TMBarsController alloc] init];
   //NSView *mt = [bc bar];
   //[mt setFrame:r0];
   //[mt setAutoresizingMask:NSViewMaxXMargin|NSViewMinYMargin];

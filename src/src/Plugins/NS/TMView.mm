@@ -348,7 +348,8 @@ void initkeymap()
 	  // if (mods & NSHelpKeyMask) s= "H-" * s;
           // if (mods & NSFunctionKeyMask) s= "F-" * s;
         }
-        debug_events << "key press: " << s << LF;
+        if (DEBUG_EVENT)
+          debug_events << "key press: " << s << LF;
         wid -> handle_keypress (s, texmacs_time());    
       }
     }
@@ -402,8 +403,9 @@ void initkeymap()
         int key = [nss characterAtIndex:0];
         if (nskeymap->contains(key)) {
           r = nskeymap[key];
-          r = ((mods & NSShiftKeyMask)? "S-" * modstr: modstr) * r;          
-          debug_events << "function key press: " << r << LF;
+          r = ((mods & NSShiftKeyMask)? "S-" * modstr: modstr) * r;
+          if (DEBUG_EVENTS)
+            debug_events << "function key press: " << r << LF;
           [self deleteWorkingText];
           wid->handle_keypress (r, texmacs_time());
           return;
@@ -415,7 +417,8 @@ void initkeymap()
           r= utf8_to_cork (rr);          
           
           string s ( modstr * r);
-          debug_events << "modified  key press: " << s << LF;
+          if (DEBUG_EVENTS)
+            debug_events << "modified  key press: " << s << LF;
           [self deleteWorkingText];
           wid->handle_keypress (s, texmacs_time());
           the_gui->update (); // FIXME: remove this line when
@@ -556,7 +559,7 @@ mouse_decode (unsigned int mstate) {
 // instead of keyDown: aString can be NSString or NSAttributedString
 {
   processingCompose = NO;
-  NSLog(@"insertText: <%@>",aString);
+//  NSLog(@"insertText: <%@>",aString);
   
   NSString *str = [aString respondsToSelector: @selector(string)] ?
   [aString string] : aString;
@@ -565,8 +568,9 @@ mouse_decode (unsigned int mstate) {
   for(unsigned int i=0; i<[str length]; i++) {
     [[str substringWithRange:NSMakeRange(i, 1)] getCString:buf maxLength:256 encoding:NSUTF8StringEncoding];
     string rr (buf, strlen(buf));
-    string s= utf8_to_cork (rr);          
-    debug_events << "key press: " << s << LF;
+    string s= utf8_to_cork (rr);
+    if (DEBUG_EVENTS)
+      debug_events << "key press: " << s << LF;
     wid->handle_keypress (s, texmacs_time());        
   }
 }
