@@ -532,14 +532,14 @@ NSImage* xpm_init(url file_name)
       while ((i<N(s)) && (s[i]!=' ') && (s[i]!='\t')) i++;
       def= locase_all (s (j, i));
     }
-
-		pmcs(name)= xpm_color(def);
+    pmcs(name)= xpm_color(def);
   }
+  
   NSImage *im = [[NSImage alloc] initWithSize:NSMakeSize(w,h)];
-	[im setFlipped:YES];
+  //[im setFlipped:YES];
   [im lockFocus];
   [[NSGraphicsContext currentContext] setCompositingOperation: NSCompositeCopy];
-
+  
   // setup pixmap
   for (y=0; y<h; y++) {
     if (N(t)< (y+c+1)) s= "";
@@ -548,13 +548,10 @@ NSImage* xpm_init(url file_name)
       string name;
       if (N(s)<(b*(x+1))) name= first_name;
       else name= s (b*x, b*(x+1));
-      if ((name == first_name) || !(pmcs->contains (name)))
-        [[NSColor colorWithDeviceWhite:1.0 alpha:0.0] set] ;      
-      else {
-      color col = pmcs[name];
-      ns_set_color (col);
-        }
-	  [NSBezierPath fillRect:NSMakeRect(x,y,1,1)];
+      color pmc= pmcs[name];
+      if (!pmcs->contains (name)) pmc= pmcs[first_name];
+      ns_set_color(pmc);
+      [NSBezierPath fillRect:NSMakeRect(x,h-1-y,1,1)];
     }
   }
   [im unlockFocus];
@@ -563,22 +560,22 @@ NSImage* xpm_init(url file_name)
 
 NSImage *
 ns_renderer_rep::xpm_image(url file_name)
-{ 
+{
   ensure_context ();
-	NSImage *image = nil;
+  NSImage *image = nil;
   ns_image mi = images [as_string(file_name)];
-  if (is_nil(mi)) {    
-		image = xpm_init(file_name);
+  if (is_nil(mi)) {
+    image = xpm_init(file_name);
     int w, h;
     NSSize imgSize = [image size];
     w = imgSize.width; h = imgSize.height;
-		ns_image mi2(image,0,0,w,h);
-		mi = mi2;
-		images(as_string(file_name)) = mi2; 	
+    ns_image mi2(image,0,0,w,h);
+    mi = mi2;
+    images(as_string(file_name)) = mi2;
     [image release];
-  }  
+  }
   else image = mi->img;
-	return image;
+  return image;
 }
 
 /******************************************************************************
