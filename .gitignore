@@ -46,3 +46,5 @@ src/src/Plugins/Qt/moc_QTMWindow.cpp
 src/src/System/config.h
 src/src/System/tm_configure.hpp
 src/src/makefile
+src/packages/macos/TeXmacs.xcodeproj/project.xcworkspace/xcuserdata/
+src/packages/macos/TeXmacs.xcodeproj/xcuserdata/
