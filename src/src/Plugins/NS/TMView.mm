@@ -254,7 +254,7 @@ void initkeymap()
   TMRect *anObject;
   delayed_rects = [[NSMutableArray arrayWithCapacity:10] retain];
   while ((anObject = [enumerator nextObject])) {
-    [self displayRect:[anObject rect]];
+    [self displayRect: [anObject rect]];
   }
   [arr release];
 }
@@ -262,7 +262,7 @@ void initkeymap()
 - (void)drawRect:(NSRect)rect 
 {
   if (ns_update_flag) {
-    [delayed_rects addObject:[[[TMRect alloc] initWithRect:rect] autorelease]];
+    [delayed_rects addObject: [[[TMRect alloc] initWithRect:rect] autorelease]];
     return;
   }
     
@@ -271,7 +271,7 @@ void initkeymap()
 	{
 		NSRect bounds = [self bounds];
 		[[NSColor blackColor] set];
-		[NSBezierPath strokeRect:NSInsetRect(bounds,1,1)];
+		[NSBezierPath strokeRect: NSInsetRect(bounds,1,1)];
 		//    return;
 	}
 //	debug_events << "DRAWING : " << rect.origin.x << ","<< rect.origin.x << ","<< rect.size.width<< "," << rect.size.height <<  "\n";

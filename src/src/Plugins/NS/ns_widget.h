@@ -128,6 +128,7 @@ public:
   void setExtents ( NSRect newExtents );
   
   virtual TMMenuItem *as_menuitem ();
+  //virtual NSView *as_view ();
 };
 
 

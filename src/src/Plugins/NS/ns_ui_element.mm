@@ -33,14 +33,46 @@ NSMenu* to_nsmenu(widget w);
 NSMenuItem* to_nsmenuitem(widget w);
 
 
+@interface TMCommand : NSObject
+{
+  command_rep *cmd;
+}
+- (void) setCommand: (command_rep *)_c;
+- (void) doit;
+@end
+
+
+
+@implementation TMCommand
+
+- (void) setCommand:(command_rep *)_c
+{
+  if (cmd) { DEC_COUNT_NULL(cmd); } cmd = _c;
+  if (cmd) {
+    INC_COUNT_NULL(cmd);
+  }
+}
+
+- (void) dealloc {
+  [self setCommand:NULL]; [super dealloc];
+}
+
+- (void) doit {
+  if (cmd) cmd->apply();
+}
+
+@end // TMCommand
+
+
+
 @interface TMMenuItem : NSMenuItem
 {
   command_rep *cmd;
   ns_simple_widget_rep* wid;// an eventual box widget (see tm_button.cpp)
 }
-- (void)setCommand:(command_rep *)_c;
-- (void)setWidget:(ns_simple_widget_rep *)_w;
-- (void)doit;
+- (void) setCommand: (command_rep *)_c;
+- (void) setWidget: (ns_simple_widget_rep *)_w;
+- (void) doit;
 @end
 
 @interface TMLazyMenu : NSMenu <NSMenuDelegate>
@@ -48,7 +80,7 @@ NSMenuItem* to_nsmenuitem(widget w);
   promise_rep<widget> *pm;
   BOOL forced;
 }
-- (void)setPromise:(promise_rep<widget> *)p;
+- (void) setPromise: (promise_rep<widget> *)p;
 @end
 
 
@@ -620,18 +652,18 @@ ns_ui_element_rep::as_view () {
       NSLayoutYAxisAnchor *yanchor = [v topAnchor];
       NSLayoutXAxisAnchor *lanchor = [v leftAnchor];
       NSLayoutXAxisAnchor *ranchor = [v rightAnchor];
-      float spacing = 0.0;
+      float hspacing = 2.0, vspacing = 2.0, hborder = 2.0, vborder = 2.0;
       for (int i = 0; i < N(arr); i++) {
         if (is_nil (arr[i])) break;
         NSView* item = concrete (arr[i])->as_view ();
         [item setTranslatesAutoresizingMaskIntoConstraints: NO];
         [v addSubview: item];
-        [[[item topAnchor] constraintEqualToAnchor: yanchor constant: spacing] setActive: YES];
-        [[[item leadingAnchor] constraintEqualToAnchor:lanchor] setActive: YES];
-        [[[item trailingAnchor] constraintEqualToAnchor:ranchor] setActive: YES];
+        [[[item topAnchor] constraintEqualToAnchor: yanchor constant: (i == 0 ? vborder : vspacing)] setActive: YES];
+        [[[item leadingAnchor] constraintEqualToAnchor: lanchor constant: hborder] setActive: YES];
+        [[[item trailingAnchor] constraintEqualToAnchor: ranchor constant: -hborder] setActive: YES];
         yanchor = [item bottomAnchor];
       }
-      [[yanchor constraintEqualToAnchor: [v bottomAnchor]] setActive: YES];
+      [[yanchor constraintEqualToAnchor: [v bottomAnchor] constant: -vborder] setActive: YES];
     }
       break;
       
@@ -646,18 +678,18 @@ ns_ui_element_rep::as_view () {
       NSLayoutXAxisAnchor *xanchor = [v leadingAnchor];
       NSLayoutYAxisAnchor *tanchor = [v topAnchor];
       NSLayoutYAxisAnchor *banchor = [v bottomAnchor];
-      float spacing = 0.0;
+      float hspacing = 2.0, vspacing = 2.0, hborder = 2.0, vborder = 2.0;
       for (int i = 0; i < N(arr); i++) {
         if (is_nil (arr[i])) break;
         NSView* item = concrete (arr[i])->as_view ();
         [item setTranslatesAutoresizingMaskIntoConstraints: NO];
         [v addSubview: item];
-        [[[item leadingAnchor] constraintEqualToAnchor: xanchor constant: spacing] setActive: YES];
-        [[[item topAnchor] constraintEqualToAnchor:tanchor] setActive: YES];
-        [[[item bottomAnchor] constraintEqualToAnchor:banchor] setActive: YES];
+        [[[item leadingAnchor] constraintEqualToAnchor: xanchor constant: (i==0 ? hborder : hspacing)] setActive: YES];
+        [[[item topAnchor] constraintEqualToAnchor: tanchor constant: vborder] setActive: YES];
+        [[[item bottomAnchor] constraintEqualToAnchor: banchor constant: -vborder] setActive: YES];
         xanchor = [item trailingAnchor];
       }
-      [[xanchor constraintEqualToAnchor: [v trailingAnchor]] setActive: YES];
+      [[xanchor constraintEqualToAnchor: [v trailingAnchor] constant: -hspacing] setActive: YES];
     }
       break;
       
@@ -677,13 +709,12 @@ ns_ui_element_rep::as_view () {
       NSLayoutYAxisAnchor *tanchor = [v topAnchor];
       NSLayoutDimension *wanchor = nil;
       NSLayoutDimension *hanchor = nil;
-      
+      float hspacing = 2.0, vspacing = 2.0, hborder = 2.0, vborder = 2.0;
       int row= 0, col= 0;
       for (int i=0; i < N(a); i++) {
         NSView* item = concrete(a[i])->as_view ();
         [item setTranslatesAutoresizingMaskIntoConstraints: NO];
         [v addSubview: item];
-#if 1
         if (!wanchor)
           wanchor = [item widthAnchor];
         else
@@ -692,19 +723,18 @@ ns_ui_element_rep::as_view () {
           wanchor = [item widthAnchor];
         else
           [[[item heightAnchor] constraintEqualToAnchor: hanchor] setActive: YES];
-#endif
-        [[[item topAnchor] constraintEqualToAnchor:tanchor] setActive: YES];
-        [[[item leadingAnchor] constraintEqualToAnchor:lanchor] setActive: YES];
+        [[[item topAnchor] constraintEqualToAnchor: tanchor constant: (row == 0 ? vborder : vspacing)] setActive: YES];
+        [[[item leadingAnchor] constraintEqualToAnchor: lanchor constant: (col == 0? hborder : hspacing)] setActive: YES];
         lanchor = [item trailingAnchor];
         col++;
         if (col >= cols) {
           col = 0; row++;
-          [[lanchor constraintLessThanOrEqualToAnchor: [v trailingAnchor]] setActive: YES];
+          [[lanchor constraintLessThanOrEqualToAnchor: [v trailingAnchor] constant: -hborder] setActive: YES];
           tanchor = [item bottomAnchor];
           lanchor = [v leadingAnchor];
         }
       }
-      [[tanchor constraintLessThanOrEqualToAnchor: [v bottomAnchor]] setActive: YES];
+      [[tanchor constraintLessThanOrEqualToAnchor: [v bottomAnchor] constant:-vborder] setActive: YES];
       NSSize naturalSize = [v fittingSize];
       [v setFrameSize: naturalSize];
     }
@@ -754,7 +784,7 @@ ns_ui_element_rep::as_view () {
     case menu_group:
     case glue_widget:
     {
-      debug_aqua << "(ns_ui_element_rep;;as_view) I'm not sure we are doing the right thing here \n";
+      debug_aqua << "(ns_ui_element_rep::as_view) I'm not sure we are doing the right thing here \n";
       v = [[[NSView alloc] init] autorelease];
     }
       break;
@@ -807,31 +837,40 @@ ns_ui_element_rep::as_view () {
       string    pre = x.x3;
       string     ks = x.x4;
       int     style = x.x5;
+    
+      NSButton* b = nil;
       
-      TMMenuItem *mi = _w->as_menuitem ();
-      NSButton *b = [[[NSButton alloc] init] autorelease];
-      [b setTranslatesAutoresizingMaskIntoConstraints: NO];
-      NSImage *img = [mi image];
-      if (img) {
-        [b setImagePosition: NSImageOnly];
-        [b setImage: img];
-        NSSize sz = [img size];
-        [[[b widthAnchor] constraintGreaterThanOrEqualToConstant:sz.width] setActive: YES];
-        [[[b heightAnchor] constraintGreaterThanOrEqualToConstant: sz.height] setActive: YES];
+      v = _w->as_view ();
+      if ([[v class] isSubclassOfClass: [NSButton class]]) {
+        b = (NSButton*)v;
       } else {
-        NSString *text = [mi title];
-        if (text) [b setTitle: text];
+        // can be a ns_simple_widget_rep, take a snapshot
+        TMMenuItem* mi = _w->as_menuitem ();
+        b = [[[NSButton alloc] init] autorelease];
+        [b setImage: [mi image]];
       }
-      [b setTarget: mi];
       [b setButtonType: NSMomentaryPushInButton];
       [b setBezelStyle: NSShadowlessSquareBezelStyle];
       [b setBordered: NO];
+      [b setTranslatesAutoresizingMaskIntoConstraints: NO];
+      [b setEnabled: NO];
+      NSImage *img = [b image];
+      if (img) {
+        NSSize sz = [img size];
+        [[[b widthAnchor] constraintGreaterThanOrEqualToConstant: sz.width] setActive: YES];
+        [[[b heightAnchor] constraintGreaterThanOrEqualToConstant: sz.height] setActive: YES];
+      }
+      TMCommand* command = [[[TMCommand alloc] init] autorelease];
+      [command setCommand: cmd.rep];
+      [[b cell] setRepresentedObject: command];
+      [b setTarget: command];
+      [b setAction: @selector(doit)];
       [b setEnabled: !(style & WIDGET_STYLE_INERT)];
+      v = b;
       //FIXME: respect  (style & WIDGET_STYLE_BUTTON)
 //      qwid->setStyle (qtmstyle());
 //      ns_apply_tm_style (qwid, style);
 //      qwid->setEnabled (! (style & WIDGET_STYLE_INERT));
-      v = b;
     }
       break;
       
@@ -841,14 +880,14 @@ ns_ui_element_rep::as_view () {
     {
       typedef pair<widget, widget> T;
       T            x = open_box<T>(load);
-      ns_widget  qtw = concrete (x.x1);
+      ns_widget    w = concrete (x.x1);
       ns_widget _help = concrete (x.x2);
       
       typedef quartet<string, int, color, bool> T1;
       
       ns_ui_element_rep* help = dynamic_cast<ns_ui_element_rep*>(_help.rep);
       
-      v = qtw->as_view ();
+      v = w->as_view ();
       if (help && help->type == text_widget) {
         T1 y = open_box<T1>(help->load);
         [v setToolTip: to_nsstring (y.x1)];
@@ -873,7 +912,6 @@ ns_ui_element_rep::as_view () {
       v = b;
     }
       break;
-      
 
       // a widget with an X pixmap icon
     case xpm_widget:
@@ -881,13 +919,13 @@ ns_ui_element_rep::as_view () {
       url image = open_box<url>(load);
       NSButton* b = [[[NSButton alloc] init] autorelease];
       NSImage* img = the_ns_renderer ()->xpm_image (image);
+      [b setImagePosition: NSImageOnly];
       [b setImage: img];
       [b setEnabled: NO];
       
       v = b;
     }
       break;
-      
 
 #if 0
 
@@ -1160,6 +1198,7 @@ ns_ui_element_rep::as_menuitem () {
     case glue_widget:
     {
       mi = [[[TMMenuItem alloc] init] autorelease];
+      [mi setTitle:@""]; // remove default title
       [mi setEnabled: NO];
       {
         typedef quintuple<tree, bool, bool, SI, SI> T;
@@ -1167,8 +1206,13 @@ ns_ui_element_rep::as_menuitem () {
         tree col = x.x1;
         bool hx = x.x2; bool vx = x.x3;
         SI w = x.x4; SI h = x.x5;
-        if (col != "") {
-          // rendering
+        if (col == "") {
+          NSSize s = NSMakeSize(w,h);
+          NSImage *img = [[[NSImage alloc] initWithSize: s] autorelease];
+          [mi setImage: img];
+          // transparent glue
+        } else {
+          // rendering colored glue
           NSSize s = NSMakeSize(w,h);
           NSImage *img = [[[NSImage alloc] initWithSize: s] autorelease];
           [img lockFocus];
@@ -1176,7 +1220,7 @@ ns_ui_element_rep::as_menuitem () {
             basic_renderer ren = the_ns_renderer();
             ren -> begin([NSGraphicsContext currentContext]);
             rectangle r = rectangle (0, 0, s.width, s.height);
-            ren->set_origin (0,0);
+            ren->set_origin (0, 0);
             ren->encode (r->x1, r->y1);
             ren->encode (r->x2, r->y2);
             ren->set_clipping (r->x1, r->y2, r->x2, r->y1);
@@ -1361,13 +1405,25 @@ to_nsmenuitem (widget w)
   return concrete(w)->as_menuitem();
 }
 
-TMMenuItem *ns_simple_widget_rep::as_menuitem ()
-{
+TMMenuItem*
+ns_simple_widget_rep::as_menuitem () {
   TMMenuItem *mi = [[[TMMenuItem alloc] init] autorelease];
   [mi setWidget:this];
   return mi;
 }
 
+#if 0
+NSView*
+ns_simple_widget_rep::as_view () {
+  TMMenuItem *mi = as_menuitem ();
+  NSButton* b = [[[NSButton alloc] init] autorelease];
+  NSImage* img = [mi image];
+  [b setImagePosition: NSImageOnly];
+  [b setImage: img];
+  [b setEnabled: NO];
+  return b;
+}
+#endif
 
 #pragma mark UI widget interface
 

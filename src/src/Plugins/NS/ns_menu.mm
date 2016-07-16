@@ -469,7 +469,7 @@ NSMenuItem* to_nsmenuitem(widget w)
 	return ((ns_menu_rep*)w.rep)->item;
 }
 
- TMMenuItem *ns_simple_widget_rep::as_menuitem()
+TMMenuItem *ns_simple_widget_rep::as_menuitem()
 {
   TMMenuItem *mi = [[[TMMenuItem alloc] init] autorelease];
   [mi setWidget:this];
