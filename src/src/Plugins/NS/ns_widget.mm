@@ -1199,6 +1199,7 @@ widget popup_widget (widget w)
 }
 
 
+#if 0
 /******************************************************************************
  *  Widgets which are not strictly required by TeXmacs
  *  their implementation is void
@@ -1240,6 +1241,6 @@ wait_widget (SI width, SI height, string message) {
   (void) width; (void) height; (void) message;
   return widget(); 
 }
-
+#endif
 
 

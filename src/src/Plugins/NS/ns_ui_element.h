@@ -15,6 +15,8 @@
 @class TMMenuItem;
 
 class ns_ui_element_rep: public ns_widget_rep {
+
+public:
   
   enum types {
     none = 0,
@@ -30,11 +32,10 @@ class ns_ui_element_rep: public ns_widget_rep {
     field_widget,    filtered_choice_widget, tree_view_widget
   } ;
   
-  types type;
+private:
   
-
-  
-  blackbox                  load;
+  types     type;
+  blackbox  load;
   
 public:
 
