@@ -13,9 +13,29 @@
 #define NS_MENU_H
 
 #include "ns_widget.h"
+#include "promise.hpp"
 
 NSMenu* to_nsmenu(widget w);
 NSMenuItem* to_nsmenuitem(widget w);
+
+
+@interface TMMenuItem : NSMenuItem
+{
+  command_rep *cmd;
+  ns_simple_widget_rep* wid;// an eventual box widget (see tm_button.cpp)
+}
+- (void)setCommand:(command_rep *)_c;
+- (void)setWidget:(ns_simple_widget_rep *)_w;
+- (void)doit;
+@end
+
+@interface TMLazyMenu : NSMenu <NSMenuDelegate>
+{
+  promise_rep<widget> *pm;
+  BOOL forced;
+}
+- (void)setPromise:(promise_rep<widget> *)p;
+@end
 
 
 #endif // defined NS_MENU_H

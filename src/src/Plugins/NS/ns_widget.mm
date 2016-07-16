@@ -68,7 +68,12 @@ ns_widget_rep::popup_window_widget (string s) {
 
 TMMenuItem *
 ns_widget_rep::as_menuitem() { 
-  return [TMMenuItem alloc];  
+  return [[[TMMenuItem alloc] init] autorelease];
+}
+
+NSView*
+ns_widget_rep::as_view () {
+  return [[[NSView alloc] init] autorelease];
 }
 
 /******************************************************************************
@@ -82,8 +87,13 @@ ns_view_widget_rep::ns_view_widget_rep(NSView *v) :
   [v retain]; 
 }
 
-ns_view_widget_rep::~ns_view_widget_rep()  { 
+ns_view_widget_rep::~ns_view_widget_rep()  {
   [view release]; 
+}
+
+NSView*
+ns_view_widget_rep::as_view () {
+  return view;
 }
 
 void

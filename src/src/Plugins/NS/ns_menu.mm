@@ -95,16 +95,6 @@ public:
 #endif
 
 
-@interface TMMenuItem : NSMenuItem
-{
-	command_rep *cmd;
-	ns_simple_widget_rep* wid;// an eventual box widget (see tm_button.cpp)
-}
-- (void)setCommand:(command_rep *)_c;
-- (void)setWidget:(ns_simple_widget_rep *)_w;
-- (void)doit;
-@end
-
 @implementation TMMenuItem
 - (void)setCommand:(command_rep *)_c 
 {  
@@ -162,13 +152,6 @@ public:
 
 
 
-@interface TMLazyMenu : NSMenu <NSMenuDelegate>
-{
-	promise_rep<widget> *pm;
-	BOOL forced;
-}
-- (void)setPromise:(promise_rep<widget> *)p;
-@end
 
 @implementation TMLazyMenu
 - (void)setPromise:(promise_rep<widget> *)p 

@@ -98,8 +98,11 @@ NSString *to_nsstring_utf8(string s)
   return nss;
 }
 
+
 string
 ns_translate (string s) {
+  string in_lan= get_input_language ();
   string out_lan= get_output_language ();
-  return tm_var_encode (translate (s, "english", out_lan));
+  return tm_var_encode (translate (s, in_lan, out_lan));
 }
+

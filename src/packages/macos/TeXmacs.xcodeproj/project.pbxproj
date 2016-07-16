@@ -2757,6 +2757,8 @@
 		9C3F67131D37D4D100742895 /* TMView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMView.h; sourceTree = "<group>"; };
 		9C3F67141D37D4D100742895 /* TMView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TMView.mm; sourceTree = "<group>"; };
 		9C3F672C1D37D51700742895 /* TeXmacsNS.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = TeXmacsNS.xcconfig; sourceTree = "<group>"; };
+		9C4324911D398D29003511A2 /* ns_ui_element.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ns_ui_element.mm; sourceTree = "<group>"; };
+		9C4324931D398D3C003511A2 /* ns_ui_element.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ns_ui_element.h; sourceTree = "<group>"; };
 		9C4A740A1D22BEE900572468 /* player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = player.cpp; sourceTree = "<group>"; };
 		9C4A740B1D22BEE900572468 /* player.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = player.hpp; sourceTree = "<group>"; };
 		9C4A740F1D22C37400572468 /* glyph_effects.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = glyph_effects.cpp; sourceTree = "<group>"; };
@@ -4801,6 +4803,8 @@
 				9C3F67121D37D4D100742895 /* TMButtonsController.m */,
 				9C3F67131D37D4D100742895 /* TMView.h */,
 				9C3F67141D37D4D100742895 /* TMView.mm */,
+				9C4324911D398D29003511A2 /* ns_ui_element.mm */,
+				9C4324931D398D3C003511A2 /* ns_ui_element.h */,
 			);
 			path = NS;
 			sourceTree = "<group>";

@@ -29,7 +29,8 @@ public:
 	virtual widget make_popup_widget (); 
 	virtual widget popup_window_widget (string s); 
  
-  virtual TMMenuItem *as_menuitem();
+  virtual TMMenuItem* as_menuitem ();
+  virtual NSView* as_view ();
   
 };
 
@@ -69,8 +70,9 @@ public:
   //  virtual void deconnect (slot s, widget w2, slot s2);
   // deconnect a state slot s from another slot s2 of another widget w2
   
+  virtual NSView* as_view ();
+
   virtual widget plain_window_widget (string s);
-  
 };
 
 
@@ -115,7 +117,7 @@ public:
   void updateScrollBars (void);
   void setExtents ( NSRect newExtents );
   
-  virtual TMMenuItem *as_menuitem();
+  virtual TMMenuItem *as_menuitem ();
 };
 
 
