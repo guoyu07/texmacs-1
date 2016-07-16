@@ -10,8 +10,9 @@
 #define NS_UI_ELEMENT_H
 
 #include "ns_widget.h"
-#include "ns_menu.h"
+//#include "ns_menu.h"
 
+@class TMMenuItem;
 
 class ns_ui_element_rep: public ns_widget_rep {
   

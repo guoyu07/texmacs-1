@@ -585,8 +585,8 @@ ns_renderer_rep::xpm_image(url file_name)
 ns_renderer_rep*
 the_ns_renderer () {
   static ns_renderer_rep* the_renderer = NULL;
-	if (!the_renderer) the_renderer= tm_new <ns_renderer_rep> ();
-	return the_renderer;
+  if (!the_renderer) the_renderer= tm_new <ns_renderer_rep> ();
+  return the_renderer;
 }
 
 /******************************************************************************
@@ -614,139 +614,138 @@ the_ns_renderer () {
 
 class ns_shadow_renderer_rep: public ns_renderer_rep {
 public:
-    NSBitmapImageRep *px;
-    ns_renderer_rep *master;
-    
+  NSBitmapImageRep *px;
+  ns_renderer_rep *master;
+  
 public:
-    ns_shadow_renderer_rep (int _w, int _h);
-    ~ns_shadow_renderer_rep ();
-    
-    void get_shadow (renderer ren, SI x1, SI y1, SI x2, SI y2);
+  ns_shadow_renderer_rep (int _w, int _h);
+  ~ns_shadow_renderer_rep ();
+  
+  void get_shadow (renderer ren, SI x1, SI y1, SI x2, SI y2);
 };
 
 class ns_proxy_renderer_rep: public ns_renderer_rep {
 public:
-    ns_renderer_rep *base;
-    
+  ns_renderer_rep *base;
+  
 public:
-    ns_proxy_renderer_rep (ns_renderer_rep *_base, int ww, int hh)
-    : ns_renderer_rep (ww, hh), base (_base) { context = base->context; }
-    ~ns_proxy_renderer_rep () { };
-    
-    void new_shadow (renderer& ren);
-    void get_shadow (renderer ren, SI x1, SI y1, SI x2, SI y2);
+  ns_proxy_renderer_rep (ns_renderer_rep *_base, int ww, int hh)
+  : ns_renderer_rep (ww, hh), base (_base) { context = base->context; }
+  ~ns_proxy_renderer_rep () { };
+  
+  void new_shadow (renderer& ren);
+  void get_shadow (renderer ren, SI x1, SI y1, SI x2, SI y2);
 };
 
 
 void
 ns_renderer_rep::new_shadow (renderer& ren) {
-  ren = this; return;
-    SI mw, mh, sw, sh;
-    get_extents (mw, mh);
-    if (ren != NULL) {
-        ren->get_extents (sw, sh);
-        if (sw != mw || sh != mh) {
-            delete_shadow (ren);
-            ren= NULL;
-        } else
-            static_cast<ns_renderer_rep*>(ren)->end();
-        // cout << "Old: " << sw << ", " << sh << "\n";
-    }
-
-    if (ren == NULL)  ren= (renderer) tm_new<ns_proxy_renderer_rep> (this, mw, mh);
+  SI mw, mh, sw, sh;
+  get_extents (mw, mh);
+  if (ren != NULL) {
+    ren->get_extents (sw, sh);
+    if (sw != mw || sh != mh) {
+      delete_shadow (ren);
+      ren= NULL;
+    } else
+      static_cast<ns_renderer_rep*>(ren)->end();
+    // cout << "Old: " << sw << ", " << sh << "\n";
+  }
   
-    if (ren) static_cast<ns_renderer_rep*>(ren)->begin(context);
-
-    // cout << "Create " << mw << ", " << mh << "\n";
+  if (ren == NULL)  ren= (renderer) tm_new<ns_proxy_renderer_rep> (this, mw, mh);
+  
+  if (ren) static_cast<ns_renderer_rep*>(ren)->begin(context);
+  
+  // cout << "Create " << mw << ", " << mh << "\n";
 }
 
 void
 ns_renderer_rep::delete_shadow (renderer& ren)  {
   return;
-    if (ren != NULL) {
-        tm_delete (ren);
-        ren= NULL;
-    }
+  if (ren != NULL) {
+    tm_delete (ren);
+    ren= NULL;
+  }
 }
 
 void
 ns_renderer_rep::get_shadow (renderer ren, SI x1, SI y1, SI x2, SI y2) {
-    // FIXME: we should use the routine fetch later
-    ASSERT (ren != NULL, "invalid renderer");
-    if (ren->is_printer ()) return;
-    ns_renderer_rep* shadow= static_cast<ns_renderer_rep*>(ren);
-    outer_round (x1, y1, x2, y2);
-    x1= max (x1, cx1- ox);
-    y1= max (y1, cy1- oy);
-    x2= min (x2, cx2- ox);
-    y2= min (y2, cy2- oy);
-    shadow->ox= ox;
-    shadow->oy= oy;
-    shadow->master= this;
-    shadow->cx1= x1+ ox;
-    shadow->cy1= y1+ oy;
-    shadow->cx2= x2+ ox;
-    shadow->cy2= y2+ oy;
-    
-    decode (x1, y1);
-    decode (x2, y2);
-    if (x1<x2 && y2<y1) {
-        NSRect rect = NSMakeRect(x1, y2, x2-x1, y1-y2);
-        //    shadow->painter->setCompositionMode(QPainter::CompositionMode_Source);
-        NSGraphicsContext *old_context = [[NSGraphicsContext currentContext] retain];
-        [NSGraphicsContext setCurrentContext:context];
-        NSBezierPath* clipPath = [NSBezierPath bezierPath];
-        [clipPath appendBezierPathWithRect: rect];
-        [clipPath setClip];
-        [NSGraphicsContext setCurrentContext:old_context]; [old_context release];
-        //    shadow->painter->drawPixmap (rect, px, rect);
-        //    cout << "ns_shadow_renderer_rep::get_shadow "
-        //         << rectangle(x1,y2,x2,y1) << LF;
-        //  XCopyArea (dpy, win, shadow->win, gc, x1, y2, x2-x1, y1-y2, x1, y2);
-    } else {
-//        shadow->painter->setClipRect(QRect());
-    }
+  // FIXME: we should use the routine fetch later
+  ASSERT (ren != NULL, "invalid renderer");
+  if (ren->is_printer ()) return;
+  ns_renderer_rep* shadow= static_cast<ns_renderer_rep*>(ren);
+  outer_round (x1, y1, x2, y2);
+  x1= max (x1, cx1- ox);
+  y1= max (y1, cy1- oy);
+  x2= min (x2, cx2- ox);
+  y2= min (y2, cy2- oy);
+  shadow->ox= ox;
+  shadow->oy= oy;
+  shadow->master= this;
+  shadow->cx1= x1+ ox;
+  shadow->cy1= y1+ oy;
+  shadow->cx2= x2+ ox;
+  shadow->cy2= y2+ oy;
+  
+  decode (x1, y1);
+  decode (x2, y2);
+  if (x1<x2 && y2<y1) {
+    NSRect rect = NSMakeRect(x1, y2, x2-x1, y1-y2);
+    //    shadow->painter->setCompositionMode(QPainter::CompositionMode_Source);
+    NSGraphicsContext *old_context = [[NSGraphicsContext currentContext] retain];
+    [NSGraphicsContext setCurrentContext:context];
+    NSBezierPath* clipPath = [NSBezierPath bezierPath];
+    [clipPath appendBezierPathWithRect: rect];
+    [clipPath setClip];
+    [NSGraphicsContext setCurrentContext:old_context]; [old_context release];
+    //    shadow->painter->drawPixmap (rect, px, rect);
+    //    cout << "ns_shadow_renderer_rep::get_shadow "
+    //         << rectangle(x1,y2,x2,y1) << LF;
+    //  XCopyArea (dpy, win, shadow->win, gc, x1, y2, x2-x1, y1-y2, x1, y2);
+  } else {
+    //        shadow->painter->setClipRect(QRect());
+  }
 }
 
 void
 ns_renderer_rep::put_shadow (renderer ren, SI x1, SI y1, SI x2, SI y2) {
-    // FIXME: we should use the routine fetch later
-    ASSERT (ren != NULL, "invalid renderer");
-    if (ren->is_printer ()) return;
-    if (context == static_cast<ns_renderer_rep*>(ren)->context) return;
-    ns_shadow_renderer_rep* shadow= static_cast<ns_shadow_renderer_rep*>(ren);
-    outer_round (x1, y1, x2, y2);
-    x1= max (x1, cx1- ox);
-    y1= max (y1, cy1- oy);
-    x2= min (x2, cx2- ox);
-    y2= min (y2, cy2- oy);
-    decode (x1, y1);
-    decode (x2, y2);
-    if (x1<x2 && y2<y1) {
-        NSRect rect = NSMakeRect(x1, y2, x2-x1, y1-y2);
-        //    cout << "ns_shadow_renderer_rep::put_shadow "
-        //         << rectangle(x1,y2,x2,y1) << LF;
-        //    painter->setCompositionMode(QPainter::CompositionMode_Source);
-        NSGraphicsContext *old_context = [[NSGraphicsContext currentContext] retain];
-        [NSGraphicsContext setCurrentContext:context];
-        [shadow->px drawInRect: rect];
-        [NSGraphicsContext setCurrentContext:old_context]; [old_context release];
-//        painter->drawPixmap (rect, shadow->px, rect);
-        //  XCopyArea (dpy, shadow->win, win, gc, x1, y2, x2-x1, y1-y2, x1, y2);
-    }
+  // FIXME: we should use the routine fetch later
+  ASSERT (ren != NULL, "invalid renderer");
+  if (ren->is_printer ()) return;
+  if (context == static_cast<ns_renderer_rep*>(ren)->context) return;
+  ns_shadow_renderer_rep* shadow= static_cast<ns_shadow_renderer_rep*>(ren);
+  outer_round (x1, y1, x2, y2);
+  x1= max (x1, cx1- ox);
+  y1= max (y1, cy1- oy);
+  x2= min (x2, cx2- ox);
+  y2= min (y2, cy2- oy);
+  decode (x1, y1);
+  decode (x2, y2);
+  if (x1<x2 && y2<y1) {
+    NSRect rect = NSMakeRect(x1, y2, x2-x1, y1-y2);
+    //    cout << "ns_shadow_renderer_rep::put_shadow "
+    //         << rectangle(x1,y2,x2,y1) << LF;
+    //    painter->setCompositionMode(QPainter::CompositionMode_Source);
+    NSGraphicsContext *old_context = [[NSGraphicsContext currentContext] retain];
+    [NSGraphicsContext setCurrentContext:context];
+    [shadow->px drawInRect: rect];
+    [NSGraphicsContext setCurrentContext:old_context]; [old_context release];
+    //        painter->drawPixmap (rect, shadow->px, rect);
+    //  XCopyArea (dpy, shadow->win, win, gc, x1, y2, x2-x1, y1-y2, x1, y2);
+  }
 }
 
 
 void
 ns_renderer_rep::apply_shadow (SI x1, SI y1, SI x2, SI y2)  {
-    if (master == NULL) return;
-    if (context == static_cast<ns_renderer_rep*>(master)->context) return;
-    outer_round (x1, y1, x2, y2);
-    decode (x1, y1);
-    decode (x2, y2);
-    static_cast<ns_renderer_rep*>(master)->encode (x1, y1);
-    static_cast<ns_renderer_rep*>(master)->encode (x2, y2);
-    master->put_shadow (this, x1, y1, x2, y2);
+  if (master == NULL) return;
+  if (context == static_cast<ns_renderer_rep*>(master)->context) return;
+  outer_round (x1, y1, x2, y2);
+  decode (x1, y1);
+  decode (x2, y2);
+  static_cast<ns_renderer_rep*>(master)->encode (x1, y1);
+  static_cast<ns_renderer_rep*>(master)->encode (x2, y2);
+  master->put_shadow (this, x1, y1, x2, y2);
 }
 
 
@@ -756,78 +755,78 @@ ns_renderer_rep::apply_shadow (SI x1, SI y1, SI x2, SI y2)  {
 
 void
 ns_proxy_renderer_rep::new_shadow (renderer& ren) {
-    SI mw, mh, sw, sh;
-    get_extents (mw, mh);
-    if (ren != NULL) {
-        ren->get_extents (sw, sh);
-        if (sw != mw || sh != mh) {
-            delete_shadow (ren);
-            ren= NULL;
-        }
-        else
-            static_cast<ns_renderer_rep*>(ren)->end();
-        // cout << "Old: " << sw << ", " << sh << "\n";
+  SI mw, mh, sw, sh;
+  get_extents (mw, mh);
+  if (ren != NULL) {
+    ren->get_extents (sw, sh);
+    if (sw != mw || sh != mh) {
+      delete_shadow (ren);
+      ren= NULL;
     }
-    if (ren == NULL) {
-//        NSBitmapImageRep *img = [[NSBitmapImageRep alloc] init];
-//        ren= (renderer) tm_new<ns_shadow_renderer_rep> (QPixmap (mw, mh));
-        ren= (renderer) tm_new<ns_shadow_renderer_rep> (mw, mh);
-    }
-    
-    // cout << "Create " << mw << ", " << mh << "\n";
-    static_cast<ns_renderer_rep*>(ren)->begin(context);
+    else
+      static_cast<ns_renderer_rep*>(ren)->end();
+    // cout << "Old: " << sw << ", " << sh << "\n";
+  }
+  if (ren == NULL) {
+    //        NSBitmapImageRep *img = [[NSBitmapImageRep alloc] init];
+    //        ren= (renderer) tm_new<ns_shadow_renderer_rep> (QPixmap (mw, mh));
+    ren= (renderer) tm_new<ns_shadow_renderer_rep> (mw, mh);
+  }
+  
+  // cout << "Create " << mw << ", " << mh << "\n";
+  static_cast<ns_renderer_rep*>(ren)->begin(context);
 }
 
 void
 ns_proxy_renderer_rep::get_shadow (renderer ren, SI x1, SI y1, SI x2, SI y2) {
-    // FIXME: we should use the routine fetch later
-    ASSERT (ren != NULL, "invalid renderer");
-    if (ren->is_printer ()) return;
-    ns_renderer_rep* shadow= static_cast<ns_renderer_rep*>(ren);
-    outer_round (x1, y1, x2, y2);
-    x1= max (x1, cx1- ox);
-    y1= max (y1, cy1- oy);
-    x2= min (x2, cx2- ox);
-    y2= min (y2, cy2- oy);
-    shadow->ox= ox;
-    shadow->oy= oy;
-    shadow->cx1= x1+ ox;
-    shadow->cy1= y1+ oy;
-    shadow->cx2= x2+ ox;
-    shadow->cy2= y2+ oy;
-    shadow->master= this;
-    decode (x1, y1);
-    decode (x2, y2);
+  // FIXME: we should use the routine fetch later
+  ASSERT (ren != NULL, "invalid renderer");
+  if (ren->is_printer ()) return;
+  ns_renderer_rep* shadow= static_cast<ns_renderer_rep*>(ren);
+  outer_round (x1, y1, x2, y2);
+  x1= max (x1, cx1- ox);
+  y1= max (y1, cy1- oy);
+  x2= min (x2, cx2- ox);
+  y2= min (y2, cy2- oy);
+  shadow->ox= ox;
+  shadow->oy= oy;
+  shadow->cx1= x1+ ox;
+  shadow->cy1= y1+ oy;
+  shadow->cx2= x2+ ox;
+  shadow->cy2= y2+ oy;
+  shadow->master= this;
+  decode (x1, y1);
+  decode (x2, y2);
+  
+  NSGraphicsContext *old_context = [[NSGraphicsContext currentContext] retain];
+  [NSGraphicsContext setCurrentContext:shadow->context];
+  if (x1<x2 && y2<y1) {
+    NSRect rect = NSMakeRect(x1, y2, x2-x1, y1-y2);
     
-    NSGraphicsContext *old_context = [[NSGraphicsContext currentContext] retain];
-    [NSGraphicsContext setCurrentContext:shadow->context];
-    if (x1<x2 && y2<y1) {
-        NSRect rect = NSMakeRect(x1, y2, x2-x1, y1-y2);
-
-        
-        NSBezierPath* clipPath = [NSBezierPath bezierPath];
-        [clipPath appendBezierPathWithRect: rect];
-        [clipPath setClip];
-
-        
-//        shadow->painter->setClipRect(rect);
-        
-        //    shadow->painter->setCompositionMode(QPainter::CompositionMode_Source);
-        NSBitmapImageRep *img = [base->view bitmapImageRepForCachingDisplayInRect:rect];
-//        QPixmap *_pixmap = static_cast<QPixmap*>(painter->device());
-        if (img) {
-            [img drawInRect:rect];
-//            shadow->painter->drawPixmap (rect, *_pixmap, rect);
-        }
-        //    cout << "ns_shadow_renderer_rep::get_shadow "
-        //         << rectangle(x1,y2,x2,y1) << LF;
-        //  XCopyArea (dpy, win, shadow->win, gc, x1, y2, x2-x1, y1-y2, x1, y2);
-
-    } else {
-        //shadow->painter->setClipRect(QRect());
+    
+    NSBezierPath* clipPath = [NSBezierPath bezierPath];
+    [clipPath appendBezierPathWithRect: rect];
+    [clipPath setClip];
+    
+    
+    //        shadow->painter->setClipRect(rect);
+    
+    //    shadow->painter->setCompositionMode(QPainter::CompositionMode_Source);
+    NSBitmapImageRep *img = [base->view bitmapImageRepForCachingDisplayInRect:rect];
+    //        QPixmap *_pixmap = static_cast<QPixmap*>(painter->device());
+    if (img) {
+      [img drawInRect:rect];
+      //            shadow->painter->drawPixmap (rect, *_pixmap, rect);
     }
-    [NSGraphicsContext setCurrentContext:old_context]; [old_context release];
+    //    cout << "ns_shadow_renderer_rep::get_shadow "
+    //         << rectangle(x1,y2,x2,y1) << LF;
+    //  XCopyArea (dpy, win, shadow->win, gc, x1, y2, x2-x1, y1-y2, x1, y2);
     
+  } else {
+    //shadow->painter->setClipRect(QRect());
+  }
+  [NSGraphicsContext setCurrentContext:old_context]; [old_context release];
+  
 }
 
 
@@ -839,11 +838,11 @@ ns_shadow_renderer_rep::ns_shadow_renderer_rep (int _w, int _h)
 // : ns_renderer_rep (_px.width(),_px.height()), px(_px)
 : ns_renderer_rep (_w, _h), px(nil)
 {
-    px = [[NSBitmapImageRep alloc] init];
-    [px setSize: NSMakeSize(w,h)];
-    context = [[NSGraphicsContext graphicsContextWithBitmapImageRep: px] retain];
-    //cout << px.width() << "," << px.height() << " " << LF;
-    // painter->begin(&px);
+  px = [[NSBitmapImageRep alloc] init];
+  [px setSize: NSMakeSize(w,h)];
+  context = [[NSGraphicsContext graphicsContextWithBitmapImageRep: px] retain];
+  //cout << px.width() << "," << px.height() << " " << LF;
+  // painter->begin(&px);
 }
 
 ns_shadow_renderer_rep::~ns_shadow_renderer_rep ()
@@ -855,44 +854,44 @@ ns_shadow_renderer_rep::~ns_shadow_renderer_rep ()
 
 void
 ns_shadow_renderer_rep::get_shadow (renderer ren, SI x1, SI y1, SI x2, SI y2) {
-    // FIXME: we should use the routine fetch later
-    ASSERT (ren != NULL, "invalid renderer");
-    if (ren->is_printer ()) return;
-    ns_shadow_renderer_rep* shadow= static_cast<ns_shadow_renderer_rep*>(ren);
-    outer_round (x1, y1, x2, y2);
-    x1= max (x1, cx1- ox);
-    y1= max (y1, cy1- oy);
-    x2= min (x2, cx2- ox);
-    y2= min (y2, cy2- oy);
-    shadow->ox= ox;
-    shadow->oy= oy;
-    shadow->cx1= x1+ ox;
-    shadow->cy1= y1+ oy;
-    shadow->cx2= x2+ ox;
-    shadow->cy2= y2+ oy;
-    shadow->master= this;
-    decode (x1, y1);
-    decode (x2, y2);
-    NSGraphicsContext *old_context = [[NSGraphicsContext currentContext] retain];
-    [NSGraphicsContext setCurrentContext:shadow->context];
-    if (x1<x2 && y2<y1) {
-        NSRect rect = NSMakeRect(x1, y2, x2-x1, y1-y2);
-        
-        NSBezierPath* clipPath = [NSBezierPath bezierPath];
-        [clipPath appendBezierPathWithRect: rect];
-        [clipPath setClip];
-
-//        shadow->painter->setClipRect(rect);
-        [px drawInRect:rect];
-        
-        //    shadow->painter->setCompositionMode(QPainter::CompositionMode_Source);   
-//        shadow->painter->drawPixmap (rect, px, rect);
-        //    cout << "ns_shadow_renderer_rep::get_shadow " 
-        //         << rectangle(x1,y2,x2,y1) << LF;
-        //  XCopyArea (dpy, win, shadow->win, gc, x1, y2, x2-x1, y1-y2, x1, y2);
-    } else {
-  //      shadow->painter->setClipRect(QRect());
-    }
-    [NSGraphicsContext setCurrentContext:old_context]; [old_context release];
-
+  // FIXME: we should use the routine fetch later
+  ASSERT (ren != NULL, "invalid renderer");
+  if (ren->is_printer ()) return;
+  ns_shadow_renderer_rep* shadow= static_cast<ns_shadow_renderer_rep*>(ren);
+  outer_round (x1, y1, x2, y2);
+  x1= max (x1, cx1- ox);
+  y1= max (y1, cy1- oy);
+  x2= min (x2, cx2- ox);
+  y2= min (y2, cy2- oy);
+  shadow->ox= ox;
+  shadow->oy= oy;
+  shadow->cx1= x1+ ox;
+  shadow->cy1= y1+ oy;
+  shadow->cx2= x2+ ox;
+  shadow->cy2= y2+ oy;
+  shadow->master= this;
+  decode (x1, y1);
+  decode (x2, y2);
+  NSGraphicsContext *old_context = [[NSGraphicsContext currentContext] retain];
+  [NSGraphicsContext setCurrentContext:shadow->context];
+  if (x1<x2 && y2<y1) {
+    NSRect rect = NSMakeRect(x1, y2, x2-x1, y1-y2);
+    
+    NSBezierPath* clipPath = [NSBezierPath bezierPath];
+    [clipPath appendBezierPathWithRect: rect];
+    [clipPath setClip];
+    
+    //        shadow->painter->setClipRect(rect);
+    [px drawInRect:rect];
+    
+    //    shadow->painter->setCompositionMode(QPainter::CompositionMode_Source);
+    //        shadow->painter->drawPixmap (rect, px, rect);
+    //    cout << "ns_shadow_renderer_rep::get_shadow "
+    //         << rectangle(x1,y2,x2,y1) << LF;
+    //  XCopyArea (dpy, win, shadow->win, gc, x1, y2, x2-x1, y1-y2, x1, y2);
+  } else {
+    //      shadow->painter->setClipRect(QRect());
+  }
+  [NSGraphicsContext setCurrentContext:old_context]; [old_context release];
+  
 }

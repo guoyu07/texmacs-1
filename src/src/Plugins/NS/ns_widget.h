@@ -22,9 +22,15 @@
 
 
 class ns_widget_rep : public widget_rep {
+  
+  array<widget> children;
+
 public:
 	ns_widget_rep() : widget_rep () { };
 	
+  void add_child (widget w) { children << w; };
+  void add_children (array<widget> a)  { children << a; };
+  
 	virtual widget plain_window_widget (string s); 
 	virtual widget make_popup_widget (); 
 	virtual widget popup_window_widget (string s); 
@@ -44,7 +50,11 @@ public:
 ABSTRACT_NULL_CODE(ns_widget);
 
 inline widget abstract (ns_widget w) { return widget (w.rep); }
-inline ns_widget concrete (widget w) { return ns_widget ((ns_widget_rep*) w.rep); }
+inline ns_widget concrete (widget w) {
+  simple_widget_rep *ww = dynamic_cast<simple_widget_rep*>(w.rep);
+  if (ww)  { w  = ww->get_impl (); }
+  return dynamic_cast<ns_widget_rep*>(w.rep);
+}
 
 
 class ns_view_widget_rep: public ns_widget_rep {

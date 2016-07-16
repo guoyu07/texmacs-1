@@ -1027,13 +1027,13 @@
 		9C3F67231D37D4D100742895 /* Window.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9C3F66FF1D37D4D100742895 /* Window.nib */; };
 		9C3F67241D37D4D100742895 /* ns_dialogues.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F67041D37D4D100742895 /* ns_dialogues.mm */; };
 		9C3F67251D37D4D100742895 /* ns_gui.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F67061D37D4D100742895 /* ns_gui.mm */; };
-		9C3F67261D37D4D100742895 /* ns_menu.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F67081D37D4D100742895 /* ns_menu.mm */; };
 		9C3F67271D37D4D100742895 /* ns_renderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F670B1D37D4D100742895 /* ns_renderer.mm */; };
 		9C3F67281D37D4D100742895 /* ns_utilities.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F670E1D37D4D100742895 /* ns_utilities.mm */; };
 		9C3F67291D37D4D100742895 /* ns_widget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F67101D37D4D100742895 /* ns_widget.mm */; };
 		9C3F672A1D37D4D100742895 /* TMButtonsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F67121D37D4D100742895 /* TMButtonsController.m */; };
 		9C3F672B1D37D4D100742895 /* TMView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F67141D37D4D100742895 /* TMView.mm */; };
 		9C3F672D1D37D51700742895 /* TeXmacsNS.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 9C3F672C1D37D51700742895 /* TeXmacsNS.xcconfig */; };
+		9C4324951D3A2B75003511A2 /* ns_ui_element.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C4324911D398D29003511A2 /* ns_ui_element.mm */; };
 		9C4A740C1D22BEE900572468 /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C4A740A1D22BEE900572468 /* player.cpp */; };
 		9C4A740D1D22BEF500572468 /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C4A740A1D22BEE900572468 /* player.cpp */; };
 		9C4A740E1D22BEF600572468 /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C4A740A1D22BEE900572468 /* player.cpp */; };
@@ -6010,6 +6010,7 @@
 				9C3F66371D37D4B400742895 /* change_boxes.cpp in Sources */,
 				9C3F66381D37D4B400742895 /* modifier_boxes.cpp in Sources */,
 				9C3F66391D37D4B400742895 /* bridge.cpp in Sources */,
+				9C4324951D3A2B75003511A2 /* ns_ui_element.mm in Sources */,
 				9C3F663A1D37D4B400742895 /* bridge_argument.cpp in Sources */,
 				9C3F663B1D37D4B400742895 /* bridge_auto.cpp in Sources */,
 				9C3F663C1D37D4B400742895 /* bridge_compound.cpp in Sources */,
@@ -6080,7 +6081,6 @@
 				9C3F66801D37D4B400742895 /* bibtex_functions.cpp in Sources */,
 				9C3F66811D37D4B400742895 /* parsebib.cpp in Sources */,
 				9C3F66821D37D4B400742895 /* packrat_grammar.cpp in Sources */,
-				9C3F67261D37D4D100742895 /* ns_menu.mm in Sources */,
 				9C3F66831D37D4B400742895 /* packrat_parser.cpp in Sources */,
 				9C3F66841D37D4B400742895 /* tree_brackets.cpp in Sources */,
 				9C3F66851D37D4B400742895 /* highlight_observer.cpp in Sources */,

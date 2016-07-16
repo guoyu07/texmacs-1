@@ -22,6 +22,7 @@
 #include "analyze.hpp"
 
 #include "promise.hpp"
+#include "scheme.hpp"
 #include <typeinfo>
 
 #import "TMView.h"
@@ -400,13 +401,8 @@ widget menu_button (widget w, command cmd, string pre, string ks, int style)
   bool ok= (style & WIDGET_STYLE_INERT) == 0;
   TMMenuItem *mi = nil;
   
-  if (typeid(*(w.rep)) == typeid(simple_widget_rep)) {
-    mi = [[[TMMenuItem alloc] init] autorelease];
-    [mi setWidget:(ns_simple_widget_rep*)(((simple_widget_rep*)w.rep)->get_impl().rep)];
-  } else  {
-    mi = ((ns_widget_rep*)w.rep)->as_menuitem();
-  }
-
+  mi = concrete(w)->as_menuitem();
+  
   [mi setCommand: cmd.rep];
   [mi setEnabled:(ok ? YES : NO)];
 	// FIXME: implement complete prefix handling and keyboard shortcuts
@@ -480,3 +476,70 @@ NSMenuItem* to_nsmenuitem(widget w)
   return mi;
 }
 
+
+
+/******************************************************************************
+ * TeXmacs interface for the creation of widgets.
+ * See Graphics/Gui/widget.hpp for comments.
+ ******************************************************************************/
+
+//widget horizontal_menu (array<widget> arr) { return widget(); }
+//widget vertical_menu (array<widget> arr) { return widget(); }
+//widget horizontal_list (array<widget> arr) { return widget(); }
+//widget vertical_list (array<widget> arr)  { return widget(); }
+widget aligned_widget (array<widget> lhs, array<widget> rhs, SI hsep, SI vsep, SI lpad, SI rpad)  { return widget(); }
+widget tabs_widget (array<widget> tabs, array<widget> bodies)  { return widget(); }
+widget icon_tabs_widget (array<url> us, array<widget> ts, array<widget> bs)  { return widget(); }
+widget wrapped_widget (widget w, command cmd) { return widget(); }
+//widget tile_menu (array<widget> a, int cols)  { return widget(); }
+//widget minibar_menu (array<widget> arr)  { return widget(); }
+//widget menu_separator (bool vertical)  { return widget(); }
+//widget menu_group (string name, int style)  { return widget(); }
+//widget pulldown_button (widget w, promise<widget> pw)  { return widget(); }
+//widget pullright_button (widget w, promise<widget> pw)  { return widget(); }
+//widget menu_button (widget w, command cmd, string pre, string ks, int style)  { return widget(); }
+//widget balloon_widget (widget w, widget help)  { return widget(); }
+//widget text_widget (string s, int style, color col, bool tsp)  { return widget(); }
+//widget xpm_widget (url file_name)  { return widget(); }
+widget toggle_widget (command cmd, bool on, int style)  { return widget(); }
+widget enum_widget (command cmd, array<string> vals, string val, int style, string width)  { return widget(); }
+widget choice_widget (command cmd, array<string> vals, array<string> chosen) { return widget(); }
+widget choice_widget (command cmd, array<string> vals, string cur) { return widget(); }
+widget choice_widget (command cmd, array<string> vals, string cur, string filter)  { return widget(); }
+widget user_canvas_widget (widget wid, int style)  { return widget(); }
+widget resize_widget (widget w, int style, string w1, string h1,
+                      string w2, string h2, string w3, string h3,
+                      string hpos, string vpos)  { return widget(); }
+widget hsplit_widget (widget l, widget r)  { return widget(); }
+widget vsplit_widget (widget t, widget b)  { return widget(); }
+widget refresh_widget (string tmwid, string kind)  { return widget(); }
+//widget refreshable_widget (object promise, string kind)  { return widget(); }
+//widget glue_widget (bool hx, bool vx, SI w, SI h)  { return widget(); }
+//widget glue_widget (tree col, bool hx, bool vx, SI w, SI h)  { return widget(); }
+//widget inputs_list_widget (command call_back, array<string> prompts)  { return widget(); }
+//widget input_text_widget (command call_back, string type, array<string> def,
+//                          int style, string width)  { return widget(); }
+//widget color_picker_widget (command call_back, bool bg, array<tree> proposals)  { return widget(); }
+//widget file_chooser_widget (command cmd, string type, string prompt)  { return widget(); }
+//widget printer_widget (command cmd, url ps_pdf_file)  { return widget(); }
+//widget texmacs_widget (int mask, command quit)  { return widget(); }
+widget ink_widget (command cb)  { return widget(); }
+
+widget
+tree_view_widget (command cmd, tree data, tree data_roles) {
+  // FIXME: not implemented
+  return widget();
+}
+widget refreshable_widget (object promise, string kind) {
+  // FIXME: not implemented
+  return widget();
+}
+
+
+//// Widgets which are not strictly required by TeXmacs have void implementations
+
+//widget empty_widget () { NOT_IMPLEMENTED; return widget(); }
+//widget extend (widget w, array<widget> a) { (void) a; return w; }
+//widget wait_widget (SI width, SI height, string message) {
+//  (void) width; (void) height; (void) message; return widget();
+//}
