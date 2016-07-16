@@ -1161,6 +1161,45 @@ ns_ui_element_rep::as_menuitem () {
     {
       mi = [[[TMMenuItem alloc] init] autorelease];
       [mi setEnabled: NO];
+      {
+        typedef quintuple<tree, bool, bool, SI, SI> T;
+        T x = open_box<T> (load);
+        tree col = x.x1;
+        bool hx = x.x2; bool vx = x.x3;
+        SI w = x.x4; SI h = x.x5;
+        if (col != "") {
+          // rendering
+          NSSize s = NSMakeSize(w,h);
+          NSImage *img = [[[NSImage alloc] initWithSize: s] autorelease];
+          [img lockFocus];
+          {
+            basic_renderer ren = the_ns_renderer();
+            ren -> begin([NSGraphicsContext currentContext]);
+            rectangle r = rectangle (0, 0, s.width, s.height);
+            ren->set_origin (0,0);
+            ren->encode (r->x1, r->y1);
+            ren->encode (r->x2, r->y2);
+            ren->set_clipping (r->x1, r->y2, r->x2, r->y1);
+        
+            if (is_atomic (col)) {
+              color c = named_color (col->label);
+              ren->set_background (c);
+              ren->set_pencil (c);
+              ren->fill (r->x1, r->y2, r->x2, r->y1);
+            } else {
+              ren->set_shrinking_factor (std_shrinkf);
+              brush old_b = ren->get_background ();
+              ren->set_background (col);
+              ren->clear_pattern (5*r->x1, 5*r->y2, 5*r->x2, 5*r->y1);
+              ren->set_background (old_b);
+              ren->set_shrinking_factor (1);
+            }
+            ren->end();
+            [img unlockFocus];
+            [mi setImage: img];
+          }
+        }
+      }
     }
       break;
       
@@ -1287,6 +1326,7 @@ ns_ui_element_rep::as_menuitem () {
       [mi setRepresentedObject: img];
     }
       break;
+      
       
     default:
       debug_aqua << "failed ns_ui_element_rep::as_menuitem, using an empty object.\n";
@@ -1538,14 +1578,16 @@ widget refreshable_widget (object promise, string kind) {
 
 widget glue_widget (bool hx, bool vx, SI w, SI h) {
   ns_widget wid = ns_ui_element_rep::create (ns_ui_element_rep::glue_widget,
-                                             hx, vx, w/PIXEL, h/PIXEL);
+                                             tree(""), hx, vx, w/PIXEL, h/PIXEL);
   return abstract (wid);
 }
 
 widget glue_widget (tree col, bool hx, bool vx, SI w, SI h) {
+  ns_widget wid = ns_ui_element_rep::create (ns_ui_element_rep::glue_widget,
+                                             col, hx, vx, w/PIXEL, h/PIXEL);
 //  return tm_new<ns_glue_widget_rep> (col, hx, vx, w, h);
-  debug_aqua << "glue_widget\n";
-  return widget();
+ // debug_aqua << "glue_widget\n";
+  return abstract (wid);
 }
 
 #if 0

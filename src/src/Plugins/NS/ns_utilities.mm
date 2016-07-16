@@ -15,25 +15,25 @@
 #include "analyze.hpp"
 #include "colors.hpp" 
 
-NSRect to_nsrect(coord4 p)
+NSRect to_nsrect (coord4 p)
 {
 	float c = 1.0/PIXEL;
 	return NSMakeRect(p.x1*c, -p.x4*c, (p.x3-p.x1)*c, (p.x4-p.x2)*c);
 }
 
-NSPoint to_nspoint(coord2 p)
+NSPoint to_nspoint (coord2 p)
 {
 	float c = 1.0/PIXEL;
 	return NSMakePoint(p.x1*c,-p.x2*c);
 }
 
-NSSize to_nssize(coord2 p)
+NSSize to_nssize (coord2 p)
 {
 	float c = 1.0/PIXEL;
 	return NSMakeSize(p.x1*c,p.x2*c);
 }
 
-coord4 from_nsrect(NSRect rect)
+coord4 from_nsrect (NSRect rect)
 {
 	SI c1, c2, c3, c4;
 	
