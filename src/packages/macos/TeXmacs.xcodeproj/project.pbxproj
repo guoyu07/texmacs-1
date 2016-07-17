@@ -1034,6 +1034,7 @@
 		9C3F672B1D37D4D100742895 /* TMView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F67141D37D4D100742895 /* TMView.mm */; };
 		9C3F672D1D37D51700742895 /* TeXmacsNS.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 9C3F672C1D37D51700742895 /* TeXmacsNS.xcconfig */; };
 		9C4324951D3A2B75003511A2 /* ns_ui_element.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C4324911D398D29003511A2 /* ns_ui_element.mm */; };
+		9C43249A1D3B8949003511A2 /* ns_picture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C4324981D3B885E003511A2 /* ns_picture.mm */; };
 		9C4A740C1D22BEE900572468 /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C4A740A1D22BEE900572468 /* player.cpp */; };
 		9C4A740D1D22BEF500572468 /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C4A740A1D22BEE900572468 /* player.cpp */; };
 		9C4A740E1D22BEF600572468 /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C4A740A1D22BEE900572468 /* player.cpp */; };
@@ -2759,6 +2760,8 @@
 		9C3F672C1D37D51700742895 /* TeXmacsNS.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = TeXmacsNS.xcconfig; sourceTree = "<group>"; };
 		9C4324911D398D29003511A2 /* ns_ui_element.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ns_ui_element.mm; sourceTree = "<group>"; };
 		9C4324931D398D3C003511A2 /* ns_ui_element.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ns_ui_element.h; sourceTree = "<group>"; };
+		9C4324971D3B885E003511A2 /* ns_picture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ns_picture.h; sourceTree = "<group>"; };
+		9C4324981D3B885E003511A2 /* ns_picture.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ns_picture.mm; sourceTree = "<group>"; };
 		9C4A740A1D22BEE900572468 /* player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = player.cpp; sourceTree = "<group>"; };
 		9C4A740B1D22BEE900572468 /* player.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = player.hpp; sourceTree = "<group>"; };
 		9C4A740F1D22C37400572468 /* glyph_effects.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = glyph_effects.cpp; sourceTree = "<group>"; };
@@ -4778,6 +4781,8 @@
 		9C3F66DE1D37D4D100742895 /* NS */ = {
 			isa = PBXGroup;
 			children = (
+				9C4324971D3B885E003511A2 /* ns_picture.h */,
+				9C4324981D3B885E003511A2 /* ns_picture.mm */,
 				9C3F66DF1D37D4D100742895 /* AutoLayout */,
 				9C3F66FB1D37D4D100742895 /* InfoPlist.strings */,
 				9C3F66FD1D37D4D100742895 /* MainMenu.nib */,
@@ -5954,6 +5959,7 @@
 				9C3F66001D37D4B400742895 /* file.cpp in Sources */,
 				9C3F66011D37D4B400742895 /* image_files.cpp in Sources */,
 				9C3F66021D37D4B400742895 /* web_files.cpp in Sources */,
+				9C43249A1D3B8949003511A2 /* ns_picture.mm in Sources */,
 				9C3F66031D37D4B400742895 /* cpp_language.cpp in Sources */,
 				9C3F66041D37D4B400742895 /* dictionary.cpp in Sources */,
 				9C3F66051D37D4B400742895 /* colors.cpp in Sources */,

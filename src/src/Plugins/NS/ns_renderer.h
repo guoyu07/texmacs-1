@@ -12,6 +12,7 @@
 #ifndef NS_RENDERER_H
 #define NS_RENDERER_H
 
+#include "mac_cocoa.h"
 #include "basic_renderer.hpp"
 
 class ns_renderer_rep:  public basic_renderer_rep {
@@ -36,6 +37,8 @@ public:
   void  fill_arc (SI x1, SI y1, SI x2, SI y2, int alpha, int delta);
   void  polygon (array<SI> x, array<SI> y, bool convex=true);
   void draw_triangle (SI x1, SI y1, SI x2, SI y2, SI x3, SI y3);
+
+  virtual void draw_picture  (picture  pic, SI x, SI y, int alpha= 255);
 
   void  image (url u, SI w, SI h, SI x, SI y, int alpha);
 

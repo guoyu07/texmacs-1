@@ -501,35 +501,3 @@ delete_renderer (renderer ren) {
   tm_delete (ren);
 }
 
-#ifndef QTTEXMACS
-#ifndef X11TEXMACS
-
-picture
-native_picture (int w, int h, int ox, int oy) {
-  (void) w; (void) h; (void) ox; (void) oy;
-  FAILED ("not yet implemented");
-  return picture ();
-}
-
-renderer
-picture_renderer (picture p, double zoomf) {
-  (void) p; (void) zoomf;
-  FAILED ("not yet implemented");
-  return NULL;
-}
-
-picture
-load_picture (url u, int w, int h) {
-  (void) u; (void) w; (void) h;
-  FAILED ("not yet implemented");
-  return picture ();
-}
-
-picture
-as_native_picture (picture pict) {
-  FAILED ("not yet implemented");
-  return pict;
-}
-
-#endif
-#endif
