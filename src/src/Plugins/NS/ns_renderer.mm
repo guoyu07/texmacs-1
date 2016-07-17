@@ -71,7 +71,7 @@ CONCRETE_NULL_CODE(cg_image);
 // bitmaps of all characters
 static hashmap<basic_character,cg_image> character_image;
 // image cache
-static hashmap<string,ns_image> images; 
+//static hashmap<string,ns_image> images;
 
 /******************************************************************************
  * ns_renderer
@@ -298,6 +298,7 @@ ns_renderer_rep::draw_triangle (SI x1, SI y1, SI x2, SI y2, SI x3, SI y3) {
  * Image rendering
  ******************************************************************************/
 
+#if 0 // old code
 void
 ns_renderer_rep::image (url u, SI w, SI h, SI x, SI y, int alpha) {
   // Given an image of original size (W, H),
@@ -349,7 +350,62 @@ ns_renderer_rep::draw_clipped (NSImage *im, int w, int h, SI x, SI y) {
   y--; // top-left origin to bottom-left origin conversion
   ensure_context ();
   [im drawAtPoint:NSMakePoint(x,y) fromRect:NSMakeRect(0,0,w,h) operation:NSCompositeSourceAtop fraction:1.0];
-}  
+}
+
+void ns_renderer_rep::draw (int c, font_glyphs fng, SI x, SI y) {
+  // get the pixmap
+  ensure_context ();
+  basic_character xc (c, fng, std_shrinkf, 0, 0);
+  cg_image mi = character_image [xc];
+  if (is_nil(mi)) {
+    // debug_events << "CACHING:" << c << "\n" ;
+    SI xo, yo;
+    glyph pre_gl= fng->get (c); if (is_nil (pre_gl)) return;
+    glyph gl= shrink (pre_gl, std_shrinkf, std_shrinkf, xo, yo);
+    int i, j, w= gl->width, h= gl->height;
+    NSImage *im = [[NSImage alloc] initWithSize:NSMakeSize(w,h)];
+    int nr_cols= std_shrinkf*std_shrinkf;
+    if (nr_cols >= 64) nr_cols= 64;
+    
+    [im lockFocus];
+    for (j=0; j<h; j++)
+      for (i=0; i<w; i++) {
+        int col = gl->get_x (i, j);
+        [[NSColor colorWithDeviceRed:0.0 green:0.0 blue:0.0 alpha: ((255*col)/(nr_cols+1))/255.0] set];
+        [NSBezierPath fillRect:NSMakeRect(i,j,1,1)];
+      }
+    [im unlockFocus];
+    
+    ns_image mi2(im, xo, yo, w, h );
+    mi = mi2;
+    [im release]; // ns_image retains im
+    character_image (xc)= mi;
+    // FIXME: we must release the image at some point (this should be ok now, see ns_image)
+  }
+  
+  // draw the character
+  {
+    CGContextRef cgc = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
+    (void) w; (void) h;
+    int x1= x- mi->xo*std_shrinkf;
+    int y1=  y+ mi->yo*std_shrinkf;
+    decode (x1, y1);
+    y1--; // top-left origin to bottom-left origin conversion
+    CGRect r = CGRectMake(x1,y1,mi->w,mi->h);
+    CGContextSetShouldAntialias (cgc, true);
+    CGContextSaveGState (cgc);
+    //  ns_set_color (context, pen->get_color ());
+    CGContextClipToMask (cgc, r, (CGImage*)(mi->img));
+    CGContextFillRect (cgc, r);
+    CGContextRestoreGState (cgc);
+  }
+  
+  
+  // draw the character
+  //  draw_clipped (mi->img, mi->w, mi->h,
+  //               x- mi->xo*std_shrinkf, y+ mi->yo*std_shrinkf);
+}
+#endif
 
 static CGContextRef 
 MyCreateBitmapContext (int pixelsWide, int pixelsHigh) {
@@ -427,67 +483,14 @@ ns_renderer_rep::draw (int c, font_glyphs fng, SI x, SI y) {
 		CGContextRestoreGState (cgc);
 	}  
 }
-#if 0
-void ns_renderer_rep::draw (int c, font_glyphs fng, SI x, SI y) {
-  // get the pixmap
-  ensure_context ();
-  basic_character xc (c, fng, std_shrinkf, 0, 0);
-  cg_image mi = character_image [xc];
-  if (is_nil(mi)) {
-    // debug_events << "CACHING:" << c << "\n" ;
-    SI xo, yo;
-    glyph pre_gl= fng->get (c); if (is_nil (pre_gl)) return;
-    glyph gl= shrink (pre_gl, std_shrinkf, std_shrinkf, xo, yo);
-    int i, j, w= gl->width, h= gl->height;
-    NSImage *im = [[NSImage alloc] initWithSize:NSMakeSize(w,h)];
-    int nr_cols= std_shrinkf*std_shrinkf;
-    if (nr_cols >= 64) nr_cols= 64;
 
-    [im lockFocus];
-    for (j=0; j<h; j++)
-      for (i=0; i<w; i++) {
-        int col = gl->get_x (i, j);
-        [[NSColor colorWithDeviceRed:0.0 green:0.0 blue:0.0 alpha: ((255*col)/(nr_cols+1))/255.0] set]; 
-        [NSBezierPath fillRect:NSMakeRect(i,j,1,1)];
-      }
-    [im unlockFocus];
-    
-    ns_image mi2(im, xo, yo, w, h );
-	mi = mi2;
-    [im release]; // ns_image retains im
-    character_image (xc)= mi;
-    // FIXME: we must release the image at some point (this should be ok now, see ns_image)
-  }
-  
-  // draw the character
-  {
-    CGContextRef cgc = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
-    (void) w; (void) h;
-    int x1= x- mi->xo*std_shrinkf;
-    int y1=  y+ mi->yo*std_shrinkf;
-    decode (x1, y1);
-    y1--; // top-left origin to bottom-left origin conversion
-    CGRect r = CGRectMake(x1,y1,mi->w,mi->h);
-    CGContextSetShouldAntialias (cgc, true);
-    CGContextSaveGState (cgc);
-    //  ns_set_color (context, pen->get_color ());
-    CGContextClipToMask (cgc, r, (CGImage*)(mi->img)); 
-    CGContextFillRect (cgc, r);
-    CGContextRestoreGState (cgc);
-  }  
-
-  
-  // draw the character
-//  draw_clipped (mi->img, mi->w, mi->h,
- //               x- mi->xo*std_shrinkf, y+ mi->yo*std_shrinkf);
-}
-#endif
 
 /******************************************************************************
 * Setting up and displaying xpm pixmaps
 ******************************************************************************/
 
-NSImage* xpm_init(url file_name)
+#if 0
+NSImage* xpm_init (url file_name)
 {
   tree t= xpm_load (file_name);
   
@@ -559,24 +562,25 @@ NSImage* xpm_init(url file_name)
 }
 
 NSImage *
-ns_renderer_rep::xpm_image(url file_name)
+xpm_image (url file_name)
 {
-  ensure_context ();
+  //ensure_context ();
   NSImage *image = nil;
   ns_image mi = images [as_string(file_name)];
   if (is_nil(mi)) {
-    image = xpm_init(file_name);
+    image = xpm_init (file_name);
     int w, h;
     NSSize imgSize = [image size];
     w = imgSize.width; h = imgSize.height;
     ns_image mi2(image,0,0,w,h);
     mi = mi2;
-    images(as_string(file_name)) = mi2;
+    images (as_string (file_name)) = mi2;
     [image release];
   }
   else image = mi->img;
   return image;
 }
+#endif
 
 /******************************************************************************
  * main NS renderer

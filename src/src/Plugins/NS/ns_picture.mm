@@ -14,8 +14,8 @@
 #include "file.hpp"
 #include "image_files.hpp"
 #include "scheme.hpp"
-#include "frame.hpp"
-
+//#include "frame.hpp"
+#include "colors.hpp"
 
 #include "ns_picture.h"
 #include "ns_utilities.h"
@@ -92,7 +92,9 @@ ns_picture_rep::internal_get_pixel (int x, int y) {
   struct Pixel { uint8_t r, g, b, a; };
   struct Pixel *pixels = (struct Pixel *)[rep bitmapData];
   int index = x + (h - 1 - y) * w;
-  return * (color*) (pixels + index); // pict.pixel (x, h - 1 - y);
+
+  Pixel& pixel = pixels[index];
+  return rgb_color (pixel.r, pixel.g, pixel.b, pixel.a);
 }
 
 void
@@ -100,7 +102,11 @@ ns_picture_rep::internal_set_pixel (int x, int y, color c) {
   struct Pixel { uint8_t r, g, b, a; };
   struct Pixel *pixels = (struct Pixel *)[rep bitmapData];
   int index = x + (h - 1 - y) * w;
-  * (color*) (pixels + index) = c;
+
+  int r,g,b,a;
+  get_rgb_color (c, r, g, b, a);
+  Pixel pixel = { r, g, b, a};
+  *(pixels + index) = pixel;
 }
 
 picture
@@ -125,10 +131,12 @@ as_native_picture (picture pict) {
   return as_ns_picture (pict);
 }
 
-NSBitmapImageRep*
+NSImage*
 xpm_image (url file_name) {
-  picture p= load_xpm (file_name);
-  return ((ns_picture_rep*) p->get_handle ())->rep;
+  picture p = load_xpm (file_name);
+  NSImage* img = [[[NSImage alloc] init] autorelease];
+  [img addRepresentation: ((ns_picture_rep*) p->get_handle ())->rep];
+  return img;
 }
 
 picture

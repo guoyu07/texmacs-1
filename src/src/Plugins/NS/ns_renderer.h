@@ -40,7 +40,7 @@ public:
 
   virtual void draw_picture  (picture  pic, SI x, SI y, int alpha= 255);
 
-  void  image (url u, SI w, SI h, SI x, SI y, int alpha);
+ // void  image (url u, SI w, SI h, SI x, SI y, int alpha);
 
   void new_shadow (renderer& ren);
   void delete_shadow (renderer& ren);
@@ -51,12 +51,10 @@ public:
 
   /***** private section *****************************************************/
   
-  void draw_clipped (NSImage *im, int w, int h, SI x, SI y);
+ // void draw_clipped (NSImage *im, int w, int h, SI x, SI y);
     
   void begin (void* c); // c must be a CGContextRef
   void end ();
-	
-  NSImage *xpm_image(url file_name);
 };
 
 ns_renderer_rep *the_ns_renderer();

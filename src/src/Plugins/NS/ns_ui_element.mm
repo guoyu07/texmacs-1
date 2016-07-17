@@ -14,6 +14,7 @@
 #include "ns_ui_element.h"
 #include "ns_utilities.h"
 #include "ns_renderer.h"
+#include "ns_picture.h"
 
 #include "ns_simple_widget.h"
 #include "ns_basic_widgets.h"
@@ -191,7 +192,8 @@ public:
     NSSize s = NSMakeSize (width/PIXEL,height/PIXEL);
     
     img = [[[NSImage alloc] initWithSize: s] autorelease];
-    [img lockFocus];
+    [img lockFocusFlipped:YES];
+    
     basic_renderer r = the_ns_renderer();
     int x1 = 0;
     int y1 = s.height;
@@ -335,11 +337,11 @@ TMMenuItem * ns_text_widget_rep::as_menuitem()
 TMMenuItem * ns_image_widget_rep::as_menuitem()
 {
 #if 0
-  CGImageRef cgi = the_ns_renderer()->xpm_image(image);
+  CGImageRef cgi = xpm_image (image);
   NSImage *img = [[[NSImage alloc] init] autorelease];
   [img addRepresentation:[[NSBitmapImageRep alloc ] initWithCGImage: cgi]];
 #else
-  NSImage *img = the_ns_renderer()->xpm_image(image);
+  NSImage *img = xpm_image (image);
 #endif
   //	TMMenuItem *mi = [[[TMMenuItem alloc] initWithTitle:to_nsstring(as_string(file_name)) action:NULL keyEquivalent:@""] autorelease];
   TMMenuItem *mi = [[[TMMenuItem alloc] initWithTitle:@"" action:NULL keyEquivalent:@""] autorelease];
@@ -533,7 +535,7 @@ widget xpm_widget (url file_name)// { return widget(); }
 {
   return tm_new <ns_image_widget_rep> (file_name);
 #if 0
-  NSImage *image = the_ns_renderer()->xpm_image(file_name);
+  NSImage *image = xpm_image (file_name);
   //	TMMenuItem *mi = [[[TMMenuItem alloc] initWithTitle:to_nsstring(as_string(file_name)) action:NULL keyEquivalent:@""] autorelease];
   TMMenuItem *mi = [[[TMMenuItem alloc] initWithTitle:@"" action:NULL keyEquivalent:@""] autorelease];
   [mi setRepresentedObject:image];
@@ -807,7 +809,7 @@ ns_ui_element_rep::as_view () {
         TMLazyMenu* menu = [[[TMLazyMenu alloc] init] autorelease];
         [menu setPromise: pw.rep];
         [b setMenu: menu];
-        [b setImage: the_ns_renderer()->xpm_image(image)];
+        [b setImage: xpm_image (image)];
         [b setButtonType: NSMomentaryPushInButton];
         v = b;
       } else if (w->type == text_widget) {
@@ -918,7 +920,7 @@ ns_ui_element_rep::as_view () {
     {
       url image = open_box<url>(load);
       NSButton* b = [[[NSButton alloc] init] autorelease];
-      NSImage* img = the_ns_renderer ()->xpm_image (image);
+      NSImage* img = xpm_image (image);
       [b setImagePosition: NSImageOnly];
       [b setImage: img];
       [b setEnabled: NO];
@@ -1365,7 +1367,7 @@ ns_ui_element_rep::as_menuitem () {
     {
       url    image = open_box<url>(load);
       mi = [[[TMMenuItem alloc] init] autorelease];
-      NSImage* img = the_ns_renderer()->xpm_image (image);
+      NSImage* img = xpm_image (image);
       [mi setImage: img];
       [mi setRepresentedObject: img];
     }

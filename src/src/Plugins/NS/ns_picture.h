@@ -39,7 +39,7 @@ public:
 };
 
 picture ns_picture (NSImage* im, int ox, int oy);
-NSBitmapImageRep* xpm_image (url file_name);
+NSImage* xpm_image (url file_name);
 
 class ns_image_renderer_rep: public ns_renderer_rep {
 public:
