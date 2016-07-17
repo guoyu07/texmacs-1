@@ -145,7 +145,8 @@ ns_renderer_rep::draw_picture (picture p, SI x, SI y, int alpha) {
   decode (x, y);
   ensure_context ();
   NSRect r = NSMakeRect(x - x0, y - y0, pict->get_width(), pict->get_height());
-  [pict->rep drawInRect: r fromRect: r operation: NSCompositeSourceOver fraction: alpha/255.0 respectFlipped:YES hints:nil];
+  NSRect r0 = NSMakeRect(0, 0, pict->get_width(), pict->get_height());
+  [pict->rep drawInRect: r fromRect: r0 operation: NSCompositeSourceOver fraction: alpha/255.0 respectFlipped:YES hints:nil];
 }
 
 /******************************************************************************
@@ -214,7 +215,7 @@ utf8_to_nsstring (const string& s) {
 bool
 ns_supports (url u) {
   static NSArray<NSString *>* formats = nil;
-  if (!formats) formats = [NSImage imageTypes];
+  if (!formats) formats = [NSImage imageFileTypes];
   string suf=suffix (u);
   bool ans = [formats containsObject: to_nsstring(suf)];
   //if (DEBUG_CONVERT) {debug_convert <<"QT valid format:"<<((ans)?"yes":"no")<<LF;}
