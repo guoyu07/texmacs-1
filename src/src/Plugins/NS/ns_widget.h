@@ -135,5 +135,7 @@ public:
 
 extern widget the_keyboard_focus;
 
+NSMenu* to_nsmenu (widget w);
+
 
 #endif // defined NS_WIDGET_H

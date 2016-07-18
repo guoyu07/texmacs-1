@@ -2743,8 +2743,6 @@
 		9C3F67041D37D4D100742895 /* ns_dialogues.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ns_dialogues.mm; sourceTree = "<group>"; };
 		9C3F67051D37D4D100742895 /* ns_gui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ns_gui.h; sourceTree = "<group>"; };
 		9C3F67061D37D4D100742895 /* ns_gui.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ns_gui.mm; sourceTree = "<group>"; };
-		9C3F67071D37D4D100742895 /* ns_menu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ns_menu.h; sourceTree = "<group>"; };
-		9C3F67081D37D4D100742895 /* ns_menu.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ns_menu.mm; sourceTree = "<group>"; };
 		9C3F67091D37D4D100742895 /* ns_other_widgets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ns_other_widgets.h; sourceTree = "<group>"; };
 		9C3F670A1D37D4D100742895 /* ns_renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ns_renderer.h; sourceTree = "<group>"; };
 		9C3F670B1D37D4D100742895 /* ns_renderer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ns_renderer.mm; sourceTree = "<group>"; };
@@ -4793,8 +4791,6 @@
 				9C3F67041D37D4D100742895 /* ns_dialogues.mm */,
 				9C3F67051D37D4D100742895 /* ns_gui.h */,
 				9C3F67061D37D4D100742895 /* ns_gui.mm */,
-				9C3F67071D37D4D100742895 /* ns_menu.h */,
-				9C3F67081D37D4D100742895 /* ns_menu.mm */,
 				9C3F67091D37D4D100742895 /* ns_other_widgets.h */,
 				9C3F670A1D37D4D100742895 /* ns_renderer.h */,
 				9C3F670B1D37D4D100742895 /* ns_renderer.mm */,

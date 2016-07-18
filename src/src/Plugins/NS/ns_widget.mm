@@ -17,8 +17,6 @@
 #include "ns_other_widgets.h"
 #include "ns_renderer.h"
 #include "ns_utilities.h"
-#include "ns_menu.h"
-
 
 #include "gui.hpp"
 #include "widget.hpp" 

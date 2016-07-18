@@ -432,7 +432,7 @@ qt_apply_tm_style (QWidget* qwid, int style, color c) {
 NSAttributedString*
 add_style (NSString *str, int style) {
   
-  NSDictionary* dict = [[[NSDictionary alloc] init] autorelease];
+  NSMutableDictionary* dict = [[[NSMutableDictionary alloc] init] autorelease];
    //	NSAttributedString *str = [mi attributedTitle];
   NSMutableParagraphStyle *pstyle = nil;
   //	NSMutableParagraphStyle *style = [(NSParagraphStyle*)[str attribute:NSParagraphStyleAttributeName atIndex:0 effectiveRange:NULL] mutableCopy];
@@ -471,9 +471,9 @@ add_style (NSString *str, int style) {
     font = f;
   }
   
-  if (pstyle) [dict insertValue: pstyle inPropertyWithKey: NSParagraphStyleAttributeName];
-  if (font) [dict insertValue: font inPropertyWithKey: NSFontAttributeName];
-  if (color) [dict insertValue: color inPropertyWithKey: NSForegroundColorAttributeName];
+  if (pstyle) [dict setObject: pstyle forKey: NSParagraphStyleAttributeName ];
+  if (font) [dict setObject: font forKey: NSFontAttributeName ];
+  if (color) [dict setObject: color forKey: NSForegroundColorAttributeName ];
   
   return [[[NSAttributedString alloc] initWithString: str attributes: dict] autorelease];
 }
@@ -633,11 +633,29 @@ ns_ui_element_rep::as_view () {
       break;
       
     case menu_separator:
-    case menu_group:
     case glue_widget:
     {
+      // when this is called during the creation of a menu, returning a simple view has
+      // the effect of triggering the call to as_menuitem
+      // (this is a bit weird, maybe reorganise at some point)
+      v = [[[NSView alloc] init] autorelease];
+    }
+      break;
+
+      
+    case menu_group:
+    {
+      typedef pair<string, int> T;
+      T         x = open_box<T> (load);
+      string name = x.x1;
+      int   style = x.x2;  //FIXME: ignored. Use a QWidgeAction to use it?
+
       //debug_aqua << "(ns_ui_element_rep::as_view) I'm not sure we are doing the right thing here \n";
       v = [[[NSView alloc] init] autorelease];
+      NSButton* b = [[[NSButton alloc] init] autorelease];
+      [b setEnabled: NO];
+      [b setAttributedStringValue: add_style (to_nsstring_utf8 (name), style)];
+      v = b;
     }
       break;
       
@@ -1116,9 +1134,9 @@ ns_ui_element_rep::as_menuitem () {
       //act->setFont (to_qfont (style, act->font()));
 
       //	NSAttributedString *str = [mi attributedTitle];
-      NSMutableParagraphStyle *pstyle = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
+     // NSMutableParagraphStyle *pstyle = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
       //	NSMutableParagraphStyle *style = [(NSParagraphStyle*)[str attribute:NSParagraphStyleAttributeName atIndex:0 effectiveRange:NULL] mutableCopy];
-      [pstyle setAlignment: NSCenterTextAlignment];
+     // [pstyle setAlignment: NSCenterTextAlignment];
       [mi setAttributedTitle: add_style ([mi title], style)];
     }
       break;
