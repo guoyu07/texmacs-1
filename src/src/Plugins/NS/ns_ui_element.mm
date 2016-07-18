@@ -51,9 +51,7 @@ NSMenuItem* to_nsmenuitem(widget w);
 - (void) setCommand:(command_rep *)_c
 {
   if (cmd) { DEC_COUNT_NULL(cmd); } cmd = _c;
-  if (cmd) {
-    INC_COUNT_NULL(cmd);
-  }
+  if (cmd) { INC_COUNT_NULL(cmd); }
 }
 
 - (void) setObject: (NSView*)_v
@@ -67,15 +65,16 @@ NSMenuItem* to_nsmenuitem(widget w);
 }
 
 - (void) doit {
+  if (cmd) {
+    cmd->apply();
+    cout << command(cmd) << LF;
+  }
   id m = [object enclosingMenuItem];
   id mm = [m menu];
   [mm cancelTracking];
-  if (cmd) cmd->apply();
 }
 
 @end // TMCommand
-
-
 
 @interface TMMenuItem : NSMenuItem
 {
@@ -402,6 +401,84 @@ TMMenuItem * ns_balloon_widget_rep::as_menuitem()
 }
 @end
 
+
+/******************************************************************************
+ * utilities
+ ******************************************************************************/
+#if 0
+void
+qt_apply_tm_style (QWidget* qwid, int style, color c) {
+  int r,g,b,a;
+  get_rgb_color (c, r, g, b, a);
+  a = a*100/255;
+  QString sheet = "* {" + parse_tm_style (style)
+  + QString("color: rgba(%1, %2, %3, %4%);").arg(r).arg(g).arg(b).arg(a)
+  + "} ";
+  
+#ifdef Q_WS_MAC
+  /* Disabled QLabels are not greyed out (at least in MacOS, since Qt 4.7.2),
+   see: https://bugreports.qt-project.org/browse/QTBUG-19008
+   For consistency we set the disabled color for all widgets.
+   */
+  sheet += " :disabled { color: #7F7F7F; }";
+#endif
+  qwid->setEnabled (! (style & WIDGET_STYLE_INERT));
+  qwid->setStyleSheet (sheet);
+}
+
+#endif
+
+
+NSAttributedString*
+add_style (NSString *str, int style) {
+  
+  NSDictionary* dict = [[[NSDictionary alloc] init] autorelease];
+   //	NSAttributedString *str = [mi attributedTitle];
+  NSMutableParagraphStyle *pstyle = nil;
+  //	NSMutableParagraphStyle *style = [(NSParagraphStyle*)[str attribute:NSParagraphStyleAttributeName atIndex:0 effectiveRange:NULL] mutableCopy];
+  NSFont* font = nil;
+  NSColor* color = nil;
+//  int fs = [NSFont systemFontSize];
+  if (style & WIDGET_STYLE_MINI) {  // Use smaller text font
+    //FIXME: remove hard coded size
+    int fs = as_int (get_preference ("gui:mini-fontsize", "8"));
+    if (fs <= 0) fs = 8;
+    font = [NSFont systemFontOfSize: fs];
+//    [dict insertValue: font inPropertyWithKey: NSFontAttributeName];
+//    sheet += QString("font-size: %1pt;").arg (fs > 0 ? fs : QTM_MINI_FONTSIZE);
+ //   sheet += QString("padding: 1px;");
+  }
+  if (style & WIDGET_STYLE_MONOSPACED) {  // Use monospaced font
+    NSFont* f = [[NSFontManager sharedFontManager] convertFont: font toHaveTrait: NSFixedPitchFontMask];
+    font = f;
+  }
+  if (style & WIDGET_STYLE_GREY)  {    // Use grey text font
+    color = [NSColor grayColor];
+    //    sheet += "color: #414141;";
+  }
+  if (style & WIDGET_STYLE_PRESSED)  { // Button is currently pressed
+  }
+  if (style & WIDGET_STYLE_INERT)  {   // Only render, don't associate any action
+  }
+  if (style & WIDGET_STYLE_BUTTON)  {  // Render button as standard button
+  }
+  if (style & WIDGET_STYLE_CENTERED) { // Use centered text
+    pstyle = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
+    [pstyle setAlignment: NSCenterTextAlignment];
+  }
+  if (style & WIDGET_STYLE_BOLD) {
+    NSFont* f = [[NSFontManager sharedFontManager] convertFont: font toHaveTrait: NSBoldFontMask];
+    font = f;
+  }
+  
+  if (pstyle) [dict insertValue: pstyle inPropertyWithKey: NSParagraphStyleAttributeName];
+  if (font) [dict insertValue: font inPropertyWithKey: NSFontAttributeName];
+  if (color) [dict insertValue: color inPropertyWithKey: NSForegroundColorAttributeName];
+  
+  return [[[NSAttributedString alloc] initWithString: str attributes: dict] autorelease];
+}
+
+
 /******************************************************************************
  * ns_ui_element_rep
  ******************************************************************************/
@@ -559,7 +636,7 @@ ns_ui_element_rep::as_view () {
     case menu_group:
     case glue_widget:
     {
-      debug_aqua << "(ns_ui_element_rep::as_view) I'm not sure we are doing the right thing here \n";
+      //debug_aqua << "(ns_ui_element_rep::as_view) I'm not sure we are doing the right thing here \n";
       v = [[[NSView alloc] init] autorelease];
     }
       break;
@@ -1042,12 +1119,7 @@ ns_ui_element_rep::as_menuitem () {
       NSMutableParagraphStyle *pstyle = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
       //	NSMutableParagraphStyle *style = [(NSParagraphStyle*)[str attribute:NSParagraphStyleAttributeName atIndex:0 effectiveRange:NULL] mutableCopy];
       [pstyle setAlignment: NSCenterTextAlignment];
-      [mi setAttributedTitle:[[[NSAttributedString alloc]
-                               initWithString: [mi title]
-                               attributes: [NSDictionary
-                                            dictionaryWithObjectsAndKeys:pstyle, NSParagraphStyleAttributeName, nil]]
-                              autorelease]];
-
+      [mi setAttributedTitle: add_style ([mi title], style)];
     }
       break;
       
