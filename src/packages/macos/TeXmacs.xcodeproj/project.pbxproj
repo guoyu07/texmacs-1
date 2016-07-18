@@ -2718,7 +2718,6 @@
 		9C4324931D398D3C003511A2 /* ns_ui_element.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ns_ui_element.h; sourceTree = "<group>"; };
 		9C4324971D3B885E003511A2 /* ns_picture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ns_picture.h; sourceTree = "<group>"; };
 		9C4324981D3B885E003511A2 /* ns_picture.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ns_picture.mm; sourceTree = "<group>"; };
-		9C43249B1D3D1C3D003511A2 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
 		9C4324A01D3D23FB003511A2 /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = InfoPlist.strings; sourceTree = "<group>"; };
 		9C4324A21D3D23FB003511A2 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = MainMenu.nib; sourceTree = "<group>"; };
 		9C4324A41D3D23FB003511A2 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Window.nib; sourceTree = "<group>"; };
@@ -4765,7 +4764,6 @@
 				9C3F67121D37D4D100742895 /* TMButtonsController.m */,
 				9C3F67131D37D4D100742895 /* TMView.h */,
 				9C3F67141D37D4D100742895 /* TMView.mm */,
-				9C43249B1D3D1C3D003511A2 /* MainMenu.xib */,
 			);
 			path = NS;
 			sourceTree = "<group>";
