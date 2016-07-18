@@ -667,12 +667,12 @@ ns_tm_widget_rep::read (slot s, blackbox index) {
 - (void)setMenu:(NSMenu *)_mi;
 @end
 
-TMMenuHelper *the_menu_helper = nil;
 
 @implementation TMMenuHelper
 - init { 
-  [super init]; mi = nil; menu = nil; 
-  
+  [super init]; mi = nil; menu = nil;
+  //[NSApp  setMainMenu: [[[NSMenu alloc] init] autorelease]];
+#if 0
   mi = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Menu" action:NULL keyEquivalent:@""];
   NSMenu *sm = [[[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Menu"] autorelease];
   [mi  setSubmenu:sm];
@@ -680,18 +680,34 @@ TMMenuHelper *the_menu_helper = nil;
   
   [[NSApp mainMenu] insertItem: mi atIndex:1];	
   //	[sm setDelegate: self];
-  
-  return self; 
+#endif
+  return self;
 }
-- (void)setMenu:(NSMenu *)_m  
-{ 
-  if (menu) [menu release];  menu = _m; [menu retain];
-  [mi  setSubmenu:menu];
-  [menu setTitle:@"Menu"];	
+
+- (void) setMenu: (NSMenu *)_m
+{
+  [menu release];  menu = _m; [menu retain];
+  [menu setTitle:@"Main TeXmacs menu"];
+  NSMenu* menubar = [NSApp mainMenu];
+  for (int i = [menubar numberOfItems]-1; i > 0 ; i--)
+    [menubar removeItemAtIndex: i];
+  for (NSMenuItem* eachItem in [menu itemArray]) {
+    NSMenu* submenu = [eachItem submenu];
+    [submenu setTitle: [eachItem title]];
+    [menu removeItem: eachItem];
+    [menubar addItem: eachItem];
+  }
+  [menubar update];
 };
-- (void)dealloc { [mi release]; [menu release]; [super dealloc]; }
-+ (TMMenuHelper *)sharedHelper 
-{ 
+
+- (void) dealloc {
+  [mi release]; [menu release]; [super dealloc];
+}
+
++ (TMMenuHelper *)sharedHelper
+{
+  static TMMenuHelper *the_menu_helper = nil;
+
   if (!the_menu_helper) 
     {
       the_menu_helper = [[TMMenuHelper alloc] init];
@@ -706,9 +722,6 @@ TMMenuHelper *the_menu_helper = nil;
 }
 #endif
 @end
-
-
-
 
 void
 ns_tm_widget_rep::write (slot s, blackbox index, widget w) {

@@ -1020,6 +1020,9 @@
 		9C3F672D1D37D51700742895 /* TeXmacsNS.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 9C3F672C1D37D51700742895 /* TeXmacsNS.xcconfig */; };
 		9C4324951D3A2B75003511A2 /* ns_ui_element.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C4324911D398D29003511A2 /* ns_ui_element.mm */; };
 		9C43249A1D3B8949003511A2 /* ns_picture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C4324981D3B885E003511A2 /* ns_picture.mm */; };
+		9C4324A51D3D23FB003511A2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9C43249F1D3D23FB003511A2 /* InfoPlist.strings */; };
+		9C4324A61D3D23FB003511A2 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9C4324A11D3D23FB003511A2 /* MainMenu.nib */; };
+		9C4324A71D3D23FB003511A2 /* Window.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9C4324A31D3D23FB003511A2 /* Window.nib */; };
 		9C4A740C1D22BEE900572468 /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C4A740A1D22BEE900572468 /* player.cpp */; };
 		9C4A740D1D22BEF500572468 /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C4A740A1D22BEE900572468 /* player.cpp */; };
 		9C4A740E1D22BEF600572468 /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C4A740A1D22BEE900572468 /* player.cpp */; };
@@ -2715,6 +2718,10 @@
 		9C4324931D398D3C003511A2 /* ns_ui_element.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ns_ui_element.h; sourceTree = "<group>"; };
 		9C4324971D3B885E003511A2 /* ns_picture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ns_picture.h; sourceTree = "<group>"; };
 		9C4324981D3B885E003511A2 /* ns_picture.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ns_picture.mm; sourceTree = "<group>"; };
+		9C43249B1D3D1C3D003511A2 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
+		9C4324A01D3D23FB003511A2 /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = InfoPlist.strings; sourceTree = "<group>"; };
+		9C4324A21D3D23FB003511A2 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = MainMenu.nib; sourceTree = "<group>"; };
+		9C4324A41D3D23FB003511A2 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Window.nib; sourceTree = "<group>"; };
 		9C4A740A1D22BEE900572468 /* player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = player.cpp; sourceTree = "<group>"; };
 		9C4A740B1D22BEE900572468 /* player.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = player.hpp; sourceTree = "<group>"; };
 		9C4A740F1D22C37400572468 /* glyph_effects.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = glyph_effects.cpp; sourceTree = "<group>"; };
@@ -4734,6 +4741,7 @@
 		9C3F66DE1D37D4D100742895 /* NS */ = {
 			isa = PBXGroup;
 			children = (
+				9C43249E1D3D23FB003511A2 /* English.lproj */,
 				9C3F67011D37D4D100742895 /* mac_cocoa.h */,
 				9C4324971D3B885E003511A2 /* ns_picture.h */,
 				9C4324981D3B885E003511A2 /* ns_picture.mm */,
@@ -4757,8 +4765,19 @@
 				9C3F67121D37D4D100742895 /* TMButtonsController.m */,
 				9C3F67131D37D4D100742895 /* TMView.h */,
 				9C3F67141D37D4D100742895 /* TMView.mm */,
+				9C43249B1D3D1C3D003511A2 /* MainMenu.xib */,
 			);
 			path = NS;
+			sourceTree = "<group>";
+		};
+		9C43249E1D3D23FB003511A2 /* English.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				9C43249F1D3D23FB003511A2 /* InfoPlist.strings */,
+				9C4324A11D3D23FB003511A2 /* MainMenu.nib */,
+				9C4324A31D3D23FB003511A2 /* Window.nib */,
+			);
+			path = English.lproj;
 			sourceTree = "<group>";
 		};
 		9C4FCFF4150F73100087378D /* Document */ = {
@@ -5078,6 +5097,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				9C3F672D1D37D51700742895 /* TeXmacsNS.xcconfig in Resources */,
+				9C4324A71D3D23FB003511A2 /* Window.nib in Resources */,
+				9C4324A61D3D23FB003511A2 /* MainMenu.nib in Resources */,
+				9C4324A51D3D23FB003511A2 /* InfoPlist.strings in Resources */,
 				9C3F657A1D37D4B400742895 /* texmacs_updates_dsa_pub.pem in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -6844,6 +6866,33 @@
 			targetProxy = 9CC614B110A99A8A0055F808 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		9C43249F1D3D23FB003511A2 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9C4324A01D3D23FB003511A2 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		9C4324A11D3D23FB003511A2 /* MainMenu.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9C4324A21D3D23FB003511A2 /* English */,
+			);
+			name = MainMenu.nib;
+			sourceTree = "<group>";
+		};
+		9C4324A31D3D23FB003511A2 /* Window.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9C4324A41D3D23FB003511A2 /* English */,
+			);
+			name = Window.nib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		4907D0DA1812E2BC00D893B4 /* Debug */ = {
