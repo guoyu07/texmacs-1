@@ -1032,10 +1032,12 @@ ns_simple_widget_rep::send (slot s, blackbox val) {
 blackbox
 ns_simple_widget_rep::query (slot s, int type_id) {
   switch (s) {
+      
     case SLOT_INVALID:
     {
       return close_box<bool> (view ? [view needsDisplay] : false);
     }
+      
     case SLOT_SIZE:
     {
       typedef pair<SI,SI> coord2;
@@ -1043,6 +1045,7 @@ ns_simple_widget_rep::query (slot s, int type_id) {
       NSRect frame = [view  frame];
       return close_box<coord2> (from_nssize(frame.size));
     }
+      
     case SLOT_SCROLL_POSITION:
     {
       TYPE_CHECK (type_id == type_helper<coord2>::id);
@@ -1078,8 +1081,6 @@ ns_simple_widget_rep::query (slot s, int type_id) {
         << ")" << LF;
       return close_box<coord4> (c);
     }
-      
-      
       
     default:
       return ns_view_widget_rep::query(s, type_id);

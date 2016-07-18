@@ -37,8 +37,10 @@ NSMenuItem* to_nsmenuitem(widget w);
 @interface TMCommand : NSObject
 {
   command_rep *cmd;
+  NSView *object; // not retained
 }
 - (void) setCommand: (command_rep *)_c;
+- (void) setObject: (NSView*)_v;
 - (void) doit;
 @end
 
@@ -54,11 +56,20 @@ NSMenuItem* to_nsmenuitem(widget w);
   }
 }
 
+- (void) setObject: (NSView*)_v
+{
+  object = _v;
+}
+
 - (void) dealloc {
-  [self setCommand:NULL]; [super dealloc];
+  [self setCommand: NULL]; [self setObject: nil];
+  [super dealloc];
 }
 
 - (void) doit {
+  id m = [object enclosingMenuItem];
+  id mm = [m menu];
+  [mm cancelTracking];
   if (cmd) cmd->apply();
 }
 
@@ -109,18 +120,20 @@ widget ns_menu_rep::make_popup_widget ()
 
 widget ns_menu_rep::popup_window_widget (string s)
 {
-  [item setTitle:to_nsstring(s)];
+  [item setTitle: to_nsstring(s)];
   return this;
 }
 
 
 void ns_menu_rep::send (slot s, blackbox val) {
   switch (s) {
+      
     case SLOT_POSITION:
     {
       ASSERT (type_box (val) == type_helper<coord2>::id, "type mismatch");
     }
       break;
+      
     case SLOT_VISIBILITY:
     {
       check_type<bool> (val, s);
@@ -128,12 +141,14 @@ void ns_menu_rep::send (slot s, blackbox val) {
       (void) flag;
     }
       break;
+      
     case SLOT_MOUSE_GRAB:
     {
       check_type<bool> (val, s);
       bool flag = open_box<bool> (val);
       (void) flag;
-      [NSMenu popUpContextMenu:[item submenu] withEvent:[NSApp currentEvent] forView:( (ns_view_widget_rep*)(the_keyboard_focus.rep))->view ];
+      [NSMenu popUpContextMenu: [item submenu] withEvent: [NSApp currentEvent]
+                       forView: ((ns_view_widget_rep*)(the_keyboard_focus.rep))->view ];
     }
       //			send_mouse_grab (THIS, val);
       break;
@@ -156,17 +171,17 @@ public:
 
 @implementation TMMenuItem
 
-- (void) setCommand:(command_rep *)_c
+- (void) setCommand: (command_rep *)_c
 {
   if (cmd) { DEC_COUNT_NULL(cmd); } cmd = _c;
   if (cmd) {
     INC_COUNT_NULL(cmd);
-    [self setAction:@selector(doit)];
-    [self setTarget:self];
+    [self setAction: @selector(doit)];
+    [self setTarget: self];
   }
 }
 
-- (void) setWidget:(ns_simple_widget_rep *)_w
+- (void) setWidget: (ns_simple_widget_rep *)_w
 {
   if (wid) { DEC_COUNT_NULL(wid); } wid = _w;
   if (wid) {
@@ -180,6 +195,7 @@ public:
 
 - (void) doit {
   if (cmd) cmd->apply();
+  [[self menu] cancelTracking];
 }
 
 - (NSImage*) image
@@ -222,9 +238,15 @@ public:
 
 - (void) setPromise:(promise_rep<widget> *)p
 {
-  if (pm) { DEC_COUNT_NULL(pm); }  pm = p;  INC_COUNT_NULL(pm);
-  forced = NO;
-  [self setDelegate:self];
+  if (pm) { DEC_COUNT_NULL(pm); }
+  pm = p;
+  if (pm) {
+    forced = NO;
+    INC_COUNT_NULL(pm);
+    [self setDelegate: self];
+  } else {
+    [self setDelegate: nil];
+  }
 }
 
 - (void) dealloc {
@@ -244,7 +266,7 @@ public:
       [menu2 removeItem:itm];
       [menu insertItem:itm atIndex:j];
     }
-    DEC_COUNT_NULL(pm); pm = NULL;
+    [self setPromise: NULL];
     forced = YES;
   }
 }
@@ -331,20 +353,16 @@ public:
 
 TMMenuItem * ns_text_widget_rep::as_menuitem()
 {
-  return [[[TMMenuItem alloc] initWithTitle:to_nsstring_utf8(str) action:NULL keyEquivalent:@""] autorelease];
+  return [[[TMMenuItem alloc] initWithTitle:to_nsstring_utf8(str)
+                                     action:NULL keyEquivalent:@""] autorelease];
 }
 
 TMMenuItem * ns_image_widget_rep::as_menuitem()
 {
-#if 0
-  CGImageRef cgi = xpm_image (image);
-  NSImage *img = [[[NSImage alloc] init] autorelease];
-  [img addRepresentation:[[NSBitmapImageRep alloc ] initWithCGImage: cgi]];
-#else
   NSImage *img = xpm_image (image);
-#endif
   //	TMMenuItem *mi = [[[TMMenuItem alloc] initWithTitle:to_nsstring(as_string(file_name)) action:NULL keyEquivalent:@""] autorelease];
-  TMMenuItem *mi = [[[TMMenuItem alloc] initWithTitle:@"" action:NULL keyEquivalent:@""] autorelease];
+  TMMenuItem *mi = [[[TMMenuItem alloc] initWithTitle:@"" action:NULL
+                                        keyEquivalent:@""] autorelease];
   [mi setRepresentedObject:img];
   [mi setImage:img];
   
@@ -353,261 +371,15 @@ TMMenuItem * ns_image_widget_rep::as_menuitem()
 
 TMMenuItem * ns_balloon_widget_rep::as_menuitem()
 {
-  TMMenuItem *mi = ((ns_widget_rep*)text.rep)->as_menuitem();
-  [mi setToolTip:to_nsstring(((ns_text_widget_rep*)hint.rep)->str)];
+  TMMenuItem *mi = concrete (text)->as_menuitem ();
+  ns_text_widget_rep* h = dynamic_cast<ns_text_widget_rep*>(hint.rep);
+  if (h)
+    [mi setToolTip: to_nsstring(h->str)];
   return mi;
 }
 
-#ifdef OLD_MENUS
-NSMenu*
-to_nsmenu (widget w)
-{
-  if (typeid(*w.rep) == typeid(ns_menu_rep)) {
-    ns_menu_rep *ww = ((ns_menu_rep*)w.rep);
-    NSMenu *m = [ww->item submenu];
-    if (!m) {
-      debug_aqua << "unexpected nil menu\n";
-      return [[NSMenu alloc] init];
-      //FIXME: something wrong going on here.
-    }
-    return m;
-  }
-  else {
-    debug_aqua << "unexpected type in to_nsmenu!\n";
-    return nil;
-  }
-}
+@implementation NSView (DEBUG_AmbiguityTests)
 
-NSMenuItem* to_nsmenuitem(widget w)
-{
-  return ((ns_menu_rep*)w.rep)->item;
-}
-
-TMMenuItem *ns_simple_widget_rep::as_menuitem ()
-{
-  TMMenuItem *mi = [[[TMMenuItem alloc] init] autorelease];
-  [mi setWidget:this];
-  return mi;
-}
-
-#endif
-
-
-#ifdef OLD_MENUS
-/******************************************************************************
- * Widgets for the construction of menus
- ******************************************************************************/
-
-widget horizontal_menu (array<widget> a)
-// a horizontal menu made up of the widgets in a
-{
-  NSMenuItem* mi = [[alloc_menuitem() initWithTitle:@"Menu" action:NULL keyEquivalent:@""] autorelease];
-  NSMenu *menu = [[alloc_menu() init] autorelease];
-  for(int i = 0; i < N(a); i++) {
-    if (is_nil(a[i]))
-      break;
-    [menu addItem: concrete(a[i])->as_menuitem()];
-  };
-  [mi setSubmenu:menu];
-  return tm_new <ns_menu_rep> (mi);
-}
-
-widget
-horizontal_list (array<widget> a) {
-  return horizontal_menu (a);
-}
-
-widget minibar_menu (array<widget> a) {
-  return horizontal_menu (a);
-}
-
-widget vertical_menu (array<widget> a) { return horizontal_menu(a); }
-// a vertical menu made up of the widgets in a
-
-widget
-vertical_list (array<widget> a) {
-  return vertical_menu (a);
-}
-
-widget tile_menu (array<widget> a, int cols)
-// a menu rendered as a table of cols columns wide & made up of widgets in a
-{
-  //	return horizontal_menu(a);
-  NSMutableArray *tiles = [NSMutableArray arrayWithCapacity:N(a)];
-  for(int i = 0; i < N(a); i++) {
-    if (is_nil(a[i]))  break;
-    //		[tiles addObject:( (ns_menu_rep*)(a[i].rep))->item];
-    [tiles addObject:concrete(a[i])->as_menuitem()];
-  };
-  TMTileView* tv = [[[TMTileView alloc] initWithObjects:tiles cols:cols] autorelease];
-  
-  NSMenuItem* mi = [[[NSMenuItem alloc] initWithTitle:@"Tile" action:NULL keyEquivalent:@""] autorelease];
-  
-  
-  [mi setView:tv];
-  return tm_new <ns_menu_rep> (mi);
-  
-}
-
-
-
-widget menu_separator (bool vertical) { return tm_new <ns_menu_rep> ([NSMenuItem separatorItem]); }
-// a horizontal or vertical menu separator
-widget menu_group (string name, int style)
-// a menu group; the name should be greyed and centered
-{
-  (void) style;
-  NSMenuItem* mi = [[alloc_menuitem() initWithTitle:to_nsstring_utf8(name) action:NULL keyEquivalent:@""] autorelease];
-  
-  //	NSAttributedString *str = [mi attributedTitle];
-  NSMutableParagraphStyle *pstyle = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
-  //	NSMutableParagraphStyle *style = [(NSParagraphStyle*)[str attribute:NSParagraphStyleAttributeName atIndex:0 effectiveRange:NULL] mutableCopy];
-  [pstyle setAlignment: NSCenterTextAlignment];
-  [mi setAttributedTitle:[[[NSAttributedString alloc]
-                           initWithString: [mi title]
-                           attributes: [NSDictionary
-                                        dictionaryWithObjectsAndKeys:pstyle, NSParagraphStyleAttributeName, nil]]
-                          autorelease]];
-  return tm_new <ns_menu_rep> (mi);
-}
-
-widget pulldown_button (widget w, promise<widget> pw)
-// a button w with a lazy pulldown menu pw
-{
-  //	NSString *title = (is_nil(w)? @"":((ns_menu_text_rep*)w.rep)->text);
-  //	NSMenuItem *mi = [[alloc_menuitem() initWithTitle:title action:NULL keyEquivalent:@""] autorelease];
-  //	TMMenuItem* mi =  (TMMenuItem*)((ns_menu_rep*)w.rep) -> item;
-  TMMenuItem* mi = concrete(w) -> as_menuitem();
-  
-  TMLazyMenu *lm = [[[TMLazyMenu alloc] init] autorelease];
-  [lm setPromise:pw.rep];
-  [mi setSubmenu: lm];
-  return tm_new <ns_menu_rep> (mi);
-}
-
-widget pullright_button (widget w, promise<widget> pw)
-// a button w with a lazy pullright menu pw
-{
-  return pulldown_button(w, pw);
-}
-
-
-
-
-widget menu_button (widget w, command cmd, string pre, string ks, int style)
-// a command button with an optional prefix (o, * or v) and
-// keyboard shortcut; if ok does not hold, then the button is greyed
-{
-  bool ok= (style & WIDGET_STYLE_INERT) == 0;
-  TMMenuItem *mi = nil;
-  
-  mi = concrete(w)->as_menuitem ();
-  
-  [mi setCommand: cmd.rep];
-  [mi setEnabled:(ok ? YES : NO)];
-  // FIXME: implement complete prefix handling and keyboard shortcuts
-  // cout << "ks: "<< ks << "\n";
-  [mi setState:(pre!="" ? NSOnState: NSOffState)];
-  if (pre == "v") {
-  } else if (pre == "*") {
-    //		[mi setOnStateImage:[NSImage imageNamed:@"TMStarMenuBullet"]];
-  } else if (pre == "o") {
-  }
-  return tm_new <ns_menu_rep> (mi);
-}
-
-widget balloon_widget (widget w, widget help)
-// given a button widget w, specify a help balloon which should be displayed
-// when the user leaves the mouse pointer on the button for a small while
-{
-  return tm_new <ns_balloon_widget_rep> (w,help);
-}
-
-widget text_widget (string s, int style, color col, bool tsp)
-// a text widget with a given color, transparency and language
-{
-  (void) style;
-  string t= tm_var_encode (s);
-  return tm_new <ns_text_widget_rep> (t,col,tsp);
-}
-widget xpm_widget (url file_name)// { return widget(); }
-// a widget with an X pixmap icon
-{
-  return tm_new <ns_image_widget_rep> (file_name);
-#if 0
-  NSImage *image = xpm_image (file_name);
-  //	TMMenuItem *mi = [[[TMMenuItem alloc] initWithTitle:to_nsstring(as_string(file_name)) action:NULL keyEquivalent:@""] autorelease];
-  TMMenuItem *mi = [[[TMMenuItem alloc] initWithTitle:@"" action:NULL keyEquivalent:@""] autorelease];
-  [mi setRepresentedObject:image];
-  [mi setImage:image];
-  return tm_new <ns_menu_rep> (mi);
-  //	return new ns_menu_text_rep(to_nsstring(as_string(file_name)));
-#endif
-}
-
-
-
-/******************************************************************************
- * TeXmacs interface for the creation of widgets.
- * See Graphics/Gui/widget.hpp for comments.
- ******************************************************************************/
-
-//widget horizontal_menu (array<widget> arr) { return widget(); }
-//widget vertical_menu (array<widget> arr) { return widget(); }
-//widget horizontal_list (array<widget> arr) { return widget(); }
-//widget vertical_list (array<widget> arr)  { return widget(); }
-widget aligned_widget (array<widget> lhs, array<widget> rhs, SI hsep, SI vsep, SI lpad, SI rpad)  { return widget(); }
-widget tabs_widget (array<widget> tabs, array<widget> bodies)  { return widget(); }
-widget icon_tabs_widget (array<url> us, array<widget> ts, array<widget> bs)  { return widget(); }
-widget wrapped_widget (widget w, command cmd) { return widget(); }
-//widget tile_menu (array<widget> a, int cols)  { return widget(); }
-//widget minibar_menu (array<widget> arr)  { return widget(); }
-//widget menu_separator (bool vertical)  { return widget(); }
-//widget menu_group (string name, int style)  { return widget(); }
-//widget pulldown_button (widget w, promise<widget> pw)  { return widget(); }
-//widget pullright_button (widget w, promise<widget> pw)  { return widget(); }
-//widget menu_button (widget w, command cmd, string pre, string ks, int style)  { return widget(); }
-//widget balloon_widget (widget w, widget help)  { return widget(); }
-//widget text_widget (string s, int style, color col, bool tsp)  { return widget(); }
-//widget xpm_widget (url file_name)  { return widget(); }
-widget toggle_widget (command cmd, bool on, int style)  { return widget(); }
-widget enum_widget (command cmd, array<string> vals, string val, int style, string width)  { return widget(); }
-widget choice_widget (command cmd, array<string> vals, array<string> chosen) { return widget(); }
-widget choice_widget (command cmd, array<string> vals, string cur) { return widget(); }
-widget choice_widget (command cmd, array<string> vals, string cur, string filter)  { return widget(); }
-widget user_canvas_widget (widget wid, int style)  { return widget(); }
-widget resize_widget (widget w, int style, string w1, string h1,
-                      string w2, string h2, string w3, string h3,
-                      string hpos, string vpos)  { return widget(); }
-widget hsplit_widget (widget l, widget r)  { return widget(); }
-widget vsplit_widget (widget t, widget b)  { return widget(); }
-widget refresh_widget (string tmwid, string kind)  { return widget(); }
-//widget refreshable_widget (object promise, string kind)  { return widget(); }
-//widget glue_widget (bool hx, bool vx, SI w, SI h)  { return widget(); }
-//widget glue_widget (tree col, bool hx, bool vx, SI w, SI h)  { return widget(); }
-//widget inputs_list_widget (command call_back, array<string> prompts)  { return widget(); }
-//widget input_text_widget (command call_back, string type, array<string> def,
-//                          int style, string width)  { return widget(); }
-//widget color_picker_widget (command call_back, bool bg, array<tree> proposals)  { return widget(); }
-//widget file_chooser_widget (command cmd, string type, string prompt)  { return widget(); }
-//widget printer_widget (command cmd, url ps_pdf_file)  { return widget(); }
-//widget texmacs_widget (int mask, command quit)  { return widget(); }
-widget ink_widget (command cb)  { return widget(); }
-
-widget
-tree_view_widget (command cmd, tree data, tree data_roles) {
-  // FIXME: not implemented
-  return widget();
-}
-widget refreshable_widget (object promise, string kind) {
-  // FIXME: not implemented
-  return widget();
-}
-
-#endif // OLD_MENUS
-
-
-@implementation NSView (AmbiguityTests)
 // Debug only. Do not ship with this code
 - (void) testAmbiguity
 {
@@ -618,6 +390,7 @@ widget refreshable_widget (object promise, string kind) {
   for (NSView *view in self.subviews)
     [view testAmbiguity];
 }
+
 // Return all constraints from self and subviews
 - (NSArray *) allConstraints
 {
@@ -864,6 +637,7 @@ ns_ui_element_rep::as_view () {
       }
       TMCommand* command = [[[TMCommand alloc] init] autorelease];
       [command setCommand: cmd.rep];
+      [command setObject: b];
       [[b cell] setRepresentedObject: command];
       [b setTarget: command];
       [b setAction: @selector(doit)];
@@ -1410,7 +1184,7 @@ to_nsmenuitem (widget w)
 TMMenuItem*
 ns_simple_widget_rep::as_menuitem () {
   TMMenuItem *mi = [[[TMMenuItem alloc] init] autorelease];
-  [mi setWidget:this];
+  [mi setWidget: this];
   return mi;
 }
 
@@ -1427,7 +1201,7 @@ ns_simple_widget_rep::as_view () {
 }
 #endif
 
-#pragma mark UI widget interface
+#pragma mark abstract UI widget interface
 
 #ifdef NEW_MENUS
 
