@@ -1010,21 +1010,6 @@
 		9C3F66D31D37D4B400742895 /* PDFWriter.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 4907D0D81812E2BC00D893B4 /* PDFWriter.o */; };
 		9C3F66D51D37D4B400742895 /* TeXmacs in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9C0B430010A8CB4E0097A335 /* TeXmacs */; };
 		9C3F66D71D37D4B400742895 /* texmacs_updates_dsa_pub.pem in CopyFiles */ = {isa = PBXBuildFile; fileRef = 491BF363178BFF3100C69EEF /* texmacs_updates_dsa_pub.pem */; };
-		9C3F67151D37D4D100742895 /* GSAutoLayoutDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F66E41D37D4D100742895 /* GSAutoLayoutDefaults.m */; };
-		9C3F67161D37D4D100742895 /* GSAutoLayoutGrid.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F66E61D37D4D100742895 /* GSAutoLayoutGrid.m */; };
-		9C3F67171D37D4D100742895 /* GSAutoLayoutHBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F66E81D37D4D100742895 /* GSAutoLayoutHBox.m */; };
-		9C3F67181D37D4D100742895 /* GSAutoLayoutHSpace.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F66EA1D37D4D100742895 /* GSAutoLayoutHSpace.m */; };
-		9C3F67191D37D4D100742895 /* GSAutoLayoutManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F66EC1D37D4D100742895 /* GSAutoLayoutManager.m */; };
-		9C3F671A1D37D4D100742895 /* GSAutoLayoutProportionalManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F66EF1D37D4D100742895 /* GSAutoLayoutProportionalManager.m */; };
-		9C3F671B1D37D4D100742895 /* GSAutoLayoutSpace.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F66F11D37D4D100742895 /* GSAutoLayoutSpace.m */; };
-		9C3F671C1D37D4D100742895 /* GSAutoLayoutStandardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F66F31D37D4D100742895 /* GSAutoLayoutStandardManager.m */; };
-		9C3F671D1D37D4D100742895 /* GSAutoLayoutVBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F66F51D37D4D100742895 /* GSAutoLayoutVBox.m */; };
-		9C3F671E1D37D4D100742895 /* GSAutoLayoutVSpace.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F66F71D37D4D100742895 /* GSAutoLayoutVSpace.m */; };
-		9C3F671F1D37D4D100742895 /* NSViewSize.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F66F91D37D4D100742895 /* NSViewSize.m */; };
-		9C3F67201D37D4D100742895 /* README in Resources */ = {isa = PBXBuildFile; fileRef = 9C3F66FA1D37D4D100742895 /* README */; };
-		9C3F67211D37D4D100742895 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9C3F66FB1D37D4D100742895 /* InfoPlist.strings */; };
-		9C3F67221D37D4D100742895 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9C3F66FD1D37D4D100742895 /* MainMenu.nib */; };
-		9C3F67231D37D4D100742895 /* Window.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9C3F66FF1D37D4D100742895 /* Window.nib */; };
 		9C3F67241D37D4D100742895 /* ns_dialogues.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F67041D37D4D100742895 /* ns_dialogues.mm */; };
 		9C3F67251D37D4D100742895 /* ns_gui.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F67061D37D4D100742895 /* ns_gui.mm */; };
 		9C3F67271D37D4D100742895 /* ns_renderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C3F670B1D37D4D100742895 /* ns_renderer.mm */; };
@@ -2707,36 +2692,6 @@
 		9C3D2E5812B0D662009E33AD /* tree_select.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tree_select.hpp; sourceTree = "<group>"; };
 		9C3DA71E12932990009617C4 /* extend_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = extend_widget.cpp; sourceTree = "<group>"; };
 		9C3F66DC1D37D4B400742895 /* TeXmacsNS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TeXmacsNS.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		9C3F66E01D37D4D100742895 /* AutoLayoutCommonInclude.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoLayoutCommonInclude.h; sourceTree = "<group>"; };
-		9C3F66E11D37D4D100742895 /* GNUstep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GNUstep.h; sourceTree = "<group>"; };
-		9C3F66E21D37D4D100742895 /* GSAutoLayoutBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSAutoLayoutBox.h; sourceTree = "<group>"; };
-		9C3F66E31D37D4D100742895 /* GSAutoLayoutDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSAutoLayoutDefaults.h; sourceTree = "<group>"; };
-		9C3F66E41D37D4D100742895 /* GSAutoLayoutDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GSAutoLayoutDefaults.m; sourceTree = "<group>"; };
-		9C3F66E51D37D4D100742895 /* GSAutoLayoutGrid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSAutoLayoutGrid.h; sourceTree = "<group>"; };
-		9C3F66E61D37D4D100742895 /* GSAutoLayoutGrid.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GSAutoLayoutGrid.m; sourceTree = "<group>"; };
-		9C3F66E71D37D4D100742895 /* GSAutoLayoutHBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSAutoLayoutHBox.h; sourceTree = "<group>"; };
-		9C3F66E81D37D4D100742895 /* GSAutoLayoutHBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GSAutoLayoutHBox.m; sourceTree = "<group>"; };
-		9C3F66E91D37D4D100742895 /* GSAutoLayoutHSpace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSAutoLayoutHSpace.h; sourceTree = "<group>"; };
-		9C3F66EA1D37D4D100742895 /* GSAutoLayoutHSpace.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GSAutoLayoutHSpace.m; sourceTree = "<group>"; };
-		9C3F66EB1D37D4D100742895 /* GSAutoLayoutManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSAutoLayoutManager.h; sourceTree = "<group>"; };
-		9C3F66EC1D37D4D100742895 /* GSAutoLayoutManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GSAutoLayoutManager.m; sourceTree = "<group>"; };
-		9C3F66ED1D37D4D100742895 /* GSAutoLayoutManagerPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSAutoLayoutManagerPrivate.h; sourceTree = "<group>"; };
-		9C3F66EE1D37D4D100742895 /* GSAutoLayoutProportionalManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSAutoLayoutProportionalManager.h; sourceTree = "<group>"; };
-		9C3F66EF1D37D4D100742895 /* GSAutoLayoutProportionalManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GSAutoLayoutProportionalManager.m; sourceTree = "<group>"; };
-		9C3F66F01D37D4D100742895 /* GSAutoLayoutSpace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSAutoLayoutSpace.h; sourceTree = "<group>"; };
-		9C3F66F11D37D4D100742895 /* GSAutoLayoutSpace.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GSAutoLayoutSpace.m; sourceTree = "<group>"; };
-		9C3F66F21D37D4D100742895 /* GSAutoLayoutStandardManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSAutoLayoutStandardManager.h; sourceTree = "<group>"; };
-		9C3F66F31D37D4D100742895 /* GSAutoLayoutStandardManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GSAutoLayoutStandardManager.m; sourceTree = "<group>"; };
-		9C3F66F41D37D4D100742895 /* GSAutoLayoutVBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSAutoLayoutVBox.h; sourceTree = "<group>"; };
-		9C3F66F51D37D4D100742895 /* GSAutoLayoutVBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GSAutoLayoutVBox.m; sourceTree = "<group>"; };
-		9C3F66F61D37D4D100742895 /* GSAutoLayoutVSpace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSAutoLayoutVSpace.h; sourceTree = "<group>"; };
-		9C3F66F71D37D4D100742895 /* GSAutoLayoutVSpace.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GSAutoLayoutVSpace.m; sourceTree = "<group>"; };
-		9C3F66F81D37D4D100742895 /* NSViewSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSViewSize.h; sourceTree = "<group>"; };
-		9C3F66F91D37D4D100742895 /* NSViewSize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSViewSize.m; sourceTree = "<group>"; };
-		9C3F66FA1D37D4D100742895 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
-		9C3F66FC1D37D4D100742895 /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		9C3F66FE1D37D4D100742895 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		9C3F67001D37D4D100742895 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Window.nib; sourceTree = "<group>"; };
 		9C3F67011D37D4D100742895 /* mac_cocoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mac_cocoa.h; sourceTree = "<group>"; };
 		9C3F67021D37D4D100742895 /* ns_basic_widgets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ns_basic_widgets.h; sourceTree = "<group>"; };
 		9C3F67031D37D4D100742895 /* ns_dialogues.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ns_dialogues.h; sourceTree = "<group>"; };
@@ -4781,10 +4736,6 @@
 			children = (
 				9C4324971D3B885E003511A2 /* ns_picture.h */,
 				9C4324981D3B885E003511A2 /* ns_picture.mm */,
-				9C3F66DF1D37D4D100742895 /* AutoLayout */,
-				9C3F66FB1D37D4D100742895 /* InfoPlist.strings */,
-				9C3F66FD1D37D4D100742895 /* MainMenu.nib */,
-				9C3F66FF1D37D4D100742895 /* Window.nib */,
 				9C3F67011D37D4D100742895 /* mac_cocoa.h */,
 				9C3F67021D37D4D100742895 /* ns_basic_widgets.h */,
 				9C3F67031D37D4D100742895 /* ns_dialogues.h */,
@@ -4808,40 +4759,6 @@
 				9C4324931D398D3C003511A2 /* ns_ui_element.h */,
 			);
 			path = NS;
-			sourceTree = "<group>";
-		};
-		9C3F66DF1D37D4D100742895 /* AutoLayout */ = {
-			isa = PBXGroup;
-			children = (
-				9C3F66E01D37D4D100742895 /* AutoLayoutCommonInclude.h */,
-				9C3F66E11D37D4D100742895 /* GNUstep.h */,
-				9C3F66E21D37D4D100742895 /* GSAutoLayoutBox.h */,
-				9C3F66E31D37D4D100742895 /* GSAutoLayoutDefaults.h */,
-				9C3F66E41D37D4D100742895 /* GSAutoLayoutDefaults.m */,
-				9C3F66E51D37D4D100742895 /* GSAutoLayoutGrid.h */,
-				9C3F66E61D37D4D100742895 /* GSAutoLayoutGrid.m */,
-				9C3F66E71D37D4D100742895 /* GSAutoLayoutHBox.h */,
-				9C3F66E81D37D4D100742895 /* GSAutoLayoutHBox.m */,
-				9C3F66E91D37D4D100742895 /* GSAutoLayoutHSpace.h */,
-				9C3F66EA1D37D4D100742895 /* GSAutoLayoutHSpace.m */,
-				9C3F66EB1D37D4D100742895 /* GSAutoLayoutManager.h */,
-				9C3F66EC1D37D4D100742895 /* GSAutoLayoutManager.m */,
-				9C3F66ED1D37D4D100742895 /* GSAutoLayoutManagerPrivate.h */,
-				9C3F66EE1D37D4D100742895 /* GSAutoLayoutProportionalManager.h */,
-				9C3F66EF1D37D4D100742895 /* GSAutoLayoutProportionalManager.m */,
-				9C3F66F01D37D4D100742895 /* GSAutoLayoutSpace.h */,
-				9C3F66F11D37D4D100742895 /* GSAutoLayoutSpace.m */,
-				9C3F66F21D37D4D100742895 /* GSAutoLayoutStandardManager.h */,
-				9C3F66F31D37D4D100742895 /* GSAutoLayoutStandardManager.m */,
-				9C3F66F41D37D4D100742895 /* GSAutoLayoutVBox.h */,
-				9C3F66F51D37D4D100742895 /* GSAutoLayoutVBox.m */,
-				9C3F66F61D37D4D100742895 /* GSAutoLayoutVSpace.h */,
-				9C3F66F71D37D4D100742895 /* GSAutoLayoutVSpace.m */,
-				9C3F66F81D37D4D100742895 /* NSViewSize.h */,
-				9C3F66F91D37D4D100742895 /* NSViewSize.m */,
-				9C3F66FA1D37D4D100742895 /* README */,
-			);
-			path = AutoLayout;
 			sourceTree = "<group>";
 		};
 		9C4FCFF4150F73100087378D /* Document */ = {
@@ -5160,11 +5077,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9C3F67201D37D4D100742895 /* README in Resources */,
-				9C3F67231D37D4D100742895 /* Window.nib in Resources */,
-				9C3F67221D37D4D100742895 /* MainMenu.nib in Resources */,
 				9C3F672D1D37D51700742895 /* TeXmacsNS.xcconfig in Resources */,
-				9C3F67211D37D4D100742895 /* InfoPlist.strings in Resources */,
 				9C3F657A1D37D4B400742895 /* texmacs_updates_dsa_pub.pem in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5837,7 +5750,6 @@
 				9C3F658F1D37D4B400742895 /* rubber_unicode_font.cpp in Sources */,
 				9C3F65901D37D4B400742895 /* db_sort.cpp in Sources */,
 				9C3F65911D37D4B400742895 /* vars.cpp in Sources */,
-				9C3F67191D37D4D100742895 /* GSAutoLayoutManager.m in Sources */,
 				9C3F65921D37D4B400742895 /* archiver.cpp in Sources */,
 				9C3F65931D37D4B400742895 /* commute.cpp in Sources */,
 				9C3F65941D37D4B400742895 /* patch.cpp in Sources */,
@@ -5852,8 +5764,6 @@
 				9C3F659D1D37D4B400742895 /* converter.cpp in Sources */,
 				9C3F659E1D37D4B400742895 /* raster_random.cpp in Sources */,
 				9C3F659F1D37D4B400742895 /* tree_correct.cpp in Sources */,
-				9C3F67151D37D4D100742895 /* GSAutoLayoutDefaults.m in Sources */,
-				9C3F671D1D37D4D100742895 /* GSAutoLayoutVBox.m in Sources */,
 				9C3F65A01D37D4B400742895 /* tree_cursor.cpp in Sources */,
 				9C3F65A11D37D4B400742895 /* tree_traverse.cpp in Sources */,
 				9C3F65A21D37D4B400742895 /* edit_main.cpp in Sources */,
@@ -5996,7 +5906,6 @@
 				9C3F66281D37D4B400742895 /* rubber_boxes.cpp in Sources */,
 				9C3F66291D37D4B400742895 /* stretch_boxes.cpp in Sources */,
 				9C3F662A1D37D4B400742895 /* database.cpp in Sources */,
-				9C3F671B1D37D4D100742895 /* GSAutoLayoutSpace.m in Sources */,
 				9C3F662B1D37D4B400742895 /* text_boxes.cpp in Sources */,
 				9C3F662C1D37D4B400742895 /* composite_boxes.cpp in Sources */,
 				9C3F662D1D37D4B400742895 /* concat_boxes.cpp in Sources */,
@@ -6046,7 +5955,6 @@
 				9C3F66571D37D4B400742895 /* db_disk.cpp in Sources */,
 				9C3F66581D37D4B400742895 /* concat_text.cpp in Sources */,
 				9C3F66591D37D4B400742895 /* concater.cpp in Sources */,
-				9C3F671E1D37D4D100742895 /* GSAutoLayoutVSpace.m in Sources */,
 				9C3F665A1D37D4B400742895 /* env.cpp in Sources */,
 				9C3F665B1D37D4B400742895 /* env_default.cpp in Sources */,
 				9C3F665C1D37D4B400742895 /* env_exec.cpp in Sources */,
@@ -6076,7 +5984,6 @@
 				9C3F66731D37D4B400742895 /* stacker.cpp in Sources */,
 				9C3F66741D37D4B400742895 /* cell.cpp in Sources */,
 				9C3F66751D37D4B400742895 /* table.cpp in Sources */,
-				9C3F671C1D37D4D100742895 /* GSAutoLayoutStandardManager.m in Sources */,
 				9C3F66761D37D4B400742895 /* unix_sys_utils.cpp in Sources */,
 				9C3F667E1D37D4B400742895 /* tm_ostream.cpp in Sources */,
 				9C3F667F1D37D4B400742895 /* gs_utilities.cpp in Sources */,
@@ -6089,7 +5996,6 @@
 				9C3F66861D37D4B400742895 /* tree_analyze.cpp in Sources */,
 				9C3F66871D37D4B400742895 /* poor_extended.cpp in Sources */,
 				9C3F66881D37D4B400742895 /* unicode_math_font.cpp in Sources */,
-				9C3F67181D37D4D100742895 /* GSAutoLayoutHSpace.m in Sources */,
 				9C3F66891D37D4B400742895 /* tree_modify.cpp in Sources */,
 				9C3F668A1D37D4B400742895 /* mac_utilities.mm in Sources */,
 				9C3F668B1D37D4B400742895 /* HIDRemote.m in Sources */,
@@ -6108,7 +6014,6 @@
 				9C3F66981D37D4B400742895 /* new_buffer.cpp in Sources */,
 				9C3F66991D37D4B400742895 /* persistent.cpp in Sources */,
 				9C3F669A1D37D4B400742895 /* new_view.cpp in Sources */,
-				9C3F671F1D37D4D100742895 /* NSViewSize.m in Sources */,
 				9C3F669B1D37D4B400742895 /* new_project.cpp in Sources */,
 				9C3F669C1D37D4B400742895 /* new_window.cpp in Sources */,
 				9C3F669D1D37D4B400742895 /* metadata.cpp in Sources */,
@@ -6122,7 +6027,6 @@
 				9C3F66A51D37D4B400742895 /* metadata-acm.cpp in Sources */,
 				9C3F66A61D37D4B400742895 /* metadata-elsevier.cpp in Sources */,
 				9C3F66A71D37D4B400742895 /* post_convert.cpp in Sources */,
-				9C3F67171D37D4D100742895 /* GSAutoLayoutHBox.m in Sources */,
 				9C3F66A81D37D4B400742895 /* tt_analyze.cpp in Sources */,
 				9C3F66A91D37D4B400742895 /* glyph_analyze.cpp in Sources */,
 				9C3F66AA1D37D4B400742895 /* fromtex_post.cpp in Sources */,
@@ -6130,8 +6034,6 @@
 				9C3F66AC1D37D4B400742895 /* glue.cpp in Sources */,
 				9C3F66AD1D37D4B400742895 /* object.cpp in Sources */,
 				9C3F66AE1D37D4B400742895 /* font_guess.cpp in Sources */,
-				9C3F671A1D37D4D100742895 /* GSAutoLayoutProportionalManager.m in Sources */,
-				9C3F67161D37D4D100742895 /* GSAutoLayoutGrid.m in Sources */,
 				9C3F66AF1D37D4B400742895 /* latex_recover.cpp in Sources */,
 				9C3F66B01D37D4B400742895 /* smart_font.cpp in Sources */,
 				9C3F66B11D37D4B400742895 /* metadata-revtex.cpp in Sources */,
@@ -6942,33 +6844,6 @@
 			targetProxy = 9CC614B110A99A8A0055F808 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		9C3F66FB1D37D4D100742895 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				9C3F66FC1D37D4D100742895 /* English */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		9C3F66FD1D37D4D100742895 /* MainMenu.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				9C3F66FE1D37D4D100742895 /* English */,
-			);
-			name = MainMenu.nib;
-			sourceTree = "<group>";
-		};
-		9C3F66FF1D37D4D100742895 /* Window.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				9C3F67001D37D4D100742895 /* English */,
-			);
-			name = Window.nib;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		4907D0DA1812E2BC00D893B4 /* Debug */ = {
