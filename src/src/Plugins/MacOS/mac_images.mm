@@ -15,6 +15,10 @@
 #include "NS/mac_cocoa.h"
 #include "ApplicationServices/ApplicationServices.h"
 
+// this function already exists in ns_utilities.h but we make it available here so that
+// we do not need to link the whole NS backend when using Qt.
+// remark: maybe consider putting ns_utilities in the MacOS plugin.
+
 static NSString *
 to_nsstring_utf8 (string s) {
   s= cork_to_utf8 (s);
