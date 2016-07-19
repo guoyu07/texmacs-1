@@ -31,6 +31,46 @@ bool ns_update_flag= false;
 int time_credit;
 int timeout_time;
 
+
+
+
+@interface TMHelper : NSObject
+{
+}
+@end
+
+@implementation TMHelper
+- init
+{
+  if (self = [super init])
+  {
+    //[[NSApplication sharedApplication] setDelegate: self];
+  }
+  return self;
+}
+
+- (void)applicationWillUpdate: (NSNotification *)aNotification
+{
+  NSBeep();
+  the_gui->update ();
+}
+
+- (void)dealloc
+{
+  [NSApp setDelegate:nil];
+  [super dealloc];
+}
+
+- (void) update
+{
+  //	NSBeep();
+  the_gui->update ();
+  //[self performSelector:@selector(waitIdle) withObject:nil afterDelay:0.25 inModes:[NSArray arrayWithObjects:NSDefaultRunLoopMode, nil]];
+}
+
+@end
+
+
 /******************************************************************************
  * Constructor and geometry
  ******************************************************************************/
@@ -44,6 +84,9 @@ ns_gui_rep::ns_gui_rep(int& argc, char** argv):
 //  argv               = argv2;
   interrupted        = false;
   interrupt_time     = texmacs_time ();
+  
+  helper = 	[[TMHelper alloc] init];
+
   
   set_output_language (get_locale_language ());
   // out_lan= get_locale_language ();
@@ -94,7 +137,6 @@ ns_gui_rep::get_selection (string key, tree& t, string& s) {
 		}
 	}
 
-
   t= tuple ("extern", s);
   return true;
 }
@@ -115,9 +157,7 @@ ns_gui_rep::set_selection (string key, tree t, string s) {
 	NSArray *types = [NSArray arrayWithObjects:
 		NSStringPboardType, nil];
 	[pb declareTypes:types owner:nil];
-	[pb setString:[NSString stringWithCString:selection] forType:NSStringPboardType];
-	
-	
+	[pb setString:[NSString stringWithCString: selection] forType: NSStringPboardType];
   }
   return true;
 }
@@ -212,6 +252,11 @@ void update()
 {
 	//NSBeep();
 	if (the_interpose_handler) the_interpose_handler();
+  ns_update_flag = false;
+
+  [[NSNotificationCenter defaultCenter] postNotificationName: @"TeXmacsUpdateWindows" object: nil];
+
+  [NSTimer scheduledTimerWithTimeInterval: 10.0 target: the_gui->helper selector: @selector(update) userInfo: nil repeats: NO];
 }
 
 void ns_gui_rep::update ()
@@ -220,34 +265,12 @@ void ns_gui_rep::update ()
   ::update();
 }
 
-
-
-
-@interface TMHelper : NSObject
-{
-}
-@end
-@implementation TMHelper
-- init
-{
-  if (self = [super init])
-  {
-		[NSApp setDelegate:self];
-  }
-  return self;
+void
+needs_update () {
+  ns_update_flag = true;
+  [NSTimer scheduledTimerWithTimeInterval: 0.0 target: the_gui->helper selector: @selector(update) userInfo: nil repeats: NO];
 }
 
-- (void)applicationWillUpdate:(NSNotification *)aNotification
-{
-//	NSBeep();
-	update();
-}
-- (void)dealloc
-{
-	[NSApp setDelegate:nil];
-  [super dealloc];
-}
-@end
 
 
 @interface TMInterposer : NSObject
@@ -283,6 +306,7 @@ void ns_gui_rep::update ()
 	update();
 	//[self performSelector:@selector(waitIdle) withObject:nil afterDelay:0.25 inModes:[NSArray arrayWithObjects:NSDefaultRunLoopMode, nil]];
 }
+
 -(void)waitIdle
 {
 	[[NSNotificationQueue defaultQueue] enqueueNotification:n 
@@ -298,12 +322,12 @@ void ns_gui_rep::update ()
 //@class FScriptMenuItem;
 
 void ns_gui_rep::event_loop ()
-#if 0
+#if 1
 {
 //	TMInterposer* i = [[TMInterposer alloc ] init];
 	//[[NSApp mainMenu] addItem:[[[FScriptMenuItem alloc] init] autorelease]];
 //	update();
-	[[[TMHelper alloc] init] autorelease];
+
 	[NSApp run];
 //	[i release];
 }
@@ -332,7 +356,7 @@ void ns_gui_rep::event_loop ()
 		}
 		interrupted = false;
     if (!event)  {
-       update();
+       update ();
       time_credit= min (1000000, 2 * time_credit);
       ns_update_flag= false;
     }
@@ -487,10 +511,6 @@ beep () {
   NSBeep();
 }
 
-void 
-needs_update () {
-  ns_update_flag= true;
-}
 
 bool check_event (int type)
   // Check whether an event of one of the above types has occurred;

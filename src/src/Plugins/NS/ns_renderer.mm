@@ -206,7 +206,7 @@ ns_renderer_rep::clear (SI x1, SI y1, SI x2, SI y2) {
   ensure_context ();
   ns_set_color (bg_brush->get_color ());
   [NSBezierPath fillRect:rect];
-  ns_set_color (pen->get_color ());
+ // ns_set_color (pen->get_color ());
 }
 
 void
@@ -230,6 +230,7 @@ ns_renderer_rep::fill (SI x1, SI y1, SI x2, SI y2) {
   decode (x1, y1);
   decode (x2, y2);
   ensure_context ();
+  ns_set_color (pen->get_color ());
   [NSBezierPath fillRect:NSMakeRect(x1,y2,x2-x1,y1-y2)];
 }
 

@@ -26,10 +26,14 @@
 typedef class ns_gui_rep* ns_gui;
 extern ns_gui the_gui;
 
+@class TMHelper;
+
 class ns_gui_rep {
 public:
   bool interrupted;
   time_t interrupt_time;
+  
+  TMHelper* helper;
   
   char*                        selection;
   hashmap<string,tree>         selection_t;

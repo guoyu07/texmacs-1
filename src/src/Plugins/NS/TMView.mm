@@ -32,7 +32,7 @@ inline void scaleSize (NSSize &point)
 }
 
 inline void unscaleSize (NSSize &point)
-{	
+{
 	point.width /= PIXEL; point.height /= PIXEL;
 }
 
@@ -58,12 +58,10 @@ inline void unscaleSize (NSSize &point)
 
 
 @interface TMView (Private)
-- (void)setNeedsDisplayInTMRect:(TMRect*)r;
-- (void)delayedUpdate;
+- (void) delayedUpdate;
 - (void) focusIn;
 - (void) focusOut;
 @end
-
 
 
 
@@ -168,6 +166,11 @@ void initkeymap()
     processingCompose = NO;
     workingText = nil;
     delayed_rects = [[NSMutableArray arrayWithCapacity:100] retain];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(delayedUpdate)
+                                                 name: @"TeXmacsUpdateWindows"
+                                               object: nil];
+
   }
   return self;
 }
@@ -182,6 +185,10 @@ void initkeymap()
   [[NSNotificationCenter defaultCenter] removeObserver: self
                                                   name: @"NSWindowDidBecomeKeyNotification"
                                                 object: nil];
+  [[NSNotificationCenter defaultCenter] removeObserver: self
+                                               name: @"TeXmacsUpdateWindows"
+                                             object: nil];
+
   
   [super dealloc];
 }
@@ -194,11 +201,6 @@ void initkeymap()
 - (ns_simple_widget_rep*)widget
 {
 	return  wid;
-}
-
-- (void)setNeedsDisplayInTMRect:(TMRect*)r
-{
-  [self setNeedsDisplayInRect:[r rect]];
 }
 
 - (void)viewWillMoveToWindow:(NSWindow *)newWindow
@@ -247,25 +249,22 @@ void initkeymap()
   }
 }
 
-- (void)delayedUpdate
+- (void) delayedUpdate
 {
+  inWindowUpdate = YES;
   NSMutableArray *arr = delayed_rects;
-  NSEnumerator *enumerator = [arr objectEnumerator];
-  TMRect *anObject;
   delayed_rects = [[NSMutableArray arrayWithCapacity:10] retain];
-  while ((anObject = [enumerator nextObject])) {
-    [self displayRect: [anObject rect]];
-  }
+  for (TMRect *anObject in arr)
+    [self setNeedsDisplayInRect: [anObject rect]];
   [arr release];
+  [self display];
+  inWindowUpdate = NO;
 }
 
 - (void)drawRect:(NSRect)rect 
 {
-  if (ns_update_flag) {
-    [delayed_rects addObject: [[[TMRect alloc] initWithRect:rect] autorelease]];
-    return;
-  }
-    
+  BOOL beenInterrupted = NO;
+  if (inWindowUpdate) {
 	// Drawing code here.
 	if ([self inLiveResize])
 	{
@@ -293,17 +292,12 @@ void initkeymap()
     r -> set_clipping (x1, y1, x2, y2);
     wid->handle_repaint (r, x1, y1, x2, y2);
     r -> end ();
-    if (gui_interrupted ())
-      ns_update_flag= true;
+    if (gui_interrupted ()) beenInterrupted = YES;
   }
+  }
+  if (beenInterrupted || !inWindowUpdate)
+    [delayed_rects addObject: [[[TMRect alloc] initWithRect:rect] autorelease]];
 //	debug_events << "END DRAWING" << "\n";
- 
-  if (ns_update_flag) {
-    if (DEBUG_EVENTS)
-      debug_events << "Postponed redrawing\n"; 
-    [self performSelector:@selector(delayedUpdate) withObject: nil afterDelay: 10];
-  }
-  
 }
 
 #if 0

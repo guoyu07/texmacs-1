@@ -14,11 +14,13 @@
 
 class ns_simple_widget_rep;
 
+
 @interface TMView : NSView  <NSTextInput>
 {
   ns_simple_widget_rep *wid;
   NSString *workingText;
   BOOL processingCompose;
+  BOOL inWindowUpdate;
   NSMutableArray *delayed_rects;
 }
 - (void) setWidget:(ns_simple_widget_rep*) w;

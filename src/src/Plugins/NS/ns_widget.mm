@@ -112,6 +112,7 @@ ns_view_widget_rep::as_view () {
 void
 ns_view_widget_rep::send (slot s, blackbox val) {
   switch (s) {
+      
     case SLOT_NAME:
     {
       check_type<string> (val, s);
@@ -122,11 +123,12 @@ ns_view_widget_rep::send (slot s, blackbox val) {
       }
     }
       break;
+      
     case SLOT_INVALIDATE:
     {
       TYPE_CHECK (type_box (val) == type_helper<coord4>::id);
       coord4 p= open_box<coord4> (val);
-      NSRect rect = to_nsrect(p);
+      NSRect rect = to_nsrect (p);
       [view setNeedsDisplayInRect: rect];
 #if 0
       if (DEBUG_AQUA)
@@ -363,10 +365,11 @@ ns_tm_widget_rep::ns_tm_widget_rep(int mask) : ns_view_widget_rep([[[NSView allo
   [sv setBackgroundColor:[NSColor grayColor]];
   
   [sv setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
+#if 0
   id newClipView = [[[TMCenteringClipView alloc] initWithFrame:[[sv contentView] frame]] autorelease];
   [newClipView setBackgroundColor:[NSColor windowBackgroundColor]];
   [sv setContentView:(NSClipView *)newClipView];
-  
+#endif
   [sv setDocumentView:[[[NSView alloc] initWithFrame: NSMakeRect(0,0,100,100)] autorelease]];
   [view addSubview:sv];
   
@@ -991,7 +994,7 @@ ns_simple_widget_rep::send (slot s, blackbox val) {
     {
       TYPE_CHECK (type_box (val) == type_helper<coord2>::id);
       coord2 p= open_box<coord2> (val);
-      NSPoint pt = to_nspoint(p);
+      NSPoint pt = to_nspoint (p);
       
       //FIXME: implement this!!!
       //      debug_aqua << "ns_simple_widget_rep::send SLOT_POSITION - TO BE IMPLEMENTED (" << pt.x << "," << pt.y << ")\n";
@@ -1007,13 +1010,12 @@ ns_simple_widget_rep::send (slot s, blackbox val) {
       TYPE_CHECK (type_box (val) == type_helper<coord2>::id);
       coord2 p= open_box<coord2> (val);
       NSPoint pt = to_nspoint(p);
-      NSSize sz = [view bounds].size;
-      sz = [[view enclosingScrollView] documentVisibleRect].size;
+      NSSize sz = [view visibleRect].size;
+//      pt.y -= sz.height/2;
+//      pt.x -= sz.width/2;
       if (DEBUG_EVENTS)
         debug_events << "Scroll position :" << pt.x << "," << pt.y << LF;
-      pt.y -= sz.height/2;
-      pt.x -= sz.width/2;
-      [view scrollPoint:pt];
+     [view scrollPoint: pt];
     }
       break;
       
@@ -1021,7 +1023,7 @@ ns_simple_widget_rep::send (slot s, blackbox val) {
     {
       TYPE_CHECK (type_box (val) == type_helper<coord4>::id);
       coord4 p= open_box<coord4> (val);
-      NSRect rect = to_nsrect(p);
+      NSRect rect = to_nsrect (p);
       //          NSSize ws = [sv contentSize];
       NSSize sz = rect.size;
       //         sz.height = max (sz.height, ws.height );
@@ -1071,23 +1073,25 @@ ns_simple_widget_rep::query (slot s, int type_id) {
     {
       typedef pair<SI,SI> coord2;
       TYPE_CHECK (type_id == type_helper<coord2>::id);
-      NSRect frame = [view  frame];
+      NSRect frame = [view visibleRect];
+
       return close_box<coord2> (from_nssize(frame.size));
     }
       
     case SLOT_SCROLL_POSITION:
     {
       TYPE_CHECK (type_id == type_helper<coord2>::id);
-      NSPoint pt = [view frame].origin;
+      NSPoint pt = [[[view enclosingScrollView] contentView] bounds].origin;
       if (DEBUG_EVENTS)
         debug_events << "Position (" << pt.x << "," << pt.y << ")\n";
+      pt.y = -pt.y;
       return close_box<coord2> (from_nspoint(pt));
     }
       
     case SLOT_EXTENTS:
     {
       TYPE_CHECK (type_id == type_helper<coord4>::id);
-      NSRect rect= [view frame];
+      NSRect rect= [view bounds];
       coord4 c= from_nsrect (rect);
       if (DEBUG_EVENTS) debug_events << "Canvas geometry (" << rect.origin.x
         << "," << rect.origin.y
@@ -1101,8 +1105,9 @@ ns_simple_widget_rep::query (slot s, int type_id) {
     {
       TYPE_CHECK (type_id == type_helper<coord4>::id);
       NSRect rect= [view visibleRect];
-      NSPoint pt = [view frame].origin;
-      rect = NSOffsetRect(rect, pt.x, pt.y);
+      //rect  = [[[view enclosingScrollView] contentView] bounds];
+      //NSPoint pt = [[[view enclosingScrollView] contentView] bounds].origin;
+//      rect = NSOffsetRect(rect, pt.x, pt.y);
       coord4 c= from_nsrect (rect);
       if (DEBUG_EVENTS) debug_events << "Visible region (" << rect.origin.x
         << "," << rect.origin.y
