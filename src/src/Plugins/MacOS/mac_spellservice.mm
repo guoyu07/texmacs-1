@@ -14,7 +14,7 @@
 #include "converter.hpp"
 #include "language.hpp"
 
-#include "NS/mac_cocoa.h"
+#include "Cocoa/mac_cocoa.h"
 
 static string 
 from_nsstring (NSString *s) {

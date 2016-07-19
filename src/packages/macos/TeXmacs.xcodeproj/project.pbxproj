@@ -3849,7 +3849,7 @@
 		9C0B484710A8CC100097A335 /* Plugins */ = {
 			isa = PBXGroup;
 			children = (
-				9C3F66DE1D37D4D100742895 /* NS */,
+				9C3F66DE1D37D4D100742895 /* Cocoa */,
 				9C0B484810A8CC100097A335 /* Axel */,
 				9C0B484B10A8CC100097A335 /* Bibtex */,
 				9C0B484E10A8CC100097A335 /* Cairo */,
@@ -4737,7 +4737,7 @@
 			path = Glue;
 			sourceTree = "<group>";
 		};
-		9C3F66DE1D37D4D100742895 /* NS */ = {
+		9C3F66DE1D37D4D100742895 /* Cocoa */ = {
 			isa = PBXGroup;
 			children = (
 				9C43249E1D3D23FB003511A2 /* English.lproj */,
@@ -4765,7 +4765,7 @@
 				9C3F67131D37D4D100742895 /* TMView.h */,
 				9C3F67141D37D4D100742895 /* TMView.mm */,
 			);
-			path = NS;
+			path = Cocoa;
 			sourceTree = "<group>";
 		};
 		9C43249E1D3D23FB003511A2 /* English.lproj */ = {

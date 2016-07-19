@@ -12,7 +12,7 @@
 #include "MacOS/mac_images.h"
 #include "converter.hpp" // hack: remove as soon as possible
 
-#include "NS/mac_cocoa.h"
+#include "Cocoa/mac_cocoa.h"
 #include "ApplicationServices/ApplicationServices.h"
 
 // this function already exists in ns_utilities.h but we make it available here so that

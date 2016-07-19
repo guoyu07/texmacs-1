@@ -14,7 +14,7 @@
 #include "typesetter.hpp"
 #include "tree_select.hpp"
 #ifdef AQUATEXMACS
-#  include "NS/ns_simple_widget.h"
+#  include "Cocoa/ns_simple_widget.h"
 #else
 #  ifdef QTTEXMACS
 #    include "Qt/qt_simple_widget.hpp"

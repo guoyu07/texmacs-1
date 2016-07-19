@@ -9,7 +9,7 @@
  ******************************************************************************/
 
 #include "mac_app.h"
-#include "NS/mac_cocoa.h"
+#include "Cocoa/mac_cocoa.h"
 #include "mac_utilities.h"
 #include "url.hpp"
 #include "converter.hpp"
