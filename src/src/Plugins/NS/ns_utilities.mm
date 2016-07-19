@@ -98,7 +98,6 @@ NSString *to_nsstring_utf8(string s)
   return nss;
 }
 
-
 string
 ns_translate (string s) {
   string in_lan= get_input_language ();

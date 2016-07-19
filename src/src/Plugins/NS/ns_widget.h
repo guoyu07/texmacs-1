@@ -82,7 +82,6 @@ public:
   
   virtual NSView* as_view ();
 
-  virtual widget plain_window_widget (string s);
 };
 
 

@@ -44,14 +44,29 @@ widget the_keyboard_focus(NULL);
 @end
 
 
-
-widget 
-ns_widget_rep::plain_window_widget (string s) {
-  (void) s;
-  return widget ();
+widget
+ns_widget_rep::plain_window_widget (string s)
+// creates a decorated window with name s and contents w
+{
+  NSRect screen_frame = [[NSScreen mainScreen] visibleFrame];
+  
+  NSWindow *nsw = [[[NSWindow alloc] initWithContentRect:NSMakeRect(0,0,100,100)
+                                               styleMask:NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSResizableWindowMask
+                                                 backing:NSBackingStoreBuffered
+                                                   defer:NO] autorelease];
+  // NSView *view = ((ns_view_widget_rep*)w.rep)->get_nsview();
+  //	NSRect frame = [[nsw contentView] frame];
+  //	[view setFrame:frame];
+  [nsw setContentView: as_view ()];
+  [nsw setTitle:to_nsstring(s)];
+  [nsw setAcceptsMouseMovedEvents:YES];
+  //	[[nsw contentView] addSubview:view];
+  //	[nsw setToolbar:((ns_tm_widget_rep*)w.rep)->toolbar];
+  widget wid =  tm_new <ns_window_widget_rep> (nsw);
+  return wid; 
 }
 
-widget 
+widget
 ns_widget_rep::make_popup_widget () {
   return this;
 }
@@ -248,29 +263,6 @@ ns_view_widget_rep::write (slot s, blackbox index, widget w) {
   }
 }
 
-widget 
-ns_view_widget_rep::plain_window_widget (string s)
-// creates a decorated window with name s and contents w
-{
-  NSRect screen_frame = [[NSScreen mainScreen] visibleFrame];
-	
-  NSWindow *nsw = [[[NSWindow alloc] initWithContentRect:NSMakeRect(0,0,100,100) 
-				     styleMask:NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSResizableWindowMask
-				     backing:NSBackingStoreBuffered
-				     defer:NO] autorelease];
-  // NSView *view = ((ns_view_widget_rep*)w.rep)->get_nsview();
-  //	NSRect frame = [[nsw contentView] frame];
-  //	[view setFrame:frame];
-  [nsw setContentView:view];
-  [nsw setTitle:to_nsstring(s)];
-  [nsw setAcceptsMouseMovedEvents:YES];
-  //	[[nsw contentView] addSubview:view];
-  //	[nsw setToolbar:((ns_tm_widget_rep*)w.rep)->toolbar];
-  widget wid =  tm_new <ns_window_widget_rep> (nsw);
-  return wid; 
-}
-
-
 #pragma mark ns_tm_widget_rep
 
 NSString *TMToolbarIdentifier = @"TMToolbarIdentifier";
@@ -281,13 +273,16 @@ NSString *TMButtonsIdentifier = @"TMButtonsIdentifier";
 @implementation TMToolbarItem
 - (void)validate
 {
+#if 1
   NSSize s = [[self view] frame].size;
+  s = [[self view] fittingSize];
   NSSize s2 = [self minSize];
   if ((s.width != s2.width)||(s.height!=s2.height)) {
     [self setMinSize:s];
     [self setMaxSize:s];
   }
   //	NSLog(@"validate\n");
+#endif
 }
 @end
 
@@ -726,6 +721,7 @@ ns_tm_widget_rep::read (slot s, blackbox index) {
 void
 ns_tm_widget_rep::write (slot s, blackbox index, widget w) {
   switch (s) {
+      
   case SLOT_SCROLLABLE: 
     {
       check_type_void (index, s);
@@ -735,16 +731,19 @@ ns_tm_widget_rep::write (slot s, blackbox index, widget w) {
       [[sv window] makeFirstResponder:v];
     }
     break;
+      
   case SLOT_MAIN_MENU:
     check_type_void (index, s);
     [[TMMenuHelper sharedHelper] setMenu:to_nsmenu(w)];
     break;
+      
   case SLOT_MAIN_ICONS:
     check_type_void (index, s);
 //    [bc setMenu:to_nsmenu(w) forRow:0];
       [bc setView: concrete(w)->as_view() forRow:0];
     layout();
     break;
+      
   case SLOT_MODE_ICONS:
     check_type_void (index, s);
 //    [bc setMenu:to_nsmenu(w) forRow:1];
@@ -752,6 +751,7 @@ ns_tm_widget_rep::write (slot s, blackbox index, widget w) {
 
     layout();
     break;
+      
   case SLOT_FOCUS_ICONS:
     check_type_void (index, s);
 //    [bc setMenu:to_nsmenu(w) forRow:2];
@@ -759,26 +759,31 @@ ns_tm_widget_rep::write (slot s, blackbox index, widget w) {
 
     layout();
     break;
+      
   case SLOT_USER_ICONS:
     check_type_void (index, s);
 //    [bc setMenu:to_nsmenu(w) forRow:3];
       [bc setView: concrete(w)->as_view() forRow:3];
     layout();
     break;
+      
   case SLOT_BOTTOM_TOOLS:
     check_type_void (index, s);
     //FIXME: implement this
     break;
+      
   case SLOT_INTERACTIVE_PROMPT:
     check_type_void (index, s);
     int_prompt = concrete(w);
     //			THIS << set_widget ("interactive prompt", concrete (w));
     break;
+      
   case SLOT_INTERACTIVE_INPUT:
     check_type_void (index, s);
     int_input = concrete(w);
     //			THIS << set_widget ("interactive input", concrete (w));
     break;
+      
   default:
     ns_view_widget_rep::write(s,index,w);
   }
@@ -794,19 +799,16 @@ ns_tm_widget_rep::plain_window_widget (string s) {
   return wid;
 }
 
-
-
 #pragma mark ns_window_widget_rep
 
-
-
 @implementation TMWindowController
-- (void)setWidget:(widget_rep*) w
+
+- (void) setWidget: (widget_rep*) w
 {
   wid = (ns_window_widget_rep*)w;
 }
 
-- (widget_rep*)widget
+- (widget_rep*) widget
 {
   return (ns_widget_rep*)wid;
 }
@@ -821,12 +823,11 @@ ns_window_widget_rep::~ns_window_widget_rep()  { [wc release]; }
 
 TMWindowController *ns_window_widget_rep::get_windowcontroller() { return wc; }
 
-
-
 void
 ns_window_widget_rep::send (slot s, blackbox val) {
   switch (s) {
-  case SLOT_SIZE:
+      
+    case SLOT_SIZE:
     {
       TYPE_CHECK (type_box (val) == type_helper<coord2>::id);
       coord2 p= open_box<coord2> (val);
@@ -836,19 +837,21 @@ ns_window_widget_rep::send (slot s, blackbox val) {
         [win setContentSize:size];
       }
     }
-    break;
-  case SLOT_POSITION:
+      break;
+      
+    case SLOT_POSITION:
     {
       TYPE_CHECK (type_box (val) == type_helper<coord2>::id);
       coord2 p= open_box<coord2> (val);
       NSWindow *win = [wc window];
-      if (win) { 
+      if (win) {
         [win setFrameOrigin:to_nspoint(p)];
       }
     }
-    break;
-  case SLOT_VISIBILITY:
-    {	
+      break;
+      
+    case SLOT_VISIBILITY:
+    {
       check_type<bool> (val, s);
       bool flag = open_box<bool> (val);
       NSWindow *win = [wc window];
@@ -856,8 +859,9 @@ ns_window_widget_rep::send (slot s, blackbox val) {
         if (flag) [win makeKeyAndOrderFront:nil] ;
         else [win orderOut:nil]  ;
       }
-    }	
-    break;
+    }
+      break;
+      
     case SLOT_MOUSE_GRAB:
     {
       //check_type<bool> (val, s);
@@ -873,9 +877,9 @@ ns_window_widget_rep::send (slot s, blackbox val) {
 #endif
     }
       break;
-
-  case SLOT_NAME:
-    {	
+      
+    case SLOT_NAME:
+    {
       check_type<string> (val, s);
       string name = open_box<string> (val);
       NSWindow *win = [wc window];
@@ -884,7 +888,8 @@ ns_window_widget_rep::send (slot s, blackbox val) {
         [win setTitle:title];
       }
     }
-    break;
+      break;
+      
     case SLOT_MODIFIED:
     {
       check_type<bool> (val, s);
@@ -893,13 +898,13 @@ ns_window_widget_rep::send (slot s, blackbox val) {
       if (win) [win setDocumentEdited:flag];
     }
       break;
-  case SLOT_REFRESH:
-    NOT_IMPLEMENTED ;
-    // send_refresh (THIS, val);
-    break;
-          
-  default:
-    FAILED ("cannot handle slot type");
+    case SLOT_REFRESH:
+      NOT_IMPLEMENTED ;
+      // send_refresh (THIS, val);
+      break;
+      
+    default:
+      FAILED ("cannot handle slot type");
   }
 }
 
@@ -907,26 +912,30 @@ ns_window_widget_rep::send (slot s, blackbox val) {
 blackbox
 ns_window_widget_rep::query (slot s, int type_id) {
   switch (s) {
-  case SLOT_IDENTIFIER:
-    TYPE_CHECK (type_id == type_helper<int>::id);
-    return close_box<int> ((intptr_t) [wc window] ? 1 : 0);
-  case SLOT_POSITION:  
+      
+    case SLOT_IDENTIFIER:
+      TYPE_CHECK (type_id == type_helper<int>::id);
+      return close_box<int> ((intptr_t) [wc window] ? 1 : 0);
+      
+    case SLOT_POSITION:
     {
       typedef pair<SI,SI> coord2;
       TYPE_CHECK (type_id == type_helper<coord2>::id);
       NSRect frame = [[wc window] frame];
       return close_box<coord2> (from_nspoint(frame.origin));
     }
-  case SLOT_SIZE:
+      
+    case SLOT_SIZE:
     {
       typedef pair<SI,SI> coord2;
       TYPE_CHECK (type_id == type_helper<coord2>::id);
       NSRect frame = [[wc window] frame];
       return close_box<coord2> (from_nssize(frame.size));
     }
-  default:
-    FAILED ("cannot handle slot type");
-    return blackbox ();
+      
+    default:
+      FAILED ("cannot handle slot type");
+      return blackbox ();
   }
 }
 
@@ -942,17 +951,21 @@ ns_window_widget_rep::notify (slot s, blackbox new_val) {
 widget
 ns_window_widget_rep::read (slot s, blackbox index) {
   switch (s) {
+      
   default:
     FAILED ("cannot handle slot type");
     return widget();
+      
   }
 }
 
 void
 ns_window_widget_rep::write (slot s, blackbox index, widget w) {
   switch (s) {
+      
   default:
     FAILED ("cannot handle slot type");
+      
   }
 }
 
@@ -973,6 +986,7 @@ void
 ns_simple_widget_rep::send (slot s, blackbox val) {
   if (DEBUG_AQUA) debug_aqua << "ns_ns_simple_widget_rep::send " << slot_name(s) << LF;
   switch (s) {
+      
     case SLOT_CURSOR:
     {
       TYPE_CHECK (type_box (val) == type_helper<coord2>::id);
@@ -1003,7 +1017,6 @@ ns_simple_widget_rep::send (slot s, blackbox val) {
     }
       break;
       
-      
     case SLOT_EXTENTS:
     {
       TYPE_CHECK (type_box (val) == type_helper<coord4>::id);
@@ -1016,7 +1029,6 @@ ns_simple_widget_rep::send (slot s, blackbox val) {
       [view setFrameSize: sz];
     }
       break;
-      
       
     case SLOT_ZOOM_FACTOR:
     {
@@ -1085,11 +1097,12 @@ ns_simple_widget_rep::query (slot s, int type_id) {
       return close_box<coord4> (c);
     }
       
-      
     case SLOT_VISIBLE_PART:
     {
       TYPE_CHECK (type_id == type_helper<coord4>::id);
       NSRect rect= [view visibleRect];
+      NSPoint pt = [view frame].origin;
+      rect = NSOffsetRect(rect, pt.x, pt.y);
       coord4 c= from_nsrect (rect);
       if (DEBUG_EVENTS) debug_events << "Visible region (" << rect.origin.x
         << "," << rect.origin.y
@@ -1215,50 +1228,5 @@ widget popup_widget (widget w)
 {
   return concrete(w)->make_popup_widget();
 }
-
-
-#if 0
-/******************************************************************************
- *  Widgets which are not strictly required by TeXmacs
- *  their implementation is void
- ******************************************************************************/
-
-widget
-empty_widget () {
-  // an empty widget of size zero
-  NOT_IMPLEMENTED;
-  return widget();
-}
-
-widget
-glue_widget (bool hx, bool vx, SI w, SI h) {
-  //{ return widget(); }
-  // an empty widget of minimal width w and height h and which is horizontally
-  // resp. vertically extensible if hx resp. vx is true
-  NOT_IMPLEMENTED;
-  (void) hx; (void) vx; (void) w; (void) h;
-  return tm_new <ns_view_widget_rep> ([[[NSView alloc] initWithFrame:NSMakeRect(0, 0, 50, 50)] autorelease]);
-}
-
-widget
-glue_widget (tree col, bool hx, bool vx, SI w, SI h) {
-  (void) col;
-  return glue_widget (hx, vx, w, h);
-}
-
-widget
-extend (widget w, array<widget> a) {
-  (void) a;
-  return w;
-}
-
-widget
-wait_widget (SI width, SI height, string message) { 
-  // a widget of a specified width and height, displaying a wait message
-  // this widget is only needed when using the X11 plugin
-  (void) width; (void) height; (void) message;
-  return widget(); 
-}
-#endif
 
 

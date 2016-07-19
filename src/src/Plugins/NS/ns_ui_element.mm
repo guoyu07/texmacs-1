@@ -7,8 +7,6 @@
 //
 
 
-#define NEW_MENUS
-
 #include "mac_cocoa.h"
 
 #include "ns_ui_element.h"
@@ -496,7 +494,6 @@ ns_ui_element_rep::ns_ui_element_rep (types _type, blackbox _load)
 
 ns_ui_element_rep::~ns_ui_element_rep() {}
 
-
 NSView*
 ns_ui_element_rep::as_view () {
   NSView *v = nil;
@@ -512,9 +509,9 @@ ns_ui_element_rep::as_view () {
       [(NSBox*)v setTitlePosition: NSNoTitle];
       [v setTranslatesAutoresizingMaskIntoConstraints: NO];
       NSLayoutYAxisAnchor *yanchor = [v topAnchor];
-      NSLayoutXAxisAnchor *lanchor = [v leftAnchor];
-      NSLayoutXAxisAnchor *ranchor = [v rightAnchor];
-      float hspacing = 2.0, vspacing = 2.0, hborder = 2.0, vborder = 2.0;
+      NSLayoutXAxisAnchor *lanchor = [v leadingAnchor];
+      NSLayoutXAxisAnchor *ranchor = [v trailingAnchor];
+      float hspacing = 0.0, vspacing = 0.0, hborder = 3.0, vborder = 3.0;
       for (int i = 0; i < N(arr); i++) {
         if (is_nil (arr[i])) break;
         NSView* item = concrete (arr[i])->as_view ();
@@ -535,15 +532,16 @@ ns_ui_element_rep::as_view () {
     {
       typedef array<widget> T;
       T arr = open_box<T> (load);
-      
-      v = [[[NSBox alloc] init] autorelease];
-      [(NSBox*)v setTitlePosition: NSNoTitle];
+#if 0
+      // custom autolayout code
+      v = [[[NSView alloc] init] autorelease];
+      //  [(NSBox*)v setTitlePosition: NSNoTitle];
       [v setTranslatesAutoresizingMaskIntoConstraints: NO];
-
+      
       NSLayoutXAxisAnchor *xanchor = [v leadingAnchor];
       NSLayoutYAxisAnchor *tanchor = [v topAnchor];
       NSLayoutYAxisAnchor *banchor = [v bottomAnchor];
-      float hspacing = 2.0, vspacing = 2.0, hborder = 2.0, vborder = 2.0;
+      float hspacing = 0.0, vspacing = 0.0, hborder = 3.0, vborder = 0.0;
       for (int i = 0; i < N(arr); i++) {
         if (is_nil (arr[i])) break;
         NSView* item = concrete (arr[i])->as_view ();
@@ -554,7 +552,24 @@ ns_ui_element_rep::as_view () {
         [[[item bottomAnchor] constraintEqualToAnchor: banchor constant: -vborder] setActive: YES];
         xanchor = [item trailingAnchor];
       }
-      [[xanchor constraintEqualToAnchor: [v trailingAnchor] constant: -hspacing] setActive: YES];
+      [[xanchor constraintEqualToAnchor: [v trailingAnchor] constant: -hborder] setActive: YES];
+#else
+      // stack based layout
+      NSStackView*sv = [[NSStackView alloc] init];
+      [sv setOrientation: NSUserInterfaceLayoutOrientationHorizontal];
+      [sv setTranslatesAutoresizingMaskIntoConstraints: NO];
+      [sv setAlignment:  NSLayoutAttributeCenterY];
+      [sv setDistribution: NSStackViewDistributionFill];
+      [sv setSpacing: 0.0];
+      v = sv;
+      for (int i = 0; i < N(arr); i++) {
+        if (is_nil (arr[i])) break;
+        NSView* item = concrete (arr[i])->as_view ();
+        [item setTranslatesAutoresizingMaskIntoConstraints: NO];
+        [sv addView: item inGravity: NSStackViewGravityLeading];
+      }
+      
+#endif
     }
       break;
       
@@ -740,7 +755,7 @@ ns_ui_element_rep::as_view () {
       [b setBordered: NO];
       [b setEnabled: NO];
       NSImage *img = [b image];
-#if 0
+#if 1
       if (img) {
         NSSize sz = [img size];
         [[[b widthAnchor] constraintGreaterThanOrEqualToConstant: sz.width] setActive: YES];
@@ -778,7 +793,7 @@ ns_ui_element_rep::as_view () {
       v = w->as_view ();
       if (help && help->type == text_widget) {
         T1 y = open_box<T1>(help->load);
-        [v setToolTip: to_nsstring (y.x1)];
+        [v setToolTip: to_nsstring_utf8 (y.x1)];
       }
     }
       break;
@@ -1314,8 +1329,6 @@ ns_simple_widget_rep::as_view () {
 
 #pragma mark abstract UI widget interface
 
-#ifdef NEW_MENUS
-
 /******************************************************************************
  * TeXmacs interface for the creation of widgets.
  * See Graphics/Gui/widget.hpp for comments.
@@ -1602,4 +1615,3 @@ widget wait_widget (SI width, SI height, string message) {
   debug_aqua << "wait_widget\n";
   return widget();
 }
-#endif

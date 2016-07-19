@@ -278,8 +278,9 @@
     view = [[NSStackView alloc] init];
     [view setOrientation: NSUserInterfaceLayoutOrientationVertical];
     [view setTranslatesAutoresizingMaskIntoConstraints: NO];
-    [view setAlignment:  NSLayoutAttributeLeft];
-    [view setSpacing: 0.0];
+    [view setAlignment: NSLayoutAttributeLeft];
+    [view setDistribution: NSStackViewDistributionFill];
+    [view setSpacing: 2.0];
 
     for (int i=0; i<4; i++) {
       NSView *v = [[[NSView alloc] init] autorelease];
@@ -312,14 +313,18 @@
 #if 0
   NSBox * b = [[[NSBox alloc] init] autorelease];
   [b setTitlePosition: NSNoTitle];
-  [b addSubview: view];
   [b setTranslatesAutoresizingMaskIntoConstraints: NO];
-  [[[b leadingAnchor] constraintEqualToAnchor: [view leadingAnchor]] setActive: YES];
-  [[[b trailingAnchor] constraintEqualToAnchor: [view trailingAnchor]] setActive: YES];
-  [[[b topAnchor] constraintEqualToAnchor: [view topAnchor]] setActive: YES];
-  [[[b bottomAnchor] constraintEqualToAnchor: [view bottomAnchor]] setActive: YES];
-#endif
+  [b addSubview: view];
+  NSView* c = b;
+  [[[c leadingAnchor] constraintEqualToAnchor: [view leadingAnchor]] setActive: YES];
+  [[[c trailingAnchor] constraintEqualToAnchor: [view trailingAnchor]] setActive: YES];
+  [[[c topAnchor] constraintEqualToAnchor: [view topAnchor]] setActive: YES];
+  [[[c bottomAnchor] constraintEqualToAnchor: [view bottomAnchor]] setActive: YES];
+  NSSize sz = [c fittingSize];
+  return b;
+#else
   return view;
+#endif
 }
 
 @end // TMToolbarController
