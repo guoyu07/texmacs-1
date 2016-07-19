@@ -178,8 +178,8 @@
   NSMenuItem *mi = [[b cell] representedObject];
   NSMenu *sm = [mi submenu];
   if (sm)
-    [NSMenu popUpContextMenu:sm withEvent:[NSApp currentEvent] forView:b];
-  else if ([mi respondsToSelector:@selector(doit)]) [(id)mi doit];
+    [NSMenu popUpContextMenu: sm withEvent: [NSApp currentEvent] forView: b];
+  else if ([mi respondsToSelector: @selector(doit)]) [(id)mi doit];
 }
 
 - (void) setMenu:(NSMenu *)menu forRow:(unsigned) idx
@@ -217,7 +217,7 @@
         
         [[b cell] setRepresentedObject: mi];
         [b setTarget: self];
-        [b setAction:@selector(buttonsAction:)];
+        [b setAction: @selector(buttonsAction:)];
 
         [arr addObject: b];
       }
@@ -235,30 +235,30 @@
   int i,j;
   for (i=[barArray count]-1; i>= 0; i--) {
     r.origin.x = baseX;
-    NSArray *arr = [barArray objectAtIndex:i];
+    NSArray *arr = [barArray objectAtIndex: i];
     float currHeight = 0.0;
     for(j=0; j<((int) [arr count]); j++) {
-      NSView *b = [arr objectAtIndex:j];
-      if ([[b class] isSubclassOfClass:[NSView class]]) {
-        if (![b superview]) [view addSubview:b];
+      NSView *b = [arr objectAtIndex: j];
+      if ([[b class] isSubclassOfClass: [NSView class]]) {
+        if (![b superview]) [view addSubview: b];
         r.size = NSMakeSize(32,32); //[b frame].size;
-        [b setFrame:r];
-        r = NSOffsetRect(r, r.size.width + 0.0, 0);
+        [b setFrame: r];
+        r = NSOffsetRect (r, r.size.width + 0.0, 0);
       } else {
-        r = NSOffsetRect(r, 10.0, 0);
+        r = NSOffsetRect (r, 10.0, 0);
       }
-      if (NSMaxX(r) > totalWidth) totalWidth = NSMaxX(r);
+      if (NSMaxX(r) > totalWidth) totalWidth = NSMaxX (r);
       if (r.size.height > currHeight) currHeight = r.size.height;
     }
-    r = NSOffsetRect(r, 0, currHeight);
+    r = NSOffsetRect (r, 0, currHeight);
     totalHeight += currHeight;
   }
   r = [view frame];
   r.size.height = totalHeight;
   r.size.width = totalWidth;
   
-  [view setFrame:r];
-  [view setNeedsDisplay:YES];
+  [view setFrame: r];
+  [view setNeedsDisplay: YES];
 }
 
 - (NSView*) bar
@@ -267,3 +267,61 @@
 }
 
 @end
+
+
+@implementation TMToolbarController
+
+- (id) init
+{
+  self = [super init];
+  if (self) {
+    view = [[NSStackView alloc] init];
+    [view setOrientation: NSUserInterfaceLayoutOrientationVertical];
+    [view setTranslatesAutoresizingMaskIntoConstraints: NO];
+    [view setAlignment:  NSLayoutAttributeLeft];
+    [view setSpacing: 0.0];
+
+    for (int i=0; i<4; i++) {
+      NSView *v = [[[NSView alloc] init] autorelease];
+      [v setTranslatesAutoresizingMaskIntoConstraints: NO];
+      [view addView:v inGravity: NSStackViewGravityBottom];
+      toolbars[i] = v;
+    }
+  }
+  return self;
+}
+
+- (void) dealloc
+{
+  for (int i=0; i<4; i++) [toolbars[i] release];
+  [view release];
+  [super dealloc];
+}
+
+
+- (void) setView:(NSView *)v forRow:(unsigned) idx
+{
+  if (idx > 3) return;
+ // [v setTranslatesAutoresizingMaskIntoConstraints: NO];
+  [view replaceSubview: toolbars[idx] with: v];
+  toolbars[idx] = v;
+}
+
+- (NSView*) bar
+{
+#if 0
+  NSBox * b = [[[NSBox alloc] init] autorelease];
+  [b setTitlePosition: NSNoTitle];
+  [b addSubview: view];
+  [b setTranslatesAutoresizingMaskIntoConstraints: NO];
+  [[[b leadingAnchor] constraintEqualToAnchor: [view leadingAnchor]] setActive: YES];
+  [[[b trailingAnchor] constraintEqualToAnchor: [view trailingAnchor]] setActive: YES];
+  [[[b topAnchor] constraintEqualToAnchor: [view topAnchor]] setActive: YES];
+  [[[b bottomAnchor] constraintEqualToAnchor: [view bottomAnchor]] setActive: YES];
+#endif
+  return view;
+}
+
+@end // TMToolbarController
+
+

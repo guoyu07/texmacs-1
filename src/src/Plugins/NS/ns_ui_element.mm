@@ -439,7 +439,8 @@ add_style (NSString *str, int style) {
   NSFont* font = nil;
   NSColor* color = nil;
 //  int fs = [NSFont systemFontSize];
-  if (style & WIDGET_STYLE_MINI) {  // Use smaller text font
+  if (style & WIDGET_STYLE_MINI) {
+    // Use smaller text font
     //FIXME: remove hard coded size
     int fs = as_int (get_preference ("gui:mini-fontsize", "8"));
     if (fs <= 0) fs = 8;
@@ -448,25 +449,32 @@ add_style (NSString *str, int style) {
 //    sheet += QString("font-size: %1pt;").arg (fs > 0 ? fs : QTM_MINI_FONTSIZE);
  //   sheet += QString("padding: 1px;");
   }
-  if (style & WIDGET_STYLE_MONOSPACED) {  // Use monospaced font
+  if (style & WIDGET_STYLE_MONOSPACED) {
+    // Use monospaced font
     NSFont* f = [[NSFontManager sharedFontManager] convertFont: font toHaveTrait: NSFixedPitchFontMask];
     font = f;
   }
-  if (style & WIDGET_STYLE_GREY)  {    // Use grey text font
+  if (style & WIDGET_STYLE_GREY)  {
+    // Use grey text font
     color = [NSColor grayColor];
     //    sheet += "color: #414141;";
   }
-  if (style & WIDGET_STYLE_PRESSED)  { // Button is currently pressed
+  if (style & WIDGET_STYLE_PRESSED)  {
+    // Button is currently pressed
   }
-  if (style & WIDGET_STYLE_INERT)  {   // Only render, don't associate any action
+  if (style & WIDGET_STYLE_INERT)  {
+    // Only render, don't associate any action
   }
-  if (style & WIDGET_STYLE_BUTTON)  {  // Render button as standard button
+  if (style & WIDGET_STYLE_BUTTON)  {
+    // Render button as standard button
   }
-  if (style & WIDGET_STYLE_CENTERED) { // Use centered text
+  if (style & WIDGET_STYLE_CENTERED) {
+    // Use centered text
     pstyle = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
     [pstyle setAlignment: NSCenterTextAlignment];
   }
   if (style & WIDGET_STYLE_BOLD) {
+    // Use bold font style
     NSFont* f = [[NSFontManager sharedFontManager] convertFont: font toHaveTrait: NSBoldFontMask];
     font = f;
   }
@@ -500,7 +508,9 @@ ns_ui_element_rep::as_view () {
       typedef array<widget> T;
       T arr = open_box<T> (load);
 
-      v = [[[NSView alloc] init] autorelease];
+      v = [[[NSBox alloc] init] autorelease];
+      [(NSBox*)v setTitlePosition: NSNoTitle];
+      [v setTranslatesAutoresizingMaskIntoConstraints: NO];
       NSLayoutYAxisAnchor *yanchor = [v topAnchor];
       NSLayoutXAxisAnchor *lanchor = [v leftAnchor];
       NSLayoutXAxisAnchor *ranchor = [v rightAnchor];
@@ -526,7 +536,10 @@ ns_ui_element_rep::as_view () {
       typedef array<widget> T;
       T arr = open_box<T> (load);
       
-      v = [[[NSView alloc] init] autorelease];
+      v = [[[NSBox alloc] init] autorelease];
+      [(NSBox*)v setTitlePosition: NSNoTitle];
+      [v setTranslatesAutoresizingMaskIntoConstraints: NO];
+
       NSLayoutXAxisAnchor *xanchor = [v leadingAnchor];
       NSLayoutYAxisAnchor *tanchor = [v topAnchor];
       NSLayoutYAxisAnchor *banchor = [v bottomAnchor];
@@ -555,8 +568,7 @@ ns_ui_element_rep::as_view () {
       int cols = x.x2;
       
       v = [[[NSView alloc] init] autorelease];
-//      [v setTranslatesAutoresizingMaskIntoConstraints: NO];
-      
+      [v setTranslatesAutoresizingMaskIntoConstraints: NO];
       NSLayoutXAxisAnchor *lanchor = [v leadingAnchor];
       NSLayoutYAxisAnchor *tanchor = [v topAnchor];
       NSLayoutDimension *wanchor = nil;
@@ -633,16 +645,31 @@ ns_ui_element_rep::as_view () {
       break;
       
     case menu_separator:
-    case glue_widget:
     {
       // when this is called during the creation of a menu, returning a simple view has
       // the effect of triggering the call to as_menuitem
       // (this is a bit weird, maybe reorganise at some point)
       v = [[[NSView alloc] init] autorelease];
+      [v setTranslatesAutoresizingMaskIntoConstraints: NO];
+      [[[v widthAnchor] constraintEqualToConstant: 10] setActive: YES];
     }
       break;
 
-      
+    case glue_widget:
+    {
+      typedef quintuple<tree, bool, bool, SI, SI> T;
+      T x = open_box<T> (load);
+      tree col = x.x1;
+      bool hx = x.x2; bool vx = x.x3;
+      SI w = x.x4; SI h = x.x5;
+      v = [[[NSView alloc] init] autorelease];
+      [v setTranslatesAutoresizingMaskIntoConstraints: NO];
+      //[v setFrameSize: NSMakeSize(w, h)];
+      if (w) [[[v widthAnchor] constraintEqualToConstant: w] setActive: YES];
+      if (h) [[[v heightAnchor] constraintEqualToConstant: h] setActive: YES];
+    }
+      break;
+
     case menu_group:
     {
       typedef pair<string, int> T;
@@ -667,30 +694,19 @@ ns_ui_element_rep::as_view () {
       ns_widget      _w = concrete (x.x1);
       promise<widget> pw = x.x2;
       
-      ns_ui_element_rep *w = dynamic_cast<ns_ui_element_rep*>(_w.rep);
-      if (!w) {
-        v = [[[NSView alloc] init] autorelease];
-      } else if (w->type == xpm_widget) {
-        url image = open_box<url> (w->load);
-        NSButton* b = [[[NSButton alloc] init] autorelease];
-        [b setTranslatesAutoresizingMaskIntoConstraints: NO];
-        TMLazyMenu* menu = [[[TMLazyMenu alloc] init] autorelease];
-        [menu setPromise: pw.rep];
-        [b setMenu: menu];
-        [b setImage: xpm_image (image)];
-        [b setButtonType: NSMomentaryPushInButton];
-        v = b;
-      } else if (w->type == text_widget) {
-        typedef quartet<string, int, color, bool> T1;
-        T1 y = open_box<T1> (w->load);
-        NSButton* b = [[[NSButton alloc] init] autorelease];
+      {
+        NSPopUpButton* b = [[[NSPopUpButton alloc] init] autorelease];
+        [b setPullsDown: YES];
         TMLazyMenu* menu = [[[TMLazyMenu alloc] init] autorelease];
         [menu setPromise: pw.rep];
         [b setMenu: menu];
         [b setButtonType: NSMomentaryPushInButton];
-        [b setTitle: to_nsstring(y.x1)];
-        [b setEnabled:(y.x2 & WIDGET_STYLE_INERT) ? NO : YES];
-        // ns_apply_tm_style (b, y.x2, y.x3);
+        [b setBezelStyle: NSSmallSquareBezelStyle];
+        [b setBordered: NO];
+//        [b setEnabled:(y.x2 & WIDGET_STYLE_INERT) ? NO : YES];
+        [[b cell] setUsesItemFromMenu: NO];
+        [[b cell] setMenuItem: _w->as_menuitem ()];
+        [[b cell] setArrowPosition: NSPopUpNoArrow];
         v = b;
       }
     }
@@ -722,14 +738,15 @@ ns_ui_element_rep::as_view () {
       [b setButtonType: NSMomentaryPushInButton];
       [b setBezelStyle: NSShadowlessSquareBezelStyle];
       [b setBordered: NO];
-      [b setTranslatesAutoresizingMaskIntoConstraints: NO];
       [b setEnabled: NO];
       NSImage *img = [b image];
+#if 0
       if (img) {
         NSSize sz = [img size];
         [[[b widthAnchor] constraintGreaterThanOrEqualToConstant: sz.width] setActive: YES];
         [[[b heightAnchor] constraintGreaterThanOrEqualToConstant: sz.height] setActive: YES];
       }
+#endif
       TMCommand* command = [[[TMCommand alloc] init] autorelease];
       [command setCommand: cmd.rep];
       [command setObject: b];
@@ -793,7 +810,13 @@ ns_ui_element_rep::as_view () {
       [b setImagePosition: NSImageOnly];
       [b setImage: img];
       [b setEnabled: NO];
-      
+      [b setTranslatesAutoresizingMaskIntoConstraints: NO];
+      if (img) {
+        NSSize sz = [img size];
+        [[[b widthAnchor] constraintGreaterThanOrEqualToConstant: sz.width] setActive: YES];
+        [[[b heightAnchor] constraintGreaterThanOrEqualToConstant: sz.height] setActive: YES];
+      }
+
       v = b;
     }
       break;
@@ -1232,6 +1255,7 @@ ns_ui_element_rep::as_menuitem () {
       url    image = open_box<url>(load);
       mi = [[[TMMenuItem alloc] init] autorelease];
       NSImage* img = xpm_image (image);
+      [mi setTitle:@""];
       [mi setImage: img];
       [mi setRepresentedObject: img];
     }
@@ -1246,7 +1270,6 @@ ns_ui_element_rep::as_menuitem () {
   return mi;
 }
 
-
 widget
 ns_ui_element_rep::make_popup_widget () {
   if (type == vertical_menu) {
@@ -1256,8 +1279,6 @@ ns_ui_element_rep::make_popup_widget () {
   else
     return ns_widget_rep::make_popup_widget();
 }
-
-
 
 NSMenu*
 to_nsmenu (widget w)

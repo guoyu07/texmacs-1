@@ -320,8 +320,8 @@ NSString *TMButtonsIdentifier = @"TMButtonsIdentifier";
       NSRect f = [[wid->bc bar] frame];
       //	NSSize s = NSMakeSize(900,70);
       NSSize s = f.size;
-      [ti setMinSize:s];
-      [ti setMaxSize:s];
+      //[ti setMinSize:s];
+      //[ti setMaxSize:s];
       
     }
     return ti;
@@ -359,18 +359,18 @@ ns_tm_widget_rep::ns_tm_widget_rep(int mask) : ns_view_widget_rep([[[NSView allo
   NSRect r2 = r; r2.size.height = s.height;
   NSRect r3 = r2; 
   r2.size.width -= s.width; r3.origin.x += r2.size.width;
+  
   sv = [[[NSScrollView alloc] initWithFrame:r1] autorelease];
-  [sv setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
   [sv setHasVerticalScroller:YES];
   [sv setHasHorizontalScroller:YES];
   [sv setBorderType:NSNoBorder];
   //  [sv setBackgroundColor:[NSColor redColor]];
   [sv setBackgroundColor:[NSColor grayColor]];
-
+  
+  [sv setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
   id newClipView = [[[TMCenteringClipView alloc] initWithFrame:[[sv contentView] frame]] autorelease];
   [newClipView setBackgroundColor:[NSColor windowBackgroundColor]];
   [sv setContentView:(NSClipView *)newClipView];
-
   
   [sv setDocumentView:[[[NSView alloc] initWithFrame: NSMakeRect(0,0,100,100)] autorelease]];
   [view addSubview:sv];
@@ -389,7 +389,7 @@ ns_tm_widget_rep::ns_tm_widget_rep(int mask) : ns_view_widget_rep([[[NSView allo
   [view addSubview:leftField];
   [view addSubview:rightField];
   
-  bc = [[TMBarsController alloc] init];
+  bc = [[TMToolbarController alloc] init];
   //NSView *mt = [bc bar];
   //[mt setFrame:r0];
   //[mt setAutoresizingMask:NSViewMaxXMargin|NSViewMinYMargin];
@@ -741,22 +741,28 @@ ns_tm_widget_rep::write (slot s, blackbox index, widget w) {
     break;
   case SLOT_MAIN_ICONS:
     check_type_void (index, s);
-    [bc setMenu:to_nsmenu(w) forRow:0];
+//    [bc setMenu:to_nsmenu(w) forRow:0];
+      [bc setView: concrete(w)->as_view() forRow:0];
     layout();
     break;
   case SLOT_MODE_ICONS:
     check_type_void (index, s);
-    [bc setMenu:to_nsmenu(w) forRow:1];
+//    [bc setMenu:to_nsmenu(w) forRow:1];
+      [bc setView: concrete(w)->as_view() forRow:1];
+
     layout();
     break;
   case SLOT_FOCUS_ICONS:
     check_type_void (index, s);
-    [bc setMenu:to_nsmenu(w) forRow:2];
+//    [bc setMenu:to_nsmenu(w) forRow:2];
+      [bc setView: concrete(w)->as_view() forRow:2];
+
     layout();
     break;
   case SLOT_USER_ICONS:
     check_type_void (index, s);
-    [bc setMenu:to_nsmenu(w) forRow:3];
+//    [bc setMenu:to_nsmenu(w) forRow:3];
+      [bc setView: concrete(w)->as_view() forRow:3];
     layout();
     break;
   case SLOT_BOTTOM_TOOLS:

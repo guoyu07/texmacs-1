@@ -38,3 +38,14 @@
 @end
 
 
+
+
+@interface TMToolbarController : NSObject {
+  NSView* toolbars[4];
+  NSStackView* view;
+}
+- (void) setView:(NSView *)menu forRow:(unsigned) idx;
+//- (void) layout;
+- (NSView*) bar;
+@end
+

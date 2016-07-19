@@ -17,13 +17,13 @@
 
 
 @class TMWidgetHelper;
-@class TMBarsController;
+@class TMToolbarController;
 
 class ns_tm_widget_rep: public ns_view_widget_rep {
 public:	
   NSScrollView *sv;
 	NSTextField *leftField, *rightField;
-	TMBarsController *bc;
+	TMToolbarController *bc;
 	TMWidgetHelper *wh;
 	NSToolbar *toolbar;
 	
