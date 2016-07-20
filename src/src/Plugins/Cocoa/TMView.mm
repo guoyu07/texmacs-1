@@ -237,7 +237,11 @@ void initkeymap()
 {
   if (DEBUG_EVENTS) debug_events << "FOCUSIN" << LF;
   if (wid) {
+#if DIRECT_EVENTS
     wid->handle_keyboard_focus (true, texmacs_time ());
+#else    
+    the_gui->process_keyboard_focus (wid, true, texmacs_time());
+#endif
   }
 }
 
@@ -245,7 +249,11 @@ void initkeymap()
 {
   if (DEBUG_EVENTS)   debug_events << "FOCUSOUT" << LF;
   if (wid) {
+#if DIRECT_EVENTS
     wid->handle_keyboard_focus (false, texmacs_time ());
+#else
+    the_gui->process_keyboard_focus (wid, true, texmacs_time());
+#endif
   }
 }
 
@@ -344,7 +352,11 @@ void initkeymap()
         }
         if (DEBUG_EVENT)
           debug_events << "key press: " << s << LF;
-        wid -> handle_keypress (s, texmacs_time());    
+#ifdef DIRECT_EVENTS
+        wid->handle_keypress (s, texmacs_time());
+#else
+        the_gui->process_keypress (wid, s, texmacs_time());
+#endif
       }
     }
     else {
@@ -401,7 +413,11 @@ void initkeymap()
           if (DEBUG_EVENTS)
             debug_events << "function key press: " << r << LF;
           [self deleteWorkingText];
+#ifdef DIRECT_EVENTS
           wid->handle_keypress (r, texmacs_time());
+#else
+          the_gui->process_keypress (wid, r, texmacs_time());
+#endif
           return;
         } else if (mods & (NSControlKeyMask  | NSCommandKeyMask | NSHelpKeyMask))
         {
@@ -414,7 +430,11 @@ void initkeymap()
           if (DEBUG_EVENTS)
             debug_events << "modified  key press: " << s << LF;
           [self deleteWorkingText];
+#ifdef DIRECT_EVENTS
           wid->handle_keypress (s, texmacs_time());
+#else
+          the_gui->process_keypress (wid, s, texmacs_time());
+#endif
           the_gui->update (); // FIXME: remove this line when
           // edit_typeset_rep::get_env_value will be faster
 
@@ -465,7 +485,11 @@ mouse_decode (unsigned int mstate) {
 	scale(point);
     unsigned int mstate= mouse_state (theEvent, false);
     string s= "press-" * mouse_decode (mstate);
+#ifdef DIRECT_EVENTS
     wid->handle_mouse (s, point.x , point.y , mstate, texmacs_time ());
+#else
+    the_gui -> process_mouse (wid, s, point.x , point.y , mstate, texmacs_time ());
+#endif
     if (DEBUG_EVENTS)
       debug_events << "mouse event: " << s << " at "
       << point.x << ", " << point.y  << LF;
@@ -479,7 +503,11 @@ mouse_decode (unsigned int mstate) {
 	scale(point);
     unsigned int mstate= mouse_state (theEvent, true);
     string s= "release-" * mouse_decode (mstate);
+#ifdef DIRECT_EVENTS
     wid->handle_mouse (s, point.x , point.y , mstate, texmacs_time ());
+#else
+    the_gui -> process_mouse (wid, s, point.x , point.y , mstate, texmacs_time ());
+#endif
     if (DEBUG_EVENTS)
       debug_events << "mouse event: " << s << " at "
       << point.x  << ", " << point.y  << LF;
@@ -493,7 +521,11 @@ mouse_decode (unsigned int mstate) {
 		scale(point);
     unsigned int mstate= mouse_state (theEvent, false);
     string s= "move";
+#ifdef DIRECT_EVENTS
     wid->handle_mouse (s, point.x , point.y , mstate, texmacs_time ());
+#else
+    the_gui -> process_mouse (wid, s, point.x , point.y , mstate, texmacs_time ());
+#endif
     if (DEBUG_EVENTS)
       debug_events << "mouse event: " << s << " at "
       << point.x  << ", " << point.y  << LF;
@@ -507,7 +539,11 @@ mouse_decode (unsigned int mstate) {
 		scale(point);
     unsigned int mstate= mouse_state (theEvent, false);
     string s= "move";
+#ifdef DIRECT_EVENTS
     wid->handle_mouse (s, point.x , point.y , mstate, texmacs_time ());
+#else
+    the_gui -> process_mouse (wid, s, point.x , point.y , mstate, texmacs_time ());
+#endif
     if (DEBUG_EVENTS)
       debug_events << "mouse event: " << s << " at "
       << point.x  << ", " << point.y  << LF;
@@ -530,7 +566,11 @@ mouse_decode (unsigned int mstate) {
   if (wid)  {
     NSSize size = [self bounds].size;
     scaleSize (size);
+#ifdef DIRECT_EVENTS
     wid->handle_notify_resize (size.width, size.height);
+#else
+    the_gui -> process_resize (wid, size.width, size.height);
+#endif
   }
 }
 
@@ -565,7 +605,11 @@ mouse_decode (unsigned int mstate) {
     string s= utf8_to_cork (rr);
     if (DEBUG_EVENTS)
       debug_events << "key press: " << s << LF;
-    wid->handle_keypress (s, texmacs_time());        
+#ifdef DIRECT_EVENTS
+    wid->handle_keypress (s, texmacs_time());
+#else
+    the_gui->process_keypress (wid, s, texmacs_time());
+#endif
   }
 }
 

@@ -17,6 +17,9 @@
 #include <locale.h>
 #include "language.hpp"
 #include "message.hpp"
+#include "command.hpp"
+#include "scheme.hpp"
+
 #include "ns_renderer.h" // for the_ns_renderer
 
 //extern hashmap<id, pointer> NSWindow_to_window;
@@ -33,6 +36,47 @@ int timeout_time;
 
 
 
+/******************************************************************************
+ * Queued events
+ ******************************************************************************/
+
+#pragma mark Queued events
+
+event_queue::event_queue() : n(0) { }
+
+void
+event_queue::append (const queued_event& ev) {
+  q << ev;
+  ++n;
+}
+
+queued_event
+event_queue::next () {
+  if (is_nil(q))
+    return queued_event();
+  queued_event ev = q->item;
+  q = q->next;
+  --n;
+  return ev;
+}
+
+bool
+event_queue::is_empty() const {
+  ASSERT (!(n!=0 && is_nil(q)), "WTF?");
+  return n == 0;
+}
+
+int
+event_queue::size() const {
+  return n;
+}
+
+
+/******************************************************************************
+ * TMHelper
+ ******************************************************************************/
+
+#pragma mark TMHelper
 
 @interface TMHelper : NSObject
 {
@@ -77,21 +121,30 @@ int timeout_time;
 
 
 ns_gui_rep::ns_gui_rep(int& argc, char** argv): 
-  interrupted(false), selection(NULL)
+interrupted(false), time_credit (100), do_check_events (false), updating (false),
+needing_update (false), selection(NULL), updatetimer(nil)
 {
   (void) argc; (void) argv;
 //  argc               = argc2;
 //  argv               = argv2;
-  interrupted        = false;
-  interrupt_time     = texmacs_time ();
+  interrupted  = false;
+  time_credit  = 100;
+  timeout_time = texmacs_time () + time_credit;
   
   helper = 	[[TMHelper alloc] init];
 
-  
+
   set_output_language (get_locale_language ());
-  // out_lan= get_locale_language ();
-//  (void) default_font ();
+  refresh_language();
+
 }
+
+ns_gui_rep::~ns_gui_rep()
+{
+  [updatetimer release];
+  [helper release];
+}
+
 
 
 /* important routines */
@@ -183,8 +236,11 @@ void ns_gui_rep::set_mouse_pointer (string name) { (void) name; }
 void ns_gui_rep::set_mouse_pointer (string curs_name, string mask_name)  { (void) curs_name; (void) mask_name; } ;
 
 /******************************************************************************
- * Main loop
+ * OLD Main loop
  ******************************************************************************/
+
+/*
+#if 0
 
 static bool check_mask(int mask)
 {
@@ -239,139 +295,500 @@ ns_gui_rep::check_event (int type) {
 }
 #endif
 
-void
-ns_gui_rep::show_wait_indicator (widget w, string message, string arg) {
-}
+ 
+ 
+ 
+ 
+ void update()
+ {
+	//NSBeep();
+	if (the_interpose_handler) the_interpose_handler();
+ ns_update_flag = false;
+ 
+ [[NSNotificationCenter defaultCenter] postNotificationName: @"TeXmacsUpdateWindows" object: nil];
+ 
+ [NSTimer scheduledTimerWithTimeInterval: 10.0 target: the_gui->helper selector: @selector(update) userInfo: nil repeats: NO];
+ }
+ 
+ void ns_gui_rep::update ()
+ {
+ //  NSLog(@"UPDATE----------------------------");
+ ::update();
+ }
+ 
+ void
+ needs_update () {
+ ns_update_flag = true;
+ [NSTimer scheduledTimerWithTimeInterval: 0.0 target: the_gui->helper selector: @selector(update) userInfo: nil repeats: NO];
+ }
+ 
+ 
+ 
+ @interface TMInterposer : NSObject
+ {
+	NSNotification *n;
+ }
+ - (void)interposeNow;
+ -(void)waitIdle;
+ @end
+ 
+ @implementation TMInterposer
+ - init
+ {
+ if (self = [super init])
+ {
+	//	n = [[NSNotification notificationWithName:@"TMInterposeNotification" object:self] retain];
+ // [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(interposeNow) name:@"TMInterposeNotification" object:nil];
+ [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(interposeNow) name:NSApplicationWillUpdateNotification object:nil];
+	//	[self waitIdle];
+ }
+ return self;
+ }
+ - (void)dealloc
+ {
+	//[n release];
+ [[NSNotificationCenter defaultCenter] removeObserver:self];
+ [super dealloc];
+ }
+ 
+ - (void)interposeNow
+ {
+ //	NSBeep();
+	update();
+	//[self performSelector:@selector(waitIdle) withObject:nil afterDelay:0.25 inModes:[NSArray arrayWithObjects:NSDefaultRunLoopMode, nil]];
+ }
+ 
+ -(void)waitIdle
+ {
+	[[NSNotificationQueue defaultQueue] enqueueNotification:n
+ postingStyle:NSPostWhenIdle
+ coalesceMask:NSNotificationCoalescingOnName
+ forModes:nil];
+ }
+ 
+ @end
+ 
+ 
+ 
+ //@class FScriptMenuItem;
+ 
+ void ns_gui_rep::event_loop ()
+ #if 1
+ {
+ //	TMInterposer* i = [[TMInterposer alloc ] init];
+	//[[NSApp mainMenu] addItem:[[[FScriptMenuItem alloc] init] autorelease]];
+ //	update();
+ 
+	[NSApp run];
+ //	[i release];
+ }
+ #else
+ {
+ //	[[NSApp mainMenu] addItem:[[[FScriptMenuItem alloc] init] autorelease]];
+	[NSApp finishLaunching];
+	{
+	NSEvent *event = nil;
+ time_credit= 1000000;
+ 
+ while (1) {
+ timeout_time= texmacs_time () + time_credit;
+ 
+ NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+ NSDate *dateSlow = [NSDate dateWithTimeIntervalSinceNow:0.5];
+ event= [NSApp nextEventMatchingMask:NSAnyEventMask untilDate: dateSlow //[NSDate distantFuture]
+ inMode:NSDefaultRunLoopMode dequeue:YES];
+ while (event)
+ {
+ [NSApp sendEvent:event];
+ //	update();
+ //NSDate *dateFast = [NSDate dateWithTimeIntervalSinceNow:0.001];
+ event= [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:[NSDate distantPast] // dateFast
+ inMode:NSDefaultRunLoopMode dequeue:YES];
+ }
+ interrupted = false;
+ if (!event)  {
+ update ();
+ time_credit= min (1000000, 2 * time_credit);
+ ns_update_flag= false;
+ }
+ [pool release];
+ }
+	}
+ }
+ #endif
+ 
+ 
+
+#endif // OLD MAIN LOOP
+*/
+
+/******************************************************************************
+ * Interpose handler interface
+ ******************************************************************************/
 
 
 void (*the_interpose_handler) (void) = NULL;
 //void set_interpose_handler (void (*r) (void)) { the_interpose_handler= r; }
 void gui_interpose (void (*r) (void)) { the_interpose_handler= r; }
 
-void update()
-{
-	//NSBeep();
-	if (the_interpose_handler) the_interpose_handler();
-  ns_update_flag = false;
 
-  [[NSNotificationCenter defaultCenter] postNotificationName: @"TeXmacsUpdateWindows" object: nil];
+/******************************************************************************
+ * Queued processing
+ ******************************************************************************/
 
-  [NSTimer scheduledTimerWithTimeInterval: 10.0 target: the_gui->helper selector: @selector(update) userInfo: nil repeats: NO];
-}
+/*!
+ We process a maximum of max events. There are two kind of events: those
+ which need a pass on interpose_handler just after and the others. We count
+ only the first kind of events. In update() we call this function with
+ max = 1 so that only one of these "sensible" events is handled. Otherwise
+ updating the internal TeXmacs structure becomes very slow. This can be
+ considered a limitation of the current implementation of interpose_handler
+ Likewise this function is just a hack to get things working properly.
+ */
 
-void ns_gui_rep::update ()
-{
-//  NSLog(@"UPDATE----------------------------");
-  ::update();
+void
+ns_gui_rep::process_queued_events (int max) {
+  int count = 0;
+  while (max < 0 || count < max)  {
+    const queued_event& ev = waiting_events.next();
+    if (ev.x1 == qp_type::QP_NULL) break;
+#ifdef ns_CPU_FIX
+    if (ev.x1 != qp_type::QP_NULL &&
+        ev.x1 != qp_type::QP_SOCKET_NOTIFICATION &&
+        ev.x1 != qp_type::QP_DELAYED_COMMANDS)
+      tm_wake_up ();
+#endif
+    switch (ev.x1) {
+      case qp_type::QP_NULL :
+        break;
+      case qp_type::QP_KEYPRESS :
+      {
+        typedef triple<widget, string, time_t > T;
+        T x = open_box <T> (ev.x2);
+        if (!is_nil (x.x1))
+          concrete_simple_widget (x.x1)->handle_keypress (x.x2, x.x3);
+      }
+        break;
+      case qp_type::QP_KEYBOARD_FOCUS :
+      {
+        typedef triple<widget, bool, time_t > T;
+        T x = open_box <T> (ev.x2);
+        if (!is_nil (x.x1))
+          concrete_simple_widget (x.x1)->handle_keyboard_focus (x.x2, x.x3);
+      }
+        break;
+      case qp_type::QP_MOUSE :
+      {
+        typedef quintuple<string, SI, SI, int, time_t > T1;
+        typedef pair<widget, T1> T;
+        T x = open_box <T> (ev.x2);
+        if (!is_nil (x.x1))
+          concrete_simple_widget (x.x1)->handle_mouse (x.x2.x1, x.x2.x2,
+                                                       x.x2.x3, x.x2.x4, x.x2.x5);
+      }
+        break;
+      case qp_type::QP_RESIZE :
+      {
+        typedef triple<widget, SI, SI > T;
+        T x = open_box <T> (ev.x2);
+        if (!is_nil (x.x1))
+          concrete_simple_widget (x.x1)->handle_notify_resize (x.x2, x.x3) ;
+      }
+        break;
+      case qp_type::QP_COMMAND :
+      {
+        command cmd = open_box <command> (ev.x2) ;
+        cmd->apply();
+      }
+        break;
+      case qp_type::QP_COMMAND_ARGS :
+      {
+        typedef pair<command, object> T;
+        T x = open_box <T> (ev.x2);
+        x.x1->apply (x.x2);
+      }
+        break;
+      case qp_type::QP_DELAYED_COMMANDS :
+      {
+ //       delayed_commands.exec_pending();
+      }
+        break;
+        
+      default:
+        FAILED ("Unexpected queued event");
+    }
+    switch (ev.x1) {
+      case qp_type::QP_COMMAND:
+      case qp_type::QP_COMMAND_ARGS:
+      case qp_type::QP_RESIZE:
+      case qp_type::QP_DELAYED_COMMANDS:
+        break;
+      default:
+        count++;
+        break;
+    }
+  }
 }
 
 void
-needs_update () {
-  ns_update_flag = true;
-  [NSTimer scheduledTimerWithTimeInterval: 0.0 target: the_gui->helper selector: @selector(update) userInfo: nil repeats: NO];
+ns_gui_rep::process_keypress (ns_simple_widget_rep *wid, string key, time_t t) {
+  typedef triple<widget, string, time_t > T;
+  add_event (queued_event (qp_type::QP_KEYPRESS,
+                           close_box<T> (T (wid, key, t))));
 }
 
-
-
-@interface TMInterposer : NSObject
-{  
-	NSNotification *n;
+void
+ns_gui_rep::process_keyboard_focus (ns_simple_widget_rep *wid, bool has_focus,
+                                    time_t t ) {
+  typedef triple<widget, bool, time_t > T;
+  add_event (queued_event (qp_type::QP_KEYBOARD_FOCUS,
+                           close_box<T> (T (wid, has_focus, t))));
 }
-- (void)interposeNow;
--(void)waitIdle;
-@end
 
-@implementation TMInterposer
-- init
-{
-  if (self = [super init])
-  {
-	//	n = [[NSNotification notificationWithName:@"TMInterposeNotification" object:self] retain];
-   // [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(interposeNow) name:@"TMInterposeNotification" object:nil];
-		 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(interposeNow) name:NSApplicationWillUpdateNotification object:nil];
-	//	[self waitIdle];
+void
+ns_gui_rep::process_mouse (ns_simple_widget_rep *wid, string kind, SI x, SI y,
+                           int mods, time_t t ) {
+  typedef quintuple<string, SI, SI, int, time_t > T1;
+  typedef pair<widget, T1> T;
+  add_event (queued_event (qp_type::QP_MOUSE,
+                           close_box<T> ( T (wid, T1 (kind, x, y, mods, t)))));
+}
+
+void
+ns_gui_rep::process_resize (ns_simple_widget_rep *wid, SI x, SI y ) {
+  typedef triple<widget, SI, SI > T;
+  add_event (queued_event (qp_type::QP_RESIZE, close_box<T> (T (wid, x, y))));
+}
+
+void
+ns_gui_rep::process_command (command _cmd) {
+  add_event (queued_event (qp_type::QP_COMMAND, close_box<command> (_cmd)));
+}
+
+void
+ns_gui_rep::process_command (command _cmd, object _args) {
+  typedef pair<command, object > T;
+  add_event (queued_event (qp_type::QP_COMMAND_ARGS,
+                           close_box<T> (T (_cmd,_args))));
+}
+
+void
+ns_gui_rep::process_delayed_commands () {
+  add_event (queued_event (qp_type::QP_DELAYED_COMMANDS, blackbox()));
+}
+
+/*!
+ FIXME: add more types and refine, compare with X11 version.
+ */
+bool
+ns_gui_rep::check_event (int type) {
+  // do not interrupt if not updating (e.g. while painting the icons in menus)
+  if (!updating || !do_check_events) return false;
+  
+  switch (type) {
+    case INTERRUPT_EVENT:
+      if (interrupted) return true;
+      else {
+        time_t now = texmacs_time ();
+        if (now - timeout_time < 0) return false;
+        timeout_time = now + time_credit;
+        interrupted  = !waiting_events.is_empty();
+        return interrupted;
+      }
+    case INTERRUPTED_EVENT:
+      return interrupted;
+    default:
+      return false;
   }
-  return self;
-}
-- (void)dealloc
-{
-	//[n release];
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
-  [super dealloc];
 }
 
-- (void)interposeNow
-{
-//	NSBeep();
-	update();
-	//[self performSelector:@selector(waitIdle) withObject:nil afterDelay:0.25 inModes:[NSArray arrayWithObjects:NSDefaultRunLoopMode, nil]];
+void
+ns_gui_rep::set_check_events (bool enable_check) {
+  do_check_events = enable_check;
 }
 
--(void)waitIdle
-{
-	[[NSNotificationQueue defaultQueue] enqueueNotification:n 
-																						 postingStyle:NSPostWhenIdle
-																						 coalesceMask:NSNotificationCoalescingOnName 
-																								 forModes:nil];
+void
+ns_gui_rep::add_event (const queued_event& ev) {
+  waiting_events.append (ev);
+  if (updating) {
+    needing_update = true;
+  } else {
+    need_update();
+    // NOTE: we cannot update now since sometimes this seems to give problems
+    // to the update of the window size after a resize. In that situation
+    // sometimes when the window receives focus again, update will be called
+    // for the focus_in event and interpose_handler is run which sends a
+    // slot_extent message to the widget causing a wrong resize of the window.
+    // This seems to cure the problem.
+  }
 }
 
-@end
 
+/*!
+ This is called by doUpdate(), which in turn is fired by a timer activated in
+ needs_update(), and ensuring that interpose_handler() is run during a pass in
+ the event loop after we reactivate the timer with a pause (see FIXME below).
+ */
 
-
-//@class FScriptMenuItem;
-
-void ns_gui_rep::event_loop ()
-#if 1
-{
-//	TMInterposer* i = [[TMInterposer alloc ] init];
-	//[[NSApp mainMenu] addItem:[[[FScriptMenuItem alloc] init] autorelease]];
-//	update();
-
-	[NSApp run];
-//	[i release];
-}
+void
+ns_gui_rep::update () {
+#ifdef ns_CPU_FIX
+  int std_delay= 1;
+  tm_sleep ();
 #else
-{
-//	[[NSApp mainMenu] addItem:[[[FScriptMenuItem alloc] init] autorelease]];
-	[NSApp finishLaunching];
-	{
-	NSEvent *event = nil;
-    time_credit= 1000000;
+  int std_delay= 1000 / 6;
+#endif
+  
+  if (updating) {
+    cout << "NESTED UPDATING: This should not happen" << LF;
+    need_update();
+    return;
+  }
+  
+  // cout << "<" << texmacs_time() << " " << N(delayed_queue) << " ";
+  
+  
+  if (!updatetimer) {
+    updatetimer = [[NSTimer scheduledTimerWithTimeInterval: 100.0 target: the_gui->helper selector: @selector(update) userInfo: nil repeats: YES] retain];
+  }
 
-  while (1) {
-    timeout_time= texmacs_time () + time_credit;
+  
+//  [updatetimer invalidate];
+  updating = true;
+  
+  static int count_events    = 0;
+  static int max_proc_events = 10;
+  
+  time_t     now = texmacs_time();
+  needing_update = false;
+  time_credit    = 100 / (waiting_events.size() + 1);
 
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-			NSDate *dateSlow = [NSDate dateWithTimeIntervalSinceNow:0.5];
-		event= [NSApp nextEventMatchingMask:NSAnyEventMask untilDate: dateSlow //[NSDate distantFuture] 
-																 inMode:NSDefaultRunLoopMode dequeue:YES];		
-		while (event)
-		{
-			[NSApp sendEvent:event];
-		//	update();
-			//NSDate *dateFast = [NSDate dateWithTimeIntervalSinceNow:0.001];
-			event= [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:[NSDate distantPast] // dateFast 
-																	 inMode:NSDefaultRunLoopMode dequeue:YES];
-		}
-		interrupted = false;
-    if (!event)  {
-       update ();
-      time_credit= min (1000000, 2 * time_credit);
-      ns_update_flag= false;
+#if 0
+  // 1.
+  // Check if a wait dialog is active and in that case remove it.
+  // If we are here then the long operation has finished.
+  
+  if (waitDialogs.count()) {
+    waitWindow->layout()->removeWidget (waitDialogs.last());
+    waitWindow->close();
+    while (waitDialogs.count()) {
+      waitDialogs.last()->deleteLater();
+      waitDialogs.removeLast();
     }
-    [pool release];
-  }  
-	}
-}
+  }
+  
+  if (popup_wid_time > 0 && now > popup_wid_time) {
+    popup_wid_time = 0;
+    _popup_wid->send (SLOT_VISIBILITY, close_box<bool> (true));
+  }
+  
+  // 2.
+  // Manage delayed commands
+  
+  if (delayed_commands.must_wait (now))
+    process_delayed_commands();
 #endif
 
+  
+  // 3.
+  // If there are pending events in the private queue process them until the
+  // limit in processed events is reached.
+  // If there are no events or the limit is reached then proceed to a redraw.
+  
+  if (waiting_events.size() == 0) {
+    // If there are no waiting events call the interpose handler at least once
+    if (the_interpose_handler) the_interpose_handler();
+  } else while (waiting_events.size() > 0 && count_events < max_proc_events) {
+    process_queued_events (1);
+    count_events++;
+    if (the_interpose_handler) the_interpose_handler();
+  }
+  // Repaint invalid regions and redraw
+  count_events = 0;
+  
+  interrupted  = false;
+  timeout_time = texmacs_time() + time_credit;
+  
+  [[NSNotificationCenter defaultCenter] postNotificationName: @"TeXmacsUpdateWindows" object: nil];
+  //  ns_simple_widget_rep::repaint_all ();
+  
+  if (waiting_events.size() > 0) needing_update = true;
+  if (interrupted)               needing_update = true;
+  if (nr_windows == 0)   {        //qApp->quit();
+    cout << "We must quit!\n";
+  }
+  
+#if 0
+  time_t delay = delayed_commands.lapse - texmacs_time();
+  if (needing_update) delay = 0;
+  else                delay = max (0, min (std_delay, delay));
+#else
+  time_t delay;
+  if (needing_update) delay = 0;
+  else                delay = std_delay;
+#endif
+  
+  [updatetimer setFireDate: [NSDate dateWithTimeIntervalSinceNow: delay]];
+  //updatetimer->start (delay);
+  updating = false;
+  
+  // FIXME: we need to ensure that the interpose_handler is run at regular
+  //        intervals (1/6th of sec) so that informations on the footbar are
+  //        updated. (this should be better handled by promoting code in
+  //        tm_editor::apply_changes (which is activated only after idle
+  //        periods) at the level of delayed commands in the gui.
+  //        The interval cannot be too small to keep CPU usage low in idle state
+}
+
+void
+ns_gui_rep::force_update() {
+  if (updating) needing_update = true;
+  else          update();
+}
+
+void
+ns_gui_rep::need_update () {
+  if (updating) needing_update = true;
+  else if (updatetimer)
+    [updatetimer setFireDate: [NSDate dateWithTimeIntervalSinceNow: 0.0]];
+
+  //updatetimer->start (0);
+  // 0 ms - call immediately when all other events have been processed
+}
+
+void needs_update () {
+  the_gui->need_update();
+}
+
+
+void ns_gui_rep::event_loop ()
+{
+  update ();
+  [NSApp run];
+}
+
+/*! Called upon change of output language.
+ 
+ We currently emit a signal which forces every QTMAction to change his text
+ according to the new language, but the preferred Qt way seems to use
+ LanguageChange events (these are triggered upon installation of QTranslators)
+ */
+void
+ns_gui_rep::refresh_language() {
+//  gui_helper->doRefresh();
+}
 
 
 
-ns_gui_rep::~ns_gui_rep() 
-{ 
-} 
+
+void
+ns_gui_rep::show_wait_indicator (widget w, string message, string arg) {
+}
+
+
+/***************************************************************************/
+/***************************************************************************/
+/***************************************************************************/
 
 
 
@@ -544,3 +961,6 @@ external_event (string type, time_t t) {
   }
 #endif
 }
+
+
+
