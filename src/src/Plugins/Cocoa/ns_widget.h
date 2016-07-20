@@ -130,6 +130,9 @@ public:
   //virtual NSView *as_view ();
 };
 
+inline ns_simple_widget_rep* concrete_simple_widget (widget w) {
+  return static_cast<ns_simple_widget_rep*>(w.rep);
+}
 
 
 extern widget the_keyboard_focus;
