@@ -73,6 +73,81 @@ event_queue::size() const {
 
 
 /******************************************************************************
+ * Delayed commands
+ ******************************************************************************/
+
+#pragma mark Delayed commands
+
+command_queue::command_queue() : lapse (0), wait (true) { }
+command_queue::~command_queue() { clear_pending(); /* implicit */ }
+
+void
+command_queue::exec (object cmd) {
+  q << cmd;
+  start_times << (((time_t) texmacs_time ()) - 1000000000);
+  lapse = texmacs_time();
+  the_gui->need_update();
+  wait= true;
+}
+
+void
+command_queue::exec_pause (object cmd) {
+  q << cmd;
+  start_times << ((time_t) texmacs_time ());
+  lapse = texmacs_time();
+  the_gui->need_update();
+  wait= true;
+}
+
+void
+command_queue::exec_pending () {
+  array<object> a = q;
+  array<time_t> b = start_times;
+  q = array<object> (0);
+  start_times = array<time_t> (0);
+  int i, n = N(a);
+  for (i = 0; i<n; i++) {
+    time_t now =  texmacs_time ();
+    if ((now - b[i]) >= 0) {
+      object obj = call (a[i]);
+      if (is_int (obj) && (now - b[i] < 1000000000)) {
+        time_t pause = as_int (obj);
+        //cout << "pause = " << obj << "\n";
+        q << a[i];
+        start_times << (now + pause);
+      }
+    }
+    else {
+      q << a[i];
+      start_times << b[i];
+    }
+  }
+  if (N(q) > 0) {
+    wait = true;  // wait_for_delayed_commands
+    lapse = start_times[0];
+    int n = N(start_times);
+    for (i = 1; i<n; i++) {
+      if (lapse > start_times[i]) lapse = start_times[i];
+    }
+  } else
+    wait = false;
+}
+
+void
+command_queue::clear_pending () {
+  q = array<object> (0);
+  start_times = array<time_t> (0);
+  wait = false;
+}
+
+bool
+command_queue::must_wait (time_t now) const {
+  return wait && (lapse <= now);
+}
+
+
+
+/******************************************************************************
  * TMHelper
  ******************************************************************************/
 
@@ -510,7 +585,7 @@ ns_gui_rep::process_queued_events (int max) {
         break;
       case qp_type::QP_DELAYED_COMMANDS :
       {
- //       delayed_commands.exec_pending();
+        delayed_commands.exec_pending();
       }
         break;
         
@@ -645,8 +720,6 @@ ns_gui_rep::update () {
     return;
   }
   
-  // cout << "<" << texmacs_time() << " " << N(delayed_queue) << " ";
-  
   
   if (!updatetimer) {
     updatetimer = [[NSTimer scheduledTimerWithTimeInterval: 100.0 target: the_gui->helper selector: @selector(update) userInfo: nil repeats: YES] retain];
@@ -681,15 +754,19 @@ ns_gui_rep::update () {
     popup_wid_time = 0;
     _popup_wid->send (SLOT_VISIBILITY, close_box<bool> (true));
   }
-  
+
+#endif
+
   // 2.
   // Manage delayed commands
   
   if (delayed_commands.must_wait (now))
     process_delayed_commands();
-#endif
 
   
+  cout << "<" << texmacs_time() << " " << waiting_events.size() << " ";
+  if (waiting_events.size()>0) cout << "(" << waiting_events.q->item.x1 << ")";
+
   // 3.
   // If there are pending events in the private queue process them until the
   // limit in processed events is reached.
@@ -715,10 +792,10 @@ ns_gui_rep::update () {
   if (waiting_events.size() > 0) needing_update = true;
   if (interrupted)               needing_update = true;
   if (nr_windows == 0)   {        //qApp->quit();
-    cout << "We must quit!\n";
+   // cout << "We must quit!\n";
   }
   
-#if 0
+#if 1
   time_t delay = delayed_commands.lapse - texmacs_time();
   if (needing_update) delay = 0;
   else                delay = max (0, min (std_delay, delay));
@@ -960,6 +1037,22 @@ external_event (string type, time_t t) {
     if (wid) the_gui -> process_keypress (wid, type, t);
   }
 #endif
+}
+
+
+
+/******************************************************************************
+ * Delayed commands interface
+ ******************************************************************************/
+
+void exec_delayed (object cmd) {
+  the_gui->delayed_commands.exec(cmd);
+}
+void exec_delayed_pause (object cmd) {
+  the_gui->delayed_commands.exec_pause(cmd);
+}
+void clear_pending_commands () {
+  the_gui->delayed_commands.clear_pending();
 }
 
 

@@ -217,9 +217,11 @@ blackbox
 ns_view_widget_rep::query (slot s, int type_id) {
   switch (s) {
     case SLOT_IDENTIFIER:
+    {
       check_type_id<int> (type_id, s);
-      return close_box<int> ([view window] ? 1 : 0);
-      
+      int identifier = (int)[view window];
+      return close_box<int> (identifier);
+    }
     case SLOT_POSITION:
     {
       check_type_id<coord2> (type_id, s);
@@ -917,9 +919,11 @@ ns_window_widget_rep::query (slot s, int type_id) {
   switch (s) {
       
     case SLOT_IDENTIFIER:
+    {
       TYPE_CHECK (type_id == type_helper<int>::id);
-      return close_box<int> ((intptr_t) [wc window] ? 1 : 0);
-      
+      int identifier = (int)[wc window];
+      return close_box<int> (identifier);
+    }
     case SLOT_POSITION:
     {
       typedef pair<SI,SI> coord2;

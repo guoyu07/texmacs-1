@@ -235,7 +235,9 @@ void initkeymap()
 
 - (void) focusIn
 {
-  if (DEBUG_EVENTS) debug_events << "FOCUSIN" << LF;
+  if (DEBUG_EVENTS) ;
+  
+  debug_events << "FOCUSIN" << LF;
   if (wid) {
 #if DIRECT_EVENTS
     wid->handle_keyboard_focus (true, texmacs_time ());
@@ -247,7 +249,9 @@ void initkeymap()
 
 - (void) focusOut
 {
-  if (DEBUG_EVENTS)   debug_events << "FOCUSOUT" << LF;
+  if (DEBUG_EVENTS) ;
+    
+    debug_events << "FOCUSOUT" << LF;
   if (wid) {
 #if DIRECT_EVENTS
     wid->handle_keyboard_focus (false, texmacs_time ());
@@ -563,6 +567,8 @@ mouse_decode (unsigned int mstate) {
 - (void)resizeWithOldSuperviewSize:(NSSize)oldBoundsSize
 {
   [super resizeWithOldSuperviewSize:oldBoundsSize];
+  // The code below is not appropriate !!!!! discover where it is necessary to communicate the resizing.
+#if 0
   if (wid)  {
     NSSize size = [self bounds].size;
     scaleSize (size);
@@ -572,6 +578,7 @@ mouse_decode (unsigned int mstate) {
     the_gui -> process_resize (wid, size.width, size.height);
 #endif
   }
+#endif
 }
 
 - (BOOL)acceptsFirstResponder

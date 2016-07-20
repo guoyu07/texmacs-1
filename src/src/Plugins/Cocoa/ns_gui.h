@@ -57,6 +57,7 @@ public:
 /*!
  */
 class event_queue {
+public: // DEBUG
   list<queued_event> q;
   event_queue (const event_queue& q2);  // = delete;
   event_queue& operator= (const event_queue& q2); // = delete;
@@ -69,8 +70,39 @@ public:
   queued_event next ();
   bool is_empty() const;
   int size() const;
+  
 };
 
+
+
+/******************************************************************************
+ * Delayed commands
+ ******************************************************************************/
+
+/*! The queue of delayed commands.
+ */
+class command_queue {
+  array<object> q;
+  array<time_t> start_times;
+  time_t lapse;
+  
+  bool wait;
+  // this flag is used in update() to insert QP_DELAYED_COMMANDS events in
+  // the TeXmacs event queue to have delayed command handling properly
+  // interspersed with the other events
+  
+public:
+  command_queue();
+  ~command_queue();
+  
+  void exec (object cmd);
+  void exec_pause (object cmd);
+  void exec_pending ();
+  void clear_pending ();
+  bool must_wait (time_t now) const;
+  
+  friend class ns_gui_rep;
+};
 
 
 /******************************************************************************
@@ -96,7 +128,7 @@ public:
   bool  needing_update;
 
   event_queue     waiting_events;
-
+  command_queue delayed_commands;
   
   TMHelper* helper;
   NSTimer* updatetimer;

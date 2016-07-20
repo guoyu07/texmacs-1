@@ -64,7 +64,11 @@ NSMenuItem* to_nsmenuitem(widget w);
 
 - (void) doit {
   if (cmd) {
+#ifdef DIRECT_EVENTS
     cmd->apply();
+#else
+    the_gui->process_command (cmd);
+#endif
     cout << command(cmd) << LF;
   }
   id m = [object enclosingMenuItem];
@@ -180,7 +184,13 @@ void ns_menu_rep::send (slot s, blackbox val) {
 }
 
 - (void) doit {
-  if (cmd) cmd->apply();
+  if (cmd) {
+#ifdef DIRECT_EVENTS
+  cmd->apply();
+#else
+  the_gui->process_command (cmd);
+#endif
+  }
   [[self menu] cancelTracking];
 }
 
