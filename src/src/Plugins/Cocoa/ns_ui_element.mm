@@ -93,13 +93,13 @@ NSMenuItem* to_nsmenuitem(widget w);
 @end
 
 
-NSMenu *alloc_menu() { return [NSMenu alloc]; }
-NSMenuItem *alloc_menuitem() { return [NSMenuItem alloc]; }
+//NSMenu *alloc_menu () { return [NSMenu alloc]; }
+//NSMenuItem *alloc_menuitem () { return [NSMenuItem alloc]; }
 
 class ns_menu_rep : public ns_widget_rep  {
 public:
   NSMenuItem *item;
-  ns_menu_rep(NSMenuItem* _item) : item(_item) { [item retain]; }
+  ns_menu_rep(NSMenuItem* _item) : item (_item) { [item retain]; }
   ~ns_menu_rep()  { [item release]; }
   
   virtual void send (slot s, blackbox val);
@@ -154,17 +154,6 @@ void ns_menu_rep::send (slot s, blackbox val) {
       FAILED ("cannot handle slot type");
   }
 }
-
-#if 0
-class ns_menu_text_rep : public ns_basic_widget_rep {
-public:
-  NSString *text;
-  ns_menu_text_rep(NSString* _text) : text(_text) { [text retain]; }
-  ~ns_menu_text_rep()  { [text release]; }
-};
-
-#endif
-
 
 @implementation TMMenuItem
 
