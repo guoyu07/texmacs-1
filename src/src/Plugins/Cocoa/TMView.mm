@@ -57,15 +57,7 @@ inline void unscaleSize (NSSize &point)
 @end
 
 
-@interface TMView (Private)
-- (void) delayedUpdate;
-- (void) focusIn;
-- (void) focusOut;
-@end
 
-
-
-@implementation TMView
 
 
 inline void map(int code, string name)
@@ -154,9 +146,11 @@ void initkeymap()
   map( NSRedoFunctionKey  ,"redo" );
   map( NSFindFunctionKey  ,"find" );
   map( NSHelpFunctionKey  ,"help" );
-  map( NSModeSwitchFunctionKey    ,"modeswitch" );  
+  map( NSModeSwitchFunctionKey    ,"modeswitch" );
 }
 
+
+@implementation TMView
 
 - (id)initWithFrame:(NSRect)frame {
   self = [super initWithFrame:frame];
@@ -166,6 +160,7 @@ void initkeymap()
     processingCompose = NO;
     workingText = nil;
     delayed_rects = [[NSMutableArray arrayWithCapacity:100] retain];
+
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(delayedUpdate)
                                                  name: @"TeXmacsUpdateWindows"
@@ -188,6 +183,10 @@ void initkeymap()
   [[NSNotificationCenter defaultCenter] removeObserver: self
                                                name: @"TeXmacsUpdateWindows"
                                              object: nil];
+  [[NSNotificationCenter defaultCenter] removeObserver: self
+                                               name: NSViewBoundsDidChangeNotification
+                                             object: nil];
+
 
   
   [super dealloc];
@@ -203,6 +202,23 @@ void initkeymap()
 	return  wid;
 }
 
+
+- (BOOL)isFlipped
+{
+  return YES;
+}
+
+- (BOOL)isOpaque
+{
+  return YES;
+}
+
+- (BOOL)acceptsFirstResponder
+{
+  return YES;
+}
+
+
 - (void)viewWillMoveToWindow:(NSWindow *)newWindow
 {
   // query widget preferred size
@@ -211,15 +227,21 @@ void initkeymap()
   NSSize s = NSMakeSize(w,h);
   unscaleSize(s);
   [self setFrameSize:s];
+
+  // remove old notifications which could have become invalid
   
-  // register to receive focus in/out notifications  
   [[NSNotificationCenter defaultCenter] removeObserver: self
                                                   name: @"NSWindowDidBecomeKeyNotification"
                                                 object: nil];
   [[NSNotificationCenter defaultCenter] removeObserver: self
                                                   name: @"NSWindowDidBecomeKeyNotification"
                                                 object: nil];
-  
+  [[NSNotificationCenter defaultCenter] removeObserver: self
+                                                  name: NSViewBoundsDidChangeNotification
+                                                object: nil];
+
+  // register to receive focus in/out notifications
+
   [[NSNotificationCenter defaultCenter] addObserver: self
                                            selector: @selector(focusIn)
                                                name: @"NSWindowDidBecomeKeyNotification"
@@ -230,8 +252,27 @@ void initkeymap()
                                                name: @"NSWindowDidResignKeyNotification"
                                              object: newWindow];
   
+
+  // get the content view which manages our position
+  NSView* contentView = [[self enclosingScrollView] contentView];
+  
+  // Make sure the watched view is sending bounds changed
+  // notifications (which is probably does anyway, but calling
+  // this again won't hurt).
+  [contentView setPostsBoundsChangedNotifications:YES];
+  
+  // a register for those notifications on the synchronized content view.
+  [[NSNotificationCenter defaultCenter] addObserver: self
+                                           selector: @selector(contentBoundsDidChange:)
+                                               name: NSViewBoundsDidChangeNotification
+                                             object: contentView];
+  
 }
 
+- (void)contentBoundsDidChange:(NSNotification *)notification
+{
+  the_gui->need_update ();
+}
 
 - (void) focusIn
 {
@@ -552,38 +593,6 @@ mouse_decode (unsigned int mstate) {
       debug_events << "mouse event: " << s << " at "
       << point.x  << ", " << point.y  << LF;
   }  
-}
-
-- (BOOL)isFlipped
-{
-  return YES;
-}
-
-- (BOOL)isOpaque
-{
-  return YES;
-}
-
-- (void)resizeWithOldSuperviewSize:(NSSize)oldBoundsSize
-{
-  [super resizeWithOldSuperviewSize:oldBoundsSize];
-  // The code below is not appropriate !!!!! discover where it is necessary to communicate the resizing.
-#if 0
-  if (wid)  {
-    NSSize size = [self bounds].size;
-    scaleSize (size);
-#ifdef DIRECT_EVENTS
-    wid->handle_notify_resize (size.width, size.height);
-#else
-    the_gui -> process_resize (wid, size.width, size.height);
-#endif
-  }
-#endif
-}
-
-- (BOOL)acceptsFirstResponder
-{
-	return YES;
 }
 
 - (void) deleteWorkingText
