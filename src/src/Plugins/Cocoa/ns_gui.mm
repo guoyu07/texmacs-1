@@ -707,12 +707,7 @@ ns_gui_rep::add_event (const queued_event& ev) {
 
 void
 ns_gui_rep::update () {
-#ifdef ns_CPU_FIX
-  int std_delay= 1;
-  tm_sleep ();
-#else
-  int std_delay= 1000 / 6;
-#endif
+  int std_delay= 1000;
   
   if (updating) {
     cout << "NESTED UPDATING: This should not happen" << LF;
@@ -722,7 +717,7 @@ ns_gui_rep::update () {
   
   if (!updatetimer) {
     NSRunLoop *runloop = [NSRunLoop currentRunLoop];
-    updatetimer = [NSTimer timerWithTimeInterval:0.1 target: the_gui->helper selector:@selector(update) userInfo:nil repeats:YES];
+    updatetimer = [NSTimer timerWithTimeInterval: 1.0 target: the_gui->helper selector:@selector(update) userInfo:nil repeats:YES];
     [runloop addTimer: updatetimer forMode: NSRunLoopCommonModes];
     [runloop addTimer: updatetimer forMode: NSEventTrackingRunLoopMode];
   }
