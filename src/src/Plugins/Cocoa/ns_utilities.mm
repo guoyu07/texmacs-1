@@ -36,17 +36,10 @@ NSSize to_nssize (coord2 p)
 coord4 from_nsrect (NSRect rect)
 {
 	SI c1, c2, c3, c4;
-#if 0
-	c1 = rect.origin.x*PIXEL;
-	c2 = rect.origin.y*PIXEL;
-	c3 = (rect.origin.x+rect.size.width)*PIXEL;
-	c4 = (rect.origin.y+rect.size.height)*PIXEL;
-#else
   c1= rect.origin.x * PIXEL;
   c2= -(rect.origin.y + rect.size.height) * PIXEL;
   c3= (rect.origin.x + rect.size.width) * PIXEL;
   c4= -rect.origin.y * PIXEL;
-#endif
 	return coord4 (c1, c2, c3, c4);
 }
 
