@@ -720,13 +720,13 @@ ns_gui_rep::update () {
     return;
   }
   
-  
   if (!updatetimer) {
-    updatetimer = [[NSTimer scheduledTimerWithTimeInterval: 100.0 target: the_gui->helper selector: @selector(update) userInfo: nil repeats: YES] retain];
+    NSRunLoop *runloop = [NSRunLoop currentRunLoop];
+    updatetimer = [NSTimer timerWithTimeInterval:0.1 target: the_gui->helper selector:@selector(update) userInfo:nil repeats:YES];
+    [runloop addTimer: updatetimer forMode: NSRunLoopCommonModes];
+    [runloop addTimer: updatetimer forMode: NSEventTrackingRunLoopMode];
   }
 
-  
-//  [updatetimer invalidate];
   updating = true;
   
   static int count_events    = 0;
@@ -763,9 +763,9 @@ ns_gui_rep::update () {
   if (delayed_commands.must_wait (now))
     process_delayed_commands();
 
-  
-  cout << "<" << texmacs_time() << " " << waiting_events.size() << " ";
-  if (waiting_events.size()>0) cout << "(" << waiting_events.q->item.x1 << ")";
+  // Debugging code
+  // cout << "<" << texmacs_time() << " " << waiting_events.size() << " ";
+  // if (waiting_events.size()>0) cout << "(" << waiting_events.q->item.x1 << ")";
 
   // 3.
   // If there are pending events in the private queue process them until the
@@ -805,7 +805,8 @@ ns_gui_rep::update () {
   else                delay = std_delay;
 #endif
   
-  [updatetimer setFireDate: [NSDate dateWithTimeIntervalSinceNow: delay]];
+  // cout << "{" << delay << "} ";
+  [updatetimer setFireDate: [NSDate dateWithTimeIntervalSinceNow: delay/1000.0]];
   //updatetimer->start (delay);
   updating = false;
   

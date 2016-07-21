@@ -1,10 +1,13 @@
-//
-//  ns_ui_element.m
-//  TeXmacs
-//
-//  Created by Massimiliano Gubinelli on 15/07/16.
-//  Copyright © 2016 TeXmacs.org. All rights reserved.
-//
+
+/******************************************************************************
+* MODULE     : ns_ui_element.mm
+* DESCRIPTION: NS UI element class
+* COPYRIGHT  : (C) 2016  Massimiliano Gubinelli
+*******************************************************************************
+* This software falls under the GNU general public license version 3 or later.
+* It comes WITHOUT ANY WARRANTY WHATSOEVER. For details, see the file LICENSE
+* in the root directory or <http://www.gnu.org/licenses/gpl-3.0.html>.
+******************************************************************************/
 
 
 #include "mac_cocoa.h"

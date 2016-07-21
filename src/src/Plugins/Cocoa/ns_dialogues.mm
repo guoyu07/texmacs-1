@@ -1,7 +1,7 @@
 
 /******************************************************************************
 * MODULE     : ns_dialogues.mm
-* DESCRIPTION: Aqua dialogues widgets classes
+* DESCRIPTION: NS dialogues widgets classes
 * COPYRIGHT  : (C) 2007  Massimiliano Gubinelli
 *******************************************************************************
 * This software falls under the GNU general public license version 3 or later.

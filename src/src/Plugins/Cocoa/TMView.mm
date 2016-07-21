@@ -22,25 +22,25 @@ extern int timeout_time;
 hashmap<int,string> nskeymap("");
 
 inline void scale (NSPoint &point)
-{	
-	point.x *= PIXEL; point.y *= -PIXEL;
+{
+  point.x *= PIXEL; point.y *= -PIXEL;
 }
 
 inline void scaleSize (NSSize &point)
-{	
-	point.width *= PIXEL; point.height *= PIXEL;
+{
+  point.width *= PIXEL; point.height *= PIXEL;
 }
 
 inline void unscaleSize (NSSize &point)
 {
-	point.width /= PIXEL; point.height /= PIXEL;
+  point.width /= PIXEL; point.height /= PIXEL;
 }
 
 
 
 @interface TMRect : NSObject
 {
-	NSRect rect;
+  NSRect rect;
 }
 - initWithRect:(NSRect)_rect;
 - (NSRect)rect;
@@ -49,9 +49,9 @@ inline void unscaleSize (NSSize &point)
 @implementation TMRect
 - initWithRect:(NSRect)_rect
 {
-	[super init];
-	rect = _rect;
-	return self;
+  [super init];
+  rect = _rect;
+  return self;
 }
 - (NSRect)rect { return rect; }
 @end
@@ -160,12 +160,12 @@ void initkeymap()
     processingCompose = NO;
     workingText = nil;
     delayed_rects = [[NSMutableArray arrayWithCapacity:100] retain];
-
+    
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(delayedUpdate)
                                                  name: @"TeXmacsUpdateWindows"
                                                object: nil];
-
+    
   }
   return self;
 }
@@ -181,25 +181,25 @@ void initkeymap()
                                                   name: @"NSWindowDidBecomeKeyNotification"
                                                 object: nil];
   [[NSNotificationCenter defaultCenter] removeObserver: self
-                                               name: @"TeXmacsUpdateWindows"
-                                             object: nil];
+                                                  name: @"TeXmacsUpdateWindows"
+                                                object: nil];
   [[NSNotificationCenter defaultCenter] removeObserver: self
-                                               name: NSViewBoundsDidChangeNotification
-                                             object: nil];
-
-
+                                                  name: NSViewBoundsDidChangeNotification
+                                                object: nil];
+  
+  
   
   [super dealloc];
 }
 
 - (void) setWidget:(ns_simple_widget_rep*) w
 {
-	wid = w;
+  wid = w;
 }
 
 - (ns_simple_widget_rep*)widget
 {
-	return  wid;
+  return  wid;
 }
 
 
@@ -227,7 +227,7 @@ void initkeymap()
   NSSize s = NSMakeSize(w,h);
   unscaleSize(s);
   [self setFrameSize:s];
-
+  
   // remove old notifications which could have become invalid
   
   [[NSNotificationCenter defaultCenter] removeObserver: self
@@ -239,9 +239,9 @@ void initkeymap()
   [[NSNotificationCenter defaultCenter] removeObserver: self
                                                   name: NSViewBoundsDidChangeNotification
                                                 object: nil];
-
+  
   // register to receive focus in/out notifications
-
+  
   [[NSNotificationCenter defaultCenter] addObserver: self
                                            selector: @selector(focusIn)
                                                name: @"NSWindowDidBecomeKeyNotification"
@@ -252,7 +252,7 @@ void initkeymap()
                                                name: @"NSWindowDidResignKeyNotification"
                                              object: newWindow];
   
-
+  
   // get the content view which manages our position
   NSView* contentView = [[self enclosingScrollView] contentView];
   
@@ -276,13 +276,12 @@ void initkeymap()
 
 - (void) focusIn
 {
-  if (DEBUG_EVENTS) ;
-  
-  debug_events << "FOCUSIN" << LF;
+  if (DEBUG_EVENTS)
+    debug_events << "FOCUSIN" << LF;
   if (wid) {
 #if DIRECT_EVENTS
     wid->handle_keyboard_focus (true, texmacs_time ());
-#else    
+#else
     the_gui->process_keyboard_focus (wid, true, texmacs_time());
 #endif
   }
@@ -290,8 +289,7 @@ void initkeymap()
 
 - (void) focusOut
 {
-  if (DEBUG_EVENTS) ;
-    
+  if (DEBUG_EVENTS)
     debug_events << "FOCUSOUT" << LF;
   if (wid) {
 #if DIRECT_EVENTS
@@ -314,43 +312,43 @@ void initkeymap()
   inWindowUpdate = NO;
 }
 
-- (void)drawRect:(NSRect)rect 
+- (void)drawRect:(NSRect)rect
 {
   BOOL beenInterrupted = NO;
   if (inWindowUpdate) {
-	// Drawing code here.
-	if ([self inLiveResize])
-	{
-		NSRect bounds = [self bounds];
-		[[NSColor blackColor] set];
-		[NSBezierPath strokeRect: NSInsetRect(bounds,1,1)];
-		//    return;
-	}
-//	debug_events << "DRAWING : " << rect.origin.x << ","<< rect.origin.x << ","<< rect.size.width<< "," << rect.size.height <<  "\n";
-//	NSRect bounds = [self bounds];
-	
-  {
-    ns_renderer_rep* r = the_ns_renderer ();
-    int x1 = rect.origin.x;
-    int y1 = rect.origin.y+rect.size.height;
-    int x2 = rect.origin.x+rect.size.width;
-    int y2 = rect.origin.y;
+    // Drawing code here.
+    if ([self inLiveResize])
+    {
+      NSRect bounds = [self bounds];
+      [[NSColor blackColor] set];
+      [NSBezierPath strokeRect: NSInsetRect(bounds,1,1)];
+      //    return;
+    }
+    //	debug_events << "DRAWING : " << rect.origin.x << ","<< rect.origin.x << ","<< rect.size.width<< "," << rect.size.height <<  "\n";
+    //	NSRect bounds = [self bounds];
     
-    r -> begin ([NSGraphicsContext currentContext]);
-    r -> view = self;
-    r -> set_origin (0,0);
-    r -> encode (x1,y1);
-    r -> encode (x2,y2);
- //    debug_events << "DRAWING RECT " << x1 << "," << y1 << "," << x2 << "," << y2 << LF;
-    r -> set_clipping (x1, y1, x2, y2);
-    wid->handle_repaint (r, x1, y1, x2, y2);
-    r -> end ();
-    if (gui_interrupted ()) beenInterrupted = YES;
-  }
+    {
+      ns_renderer_rep* r = the_ns_renderer ();
+      int x1 = rect.origin.x;
+      int y1 = rect.origin.y+rect.size.height;
+      int x2 = rect.origin.x+rect.size.width;
+      int y2 = rect.origin.y;
+      
+      r -> begin ([NSGraphicsContext currentContext]);
+      r -> view = self;
+      r -> set_origin (0,0);
+      r -> encode (x1,y1);
+      r -> encode (x2,y2);
+      //    debug_events << "DRAWING RECT " << x1 << "," << y1 << "," << x2 << "," << y2 << LF;
+      r -> set_clipping (x1, y1, x2, y2);
+      wid->handle_repaint (r, x1, y1, x2, y2);
+      r -> end ();
+      if (gui_interrupted ()) beenInterrupted = YES;
+    }
   }
   if (beenInterrupted || !inWindowUpdate)
     [delayed_rects addObject: [[[TMRect alloc] initWithRect:rect] autorelease]];
-//	debug_events << "END DRAWING" << "\n";
+  //	debug_events << "END DRAWING" << "\n";
 }
 
 #if 0
@@ -378,12 +376,12 @@ void initkeymap()
       {
         [nss getCString:str maxLength:256 encoding:NSUTF8StringEncoding];
         string rr (str, strlen(str));
-        r= utf8_to_cork (rr);          
-      } 
+        r= utf8_to_cork (rr);
+      }
       
       
       string s (r);
-      if (! contains_unicode_char (s))     
+      if (! contains_unicode_char (s))
       {
         //      string s= ((mods & NSShiftKeyMask)? "S-" * r: r);
         /* other keyboard modifiers */
@@ -392,7 +390,7 @@ void initkeymap()
           if (mods & NSAlternateKeyMask) s= "A-" * s;
           if (mods & NSCommandKeyMask) s= "M-" * s;
           // if (mods & NSNumericPadKeyMask) s= "K-" * s;
-	  // if (mods & NSHelpKeyMask) s= "H-" * s;
+          // if (mods & NSHelpKeyMask) s= "H-" * s;
           // if (mods & NSFunctionKeyMask) s= "F-" * s;
         }
         if (DEBUG_EVENT)
@@ -414,7 +412,7 @@ void initkeymap()
       [self interpretKeyEvents: nsEvArray];
       [nsEvArray removeObject: theEvent];
     }
-  }	
+  }
   
   
 }
@@ -422,7 +420,7 @@ void initkeymap()
 - (void)keyDown:(NSEvent *)theEvent
 {
   if (!wid) return;
-
+  
   time_credit= 25;
   timeout_time= texmacs_time () + time_credit;
   static bool fInit = false;
@@ -469,7 +467,7 @@ void initkeymap()
           static char str[256];
           [nss getCString:str maxLength:256 encoding:NSUTF8StringEncoding];
           string rr (str, strlen(str));
-          r= utf8_to_cork (rr);          
+          r= utf8_to_cork (rr);
           
           string s ( modstr * r);
           if (DEBUG_EVENTS)
@@ -482,7 +480,7 @@ void initkeymap()
 #endif
           the_gui->update (); // FIXME: remove this line when
           // edit_typeset_rep::get_env_value will be faster
-
+          
           return;
         }
       }
@@ -506,10 +504,10 @@ mouse_state (NSEvent* event, bool flag) {
   unsigned int i= 0;
   i += 1 << min([event buttonNumber],4);
   unsigned int mods = [event modifierFlags];
-  if (mods & NSAlternateKeyMask) i = 2;  
-  if (mods & NSCommandKeyMask) i = 4;  
-  if (mods & NSShiftKeyMask) i += 256;  
-  if (mods & NSControlKeyMask) i += 2048;  
+  if (mods & NSAlternateKeyMask) i = 2;
+  if (mods & NSCommandKeyMask) i = 4;
+  if (mods & NSShiftKeyMask) i += 256;
+  if (mods & NSControlKeyMask) i += 2048;
   return i;
 }
 
@@ -527,7 +525,7 @@ mouse_decode (unsigned int mstate) {
 {
   if (wid) {
     NSPoint point = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-	scale(point);
+    scale(point);
     unsigned int mstate= mouse_state (theEvent, false);
     string s= "press-" * mouse_decode (mstate);
 #ifdef DIRECT_EVENTS
@@ -545,7 +543,7 @@ mouse_decode (unsigned int mstate) {
 {
   if (wid) {
     NSPoint point = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-	scale(point);
+    scale(point);
     unsigned int mstate= mouse_state (theEvent, true);
     string s= "release-" * mouse_decode (mstate);
 #ifdef DIRECT_EVENTS
@@ -563,7 +561,7 @@ mouse_decode (unsigned int mstate) {
 {
   if (wid) {
     NSPoint point = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-		scale(point);
+    scale(point);
     unsigned int mstate= mouse_state (theEvent, false);
     string s= "move";
 #ifdef DIRECT_EVENTS
@@ -574,14 +572,14 @@ mouse_decode (unsigned int mstate) {
     if (DEBUG_EVENTS)
       debug_events << "mouse event: " << s << " at "
       << point.x  << ", " << point.y  << LF;
-  }  
+  }
 }
 
 - (void)mouseMoved:(NSEvent *)theEvent
 {
   if (wid) {
     NSPoint point = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-		scale(point);
+    scale(point);
     unsigned int mstate= mouse_state (theEvent, false);
     string s= "move";
 #ifdef DIRECT_EVENTS
@@ -592,11 +590,11 @@ mouse_decode (unsigned int mstate) {
     if (DEBUG_EVENTS)
       debug_events << "mouse event: " << s << " at "
       << point.x  << ", " << point.y  << LF;
-  }  
+  }
 }
 
 - (void) deleteWorkingText
-{ 
+{
   if (workingText == nil) return;
   [workingText release];
   workingText = nil;
@@ -609,7 +607,7 @@ mouse_decode (unsigned int mstate) {
 // instead of keyDown: aString can be NSString or NSAttributedString
 {
   processingCompose = NO;
-//  NSLog(@"insertText: <%@>",aString);
+  //  NSLog(@"insertText: <%@>",aString);
   
   NSString *str = [aString respondsToSelector: @selector(string)] ?
   [aString string] : aString;
@@ -651,7 +649,7 @@ mouse_decode (unsigned int mstate) {
 
 - (void) unmarkText
 {
-  [self deleteWorkingText];  
+  [self deleteWorkingText];
 }
 
 - (BOOL) hasMarkedText
