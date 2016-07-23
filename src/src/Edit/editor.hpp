@@ -53,7 +53,7 @@ public:
   widget_rep*  cvw;  // non reference counted canvas widget
 
 protected:
-  abs_buffer    buf;  // the underlying buffer
+  abs_buffer   buf;  // the underlying buffer
   drd_info     drd;  // the drd for the buffer
   tree&        et;   // all TeXmacs trees
   box          eb;   // box translation of tree

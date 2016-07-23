@@ -23,9 +23,7 @@
 #include "data_cache.hpp"
 #include "window.hpp"
 
-#include "../Data/new_buffer.hpp"
-#include "../Data/new_window.hpp"
-
+#include "tm_data.hpp"
 
 #ifdef AQUATEXMACS
 void mac_fix_paths ();
