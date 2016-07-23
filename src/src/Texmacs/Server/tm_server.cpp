@@ -67,6 +67,7 @@ get_server () {
   return *the_server;
 }
 
+
 bool
 in_presentation_mode () {
   return get_server () -> in_full_screen_mode ();
@@ -74,7 +75,7 @@ in_presentation_mode () {
 
 tree
 get_subtree (path p) {
-  return get_current_editor () -> the_subtree (p);
+  return get_server () ->  get_current_editor () -> the_subtree (p);
 }
 
 void

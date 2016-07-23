@@ -14,8 +14,8 @@
 #include "iterator.hpp"
 #include "file.hpp"
 #include "scheme.hpp"
+#include "server.hpp"
 
-tree latex_expand (tree doc, url name);
 bool tracked_tree_to_latex_document (tree, object, string&, string&);
 string latex_unmark (string, hashset<path>, hashmap<int,array<path> >&);
 
@@ -255,7 +255,7 @@ texmacs_error_find (string s, string src, hashmap<int,array<path> > corr) {
 tree
 try_latex_export (tree doc, object opts, url src, url dest) {
   string s, ms;
-  doc= latex_expand (doc, src);
+  doc= get_server()->latex_expand (doc, src);
   //cout << "Exporting to LaTeX\n";
   if (tracked_tree_to_latex_document (doc, opts, s, ms)) {
     //cout << "Failed to export\n";

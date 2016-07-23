@@ -157,7 +157,6 @@ tree evaluate_point (tree t);
 
 /* Other routines */
 class url;
-tree load_inclusion (url u);
 bool is_percentage (tree t, string s);
 bool is_percentage (tree t);
 double as_percentage (tree t);

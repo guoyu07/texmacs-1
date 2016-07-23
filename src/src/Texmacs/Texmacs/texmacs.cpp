@@ -422,9 +422,9 @@ TeXmacs_main (int argc, char** argv) {
     where= " :new-window";
     exec_delayed (scheme_cmd (cmd));
   }
-  if (number_buffers () == 0) {
+  if (sv->number_buffers () == 0) {
     if (DEBUG_STD) debug_boot << "Creating 'no name' buffer...\n";
-    open_window ();
+    sv->open_window ();
   }
 
   bench_print ();

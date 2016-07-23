@@ -10,7 +10,7 @@
 ******************************************************************************/
 
 #include "tm_window.hpp"
-#include "tm_data.hpp"
+#include "tm_server.hpp"
 #include "../Data/new_window.hpp"
 
 #include "message.hpp"
@@ -132,9 +132,9 @@ get_preferred_size (string name, SI& ww, SI& hh) {
 
 static int tm_window_serial= 0;
 
-tm_window_rep::tm_window_rep (widget wid2, tree geom):
-  win (texmacs_window_widget (wid2, geom)),
-  wid (wid2), id (create_window_id ()),
+tm_window_rep::tm_window_rep (tm_server_windows_rep *sv2, widget wid2, tree geom):
+  sv(sv2), win (texmacs_window_widget (wid2, geom)),
+  wid (wid2), id (sv2->create_window_id ()),
   serial (tm_window_serial++),
   menu_current (object ()), menu_cache (widget ()),
   text_ptr (NULL)
@@ -142,8 +142,8 @@ tm_window_rep::tm_window_rep (widget wid2, tree geom):
   zoomf= get_server () -> get_default_zoom_factor ();
 }
 
-tm_window_rep::tm_window_rep (tree doc, command quit):
-  win (texmacs_widget (0, quit)),
+tm_window_rep::tm_window_rep (tm_server_windows_rep *sv2, tree doc, command quit):
+  sv(sv2), win (texmacs_widget (0, quit)),
   wid (win), id (url_none ()),
   serial (tm_window_serial++),
   menu_current (object ()), menu_cache (widget ()),
@@ -154,7 +154,7 @@ tm_window_rep::tm_window_rep (tree doc, command quit):
 }
 
 tm_window_rep::~tm_window_rep () {
-  if (!is_none (id)) destroy_window_id (id);
+  if (!is_none (id)) sv->destroy_window_id (id);
 }
 
 /******************************************************************************
@@ -198,8 +198,10 @@ texmacs_window_widget (widget wid, tree geom) {
 class close_embedded_command_rep: public command_rep {
   tm_view vw;
   tm_view focus_view;
+  tm_server_rep* sv;
+  
 public:
-  close_embedded_command_rep (tm_view vw2, tm_view focus_view2): vw (vw2), focus_view(focus_view2) {}
+  close_embedded_command_rep ( tm_server_rep* sv2, tm_view vw2, tm_view focus_view2): sv(sv2), vw (vw2), focus_view(focus_view2) {}
   void apply ();
   tm_ostream& print (tm_ostream& out) {
     return out << "Close_Embedded widget command"; }
@@ -209,26 +211,26 @@ void
 close_embedded_command_rep::apply () {
   //cout << "Destroy " << vw->buf->buf->name << "\n";
   ASSERT (!is_nil(vw->ed), "embedded command acting on deleted editor");
-  url foc= abstract_window (focus_view->win);
+  url foc= sv->abstract_window (focus_view->win);
   if (is_none (foc)) {
-    array<url> a= windows_list ();
+    array<url> a= sv->windows_list ();
     ASSERT (N(a) != 0, "no remaining windows");
     foc= a[0];
   }
-  window_focus (foc);
+  sv->window_focus (foc);
   //cout << "Changed focus\n";
   tm_window win= vw->win;
-  ASSERT (N (buffer_to_views (vw->buf->buf->name)) == 1,
+  ASSERT (N (sv->buffer_to_views (vw->buf->buf->name)) == 1,
           "invalid cloned embedded TeXmacs widget");
-  remove_buffer (vw->buf->buf->name);
+  sv->remove_buffer (vw->buf->buf->name);
   //cout << "Deleted buffer\n";
   tm_delete (win);
   //cout << "Deleted window\n";
 }
 
 command
-close_embedded_command (tm_view vw, tm_view focus_view) {
-  return tm_new<close_embedded_command_rep> (vw, focus_view);
+close_embedded_command (tm_server_rep* sv, tm_view vw, tm_view focus_view) {
+  return tm_new<close_embedded_command_rep> (sv, vw, focus_view);
 }
 
 /******************************************************************************
@@ -267,7 +269,7 @@ enrich_embedded_document (tree body, tree style) {
 }
 
 widget
-texmacs_input_widget (tree doc, tree style, url wname) {
+tm_server_rep::texmacs_input_widget (tree doc, tree style, url wname) {
   doc= enrich_embedded_document (doc, style);
   url       base = get_master_buffer (get_current_buffer ());
   tm_view   curvw= concrete_view (get_current_view ());
@@ -275,12 +277,12 @@ texmacs_input_widget (tree doc, tree style, url wname) {
   if (contains (name, get_all_buffers ())) set_buffer_tree (name, doc);
   else create_buffer (name, doc);
   tm_view   vw   = concrete_view (get_passive_view (name));
-  tm_window win  = tm_new<tm_window_rep> (doc, command ());
+  tm_window win  = tm_new<tm_window_rep> (this, doc, command ());
   set_master_buffer (name, base);
   vw->win= win;
   set_scrollable (win->wid, vw->ed);
   vw->ed->cvw= win->wid.rep;
-  return wrapped_widget (win->wid, close_embedded_command (vw, curvw));
+  return wrapped_widget (win->wid, close_embedded_command (this, vw, curvw));
 }
 
 /******************************************************************************

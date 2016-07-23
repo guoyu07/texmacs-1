@@ -1491,14 +1491,6 @@ source code.
   </explain>
 
   <\explain>
-    <scm|(tree-load-inclusion <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|load_inclusion> which returns
-    <scm|tree>.
-  </explain>
-
-  <\explain>
     <scm|(tree-as-string <scm-arg|content>)>
 <explain-synopsis|no synopsis>
   <|explain>
@@ -4587,14 +4579,6 @@ source code.
   </explain>
 
   <\explain>
-    <scm|(widget-texmacs-input <scm-arg|content> <scm-arg|content> <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|texmacs_input_widget> which returns
-    <scm|widget>.
-  </explain>
-
-  <\explain>
     <scm|(widget-ink <scm-arg|command>)>
 <explain-synopsis|no synopsis>
   <|explain>
@@ -4696,510 +4680,6 @@ source code.
   <|explain>
     Calls the <c++> function <cpp|windows_refresh> which returns
     <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-list)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|get_all_buffers> which returns
-    <scm|array_url>.
-  </explain>
-
-  <\explain>
-    <scm|(current-buffer-url)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|get_current_buffer_safe> which returns
-    <scm|url>.
-  </explain>
-
-  <\explain>
-    <scm|(path-to-buffer <scm-arg|path>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|path_to_buffer> which returns
-    <scm|url>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-new)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|make_new_buffer> which returns
-    <scm|url>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-rename <scm-arg|url> <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|rename_buffer> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-set <scm-arg|url> <scm-arg|content>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|set_buffer_tree> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-get <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|get_buffer_tree> which returns
-    <scm|tree>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-set-body <scm-arg|url> <scm-arg|content>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|set_buffer_body> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-get-body <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|get_buffer_body> which returns
-    <scm|tree>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-set-master <scm-arg|url> <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|set_master_buffer> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-get-master <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|get_master_buffer> which returns
-    <scm|url>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-set-title <scm-arg|url> <scm-arg|string>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|set_title_buffer> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-get-title <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|get_title_buffer> which returns
-    <scm|string>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-last-save <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|get_last_save_buffer> which returns
-    <scm|int>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-last-visited <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|last_visited> which returns
-    <scm|double>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-modified? <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|buffer_modified> which returns
-    <scm|bool>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-modified-since-autosave? <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|buffer_modified_since_autosave> which returns
-    <scm|bool>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-pretend-modified <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|pretend_buffer_modified> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-pretend-saved <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|pretend_buffer_saved> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-pretend-autosaved <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|pretend_buffer_autosaved> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-attach-notifier <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|attach_buffer_notifier> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-has-name? <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|buffer_has_name> which returns
-    <scm|bool>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-aux? <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|is_aux_buffer> which returns
-    <scm|bool>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-import <scm-arg|url> <scm-arg|url> <scm-arg|string>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|buffer_import> which returns
-    <scm|bool>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-load <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|buffer_load> which returns
-    <scm|bool>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-export <scm-arg|url> <scm-arg|url> <scm-arg|string>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|buffer_export> which returns
-    <scm|bool>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-save <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|buffer_save> which returns
-    <scm|bool>.
-  </explain>
-
-  <\explain>
-    <scm|(tree-import-loaded <scm-arg|string> <scm-arg|url> <scm-arg|string>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|import_loaded_tree> which returns
-    <scm|tree>.
-  </explain>
-
-  <\explain>
-    <scm|(tree-import <scm-arg|url> <scm-arg|string>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|import_tree> which returns
-    <scm|tree>.
-  </explain>
-
-  <\explain>
-    <scm|(tree-export <scm-arg|tree> <scm-arg|url> <scm-arg|string>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|export_tree> which returns
-    <scm|bool>.
-  </explain>
-
-  <\explain>
-    <scm|(tree-load-style <scm-arg|string>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|load_style_tree> which returns
-    <scm|tree>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-focus <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|focus_on_buffer> which returns
-    <scm|bool>.
-  </explain>
-
-  <\explain>
-    <scm|(view-list)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|get_all_views> which returns
-    <scm|array_url>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-\<gtr\>views <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|buffer_to_views> which returns
-    <scm|array_url>.
-  </explain>
-
-  <\explain>
-    <scm|(current-view-url)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|get_current_view_safe> which returns
-    <scm|url>.
-  </explain>
-
-  <\explain>
-    <scm|(window-\<gtr\>view <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|window_to_view> which returns
-    <scm|url>.
-  </explain>
-
-  <\explain>
-    <scm|(view-\<gtr\>buffer <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|view_to_buffer> which returns
-    <scm|url>.
-  </explain>
-
-  <\explain>
-    <scm|(view-\<gtr\>window-url <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|view_to_window> which returns
-    <scm|url>.
-  </explain>
-
-  <\explain>
-    <scm|(view-new <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|get_new_view> which returns
-    <scm|url>.
-  </explain>
-
-  <\explain>
-    <scm|(view-passive <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|get_passive_view> which returns
-    <scm|url>.
-  </explain>
-
-  <\explain>
-    <scm|(view-recent <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|get_recent_view> which returns
-    <scm|url>.
-  </explain>
-
-  <\explain>
-    <scm|(view-delete <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|delete_view> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(window-set-view <scm-arg|url> <scm-arg|url> <scm-arg|bool>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|window_set_view> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(switch-to-buffer <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|switch_to_buffer> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(window-list)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|windows_list> which returns
-    <scm|array_url>.
-  </explain>
-
-  <\explain>
-    <scm|(windows-number)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|get_nr_windows> which returns
-    <scm|int>.
-  </explain>
-
-  <\explain>
-    <scm|(current-window)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|get_current_window> which returns
-    <scm|url>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-\<gtr\>windows <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|buffer_to_windows> which returns
-    <scm|array_url>.
-  </explain>
-
-  <\explain>
-    <scm|(window-to-buffer <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|window_to_buffer> which returns
-    <scm|url>.
-  </explain>
-
-  <\explain>
-    <scm|(window-set-buffer <scm-arg|url> <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|window_set_buffer> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(window-focus <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|window_focus> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(new-buffer)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|create_buffer> which returns
-    <scm|url>.
-  </explain>
-
-  <\explain>
-    <scm|(open-buffer-in-window <scm-arg|url> <scm-arg|content> <scm-arg|content>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|new_buffer_in_new_window> which returns
-    <scm|url>.
-  </explain>
-
-  <\explain>
-    <scm|(open-window)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|open_window> which returns
-    <scm|url>.
-  </explain>
-
-  <\explain>
-    <scm|(open-window-geometry <scm-arg|content>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|open_window> which returns
-    <scm|url>.
-  </explain>
-
-  <\explain>
-    <scm|(clone-window)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|clone_window> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(buffer-close <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|kill_buffer> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(kill-window <scm-arg|url>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|kill_window> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(kill-current-window-and-buffer)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|kill_current_window_and_buffer> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(project-attach <scm-arg|string>)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|project_attach> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(project-detach)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|project_attach> which returns
-    <scm|void>.
-  </explain>
-
-  <\explain>
-    <scm|(project-attached?)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|project_attached> which returns
-    <scm|bool>.
-  </explain>
-
-  <\explain>
-    <scm|(project-get)>
-<explain-synopsis|no synopsis>
-  <|explain>
-    Calls the <c++> function <cpp|project_get> which returns
-    <scm|url>.
   </explain>
 
   <\explain>
@@ -5752,6 +5232,526 @@ source code.
   <|explain>
     Calls the <c++> function <cpp|quit> which returns
     <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-list)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|get_all_buffers> which returns
+    <scm|array_url>.
+  </explain>
+
+  <\explain>
+    <scm|(current-buffer-url)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|get_current_buffer_safe> which returns
+    <scm|url>.
+  </explain>
+
+  <\explain>
+    <scm|(path-to-buffer <scm-arg|path>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|path_to_buffer> which returns
+    <scm|url>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-new)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|make_new_buffer> which returns
+    <scm|url>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-rename <scm-arg|url> <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|rename_buffer> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-set <scm-arg|url> <scm-arg|content>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|set_buffer_tree> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-get <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|get_buffer_tree> which returns
+    <scm|tree>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-set-body <scm-arg|url> <scm-arg|content>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|set_buffer_body> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-get-body <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|get_buffer_body> which returns
+    <scm|tree>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-set-master <scm-arg|url> <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|set_master_buffer> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-get-master <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|get_master_buffer> which returns
+    <scm|url>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-set-title <scm-arg|url> <scm-arg|string>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|set_title_buffer> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-get-title <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|get_title_buffer> which returns
+    <scm|string>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-last-save <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|get_last_save_buffer> which returns
+    <scm|int>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-last-visited <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|last_visited> which returns
+    <scm|double>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-modified? <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|buffer_modified> which returns
+    <scm|bool>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-modified-since-autosave? <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|buffer_modified_since_autosave> which returns
+    <scm|bool>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-pretend-modified <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|pretend_buffer_modified> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-pretend-saved <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|pretend_buffer_saved> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-pretend-autosaved <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|pretend_buffer_autosaved> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-attach-notifier <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|attach_buffer_notifier> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-has-name? <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|buffer_has_name> which returns
+    <scm|bool>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-aux? <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|is_aux_buffer> which returns
+    <scm|bool>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-import <scm-arg|url> <scm-arg|url> <scm-arg|string>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|buffer_import> which returns
+    <scm|bool>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-load <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|buffer_load> which returns
+    <scm|bool>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-export <scm-arg|url> <scm-arg|url> <scm-arg|string>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|buffer_export> which returns
+    <scm|bool>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-save <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|buffer_save> which returns
+    <scm|bool>.
+  </explain>
+
+  <\explain>
+    <scm|(tree-import-loaded <scm-arg|string> <scm-arg|url> <scm-arg|string>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|import_loaded_tree> which returns
+    <scm|tree>.
+  </explain>
+
+  <\explain>
+    <scm|(tree-import <scm-arg|url> <scm-arg|string>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|import_tree> which returns
+    <scm|tree>.
+  </explain>
+
+  <\explain>
+    <scm|(tree-export <scm-arg|tree> <scm-arg|url> <scm-arg|string>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|export_tree> which returns
+    <scm|bool>.
+  </explain>
+
+  <\explain>
+    <scm|(tree-load-style <scm-arg|string>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|load_style_tree> which returns
+    <scm|tree>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-focus <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|focus_on_buffer> which returns
+    <scm|bool>.
+  </explain>
+
+  <\explain>
+    <scm|(view-list)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|get_all_views> which returns
+    <scm|array_url>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-\<gtr\>views <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|buffer_to_views> which returns
+    <scm|array_url>.
+  </explain>
+
+  <\explain>
+    <scm|(current-view-url)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|get_current_view_safe> which returns
+    <scm|url>.
+  </explain>
+
+  <\explain>
+    <scm|(window-\<gtr\>view <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|window_to_view> which returns
+    <scm|url>.
+  </explain>
+
+  <\explain>
+    <scm|(view-\<gtr\>buffer <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|view_to_buffer> which returns
+    <scm|url>.
+  </explain>
+
+  <\explain>
+    <scm|(view-\<gtr\>window-url <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|view_to_window> which returns
+    <scm|url>.
+  </explain>
+
+  <\explain>
+    <scm|(view-new <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|get_new_view> which returns
+    <scm|url>.
+  </explain>
+
+  <\explain>
+    <scm|(view-passive <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|get_passive_view> which returns
+    <scm|url>.
+  </explain>
+
+  <\explain>
+    <scm|(view-recent <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|get_recent_view> which returns
+    <scm|url>.
+  </explain>
+
+  <\explain>
+    <scm|(view-delete <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|delete_view> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(window-set-view <scm-arg|url> <scm-arg|url> <scm-arg|bool>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|window_set_view> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(switch-to-buffer <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|switch_to_buffer> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(window-list)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|windows_list> which returns
+    <scm|array_url>.
+  </explain>
+
+  <\explain>
+    <scm|(windows-number)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|get_nr_windows> which returns
+    <scm|int>.
+  </explain>
+
+  <\explain>
+    <scm|(current-window)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|get_current_window> which returns
+    <scm|url>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-\<gtr\>windows <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|buffer_to_windows> which returns
+    <scm|array_url>.
+  </explain>
+
+  <\explain>
+    <scm|(window-to-buffer <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|window_to_buffer> which returns
+    <scm|url>.
+  </explain>
+
+  <\explain>
+    <scm|(window-set-buffer <scm-arg|url> <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|window_set_buffer> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(window-focus <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|window_focus> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(new-buffer)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|create_buffer> which returns
+    <scm|url>.
+  </explain>
+
+  <\explain>
+    <scm|(open-buffer-in-window <scm-arg|url> <scm-arg|content> <scm-arg|content>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|new_buffer_in_new_window> which returns
+    <scm|url>.
+  </explain>
+
+  <\explain>
+    <scm|(open-window)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|open_window> which returns
+    <scm|url>.
+  </explain>
+
+  <\explain>
+    <scm|(open-window-geometry <scm-arg|content>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|open_window> which returns
+    <scm|url>.
+  </explain>
+
+  <\explain>
+    <scm|(clone-window)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|clone_window> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(buffer-close <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|kill_buffer> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(kill-window <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|kill_window> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(kill-current-window-and-buffer)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|kill_current_window_and_buffer> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(project-attach <scm-arg|string>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|project_attach> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(project-detach)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|project_attach> which returns
+    <scm|void>.
+  </explain>
+
+  <\explain>
+    <scm|(project-attached?)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|project_attached> which returns
+    <scm|bool>.
+  </explain>
+
+  <\explain>
+    <scm|(project-get)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|project_get> which returns
+    <scm|url>.
+  </explain>
+
+  <\explain>
+    <scm|(tree-load-inclusion <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|load_inclusion> which returns
+    <scm|tree>.
+  </explain>
+
+  <\explain>
+    <scm|(widget-texmacs-input <scm-arg|content> <scm-arg|content> <scm-arg|url>)>
+<explain-synopsis|no synopsis>
+  <|explain>
+    Calls the <c++> function <cpp|texmacs_input_widget> which returns
+    <scm|widget>.
   </explain>
 
   <\explain>

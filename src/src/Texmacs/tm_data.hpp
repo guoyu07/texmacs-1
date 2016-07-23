@@ -20,6 +20,6 @@
 #include "Data/new_buffer.hpp"
 
 
-extern array<tm_buffer> bufs;
+//extern array<tm_buffer> bufs;
 
 #endif // defined TM_DATA_H

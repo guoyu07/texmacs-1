@@ -13,6 +13,8 @@
 #include "convert.hpp"
 #include "connect.hpp"
 #include "dictionary.hpp"
+#include "server.hpp"
+
 
 /******************************************************************************
 * Set left footer with information about environment variables

@@ -15,6 +15,8 @@
 #include "tree_traverse.hpp"
 #include "drd_mode.hpp"
 #include "analyze.hpp"
+#include "scheme.hpp"
+
 
 /******************************************************************************
 * Constructor and destructor

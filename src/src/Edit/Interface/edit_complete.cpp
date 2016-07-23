@@ -14,6 +14,7 @@
 #include "analyze.hpp"
 #include "connect.hpp"
 #include "dictionary.hpp"
+#include "scheme.hpp"
 
 /******************************************************************************
 * Finding completions in text

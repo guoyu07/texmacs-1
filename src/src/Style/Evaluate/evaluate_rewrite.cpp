@@ -14,6 +14,7 @@
 #include "std_environment.hpp"
 #include "vars.hpp"
 #include "scheme.hpp"
+#include "server.hpp"
 
 extern int script_status;
 
@@ -135,7 +136,7 @@ rewrite_impl (tree t) {
     {
       url base_file_name (as_string (std_env ["base-file-name"]));
       url file_name= url_system (evaluate_string (t[0]));
-      return load_inclusion (relative (base_file_name, file_name));
+      return get_server ()->load_inclusion (relative (base_file_name, file_name));
     }
   case REWRITE_INACTIVE:
     {

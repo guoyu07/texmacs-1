@@ -10,6 +10,7 @@
 ******************************************************************************/
 
 #include "concater.hpp"
+#include "server.hpp"
 
 /******************************************************************************
 * Typesetting environment changes
@@ -150,7 +151,7 @@ concater_rep::typeset_include (tree t, path ip) {
   if (N(t) != 1) { typeset_error (t, ip); return; }
   url file_name= url_unix (env->exec_string (t[0]));
   url incl_file= relative (env->base_file_name, file_name);
-  tree incl= load_inclusion (incl_file);
+  tree incl= get_server ()->load_inclusion (incl_file);
   url save_name= env->cur_file_name;
   env->cur_file_name= incl_file;
   env->secure= is_secure (env->cur_file_name);

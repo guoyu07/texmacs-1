@@ -15,8 +15,7 @@
 #include "file.hpp"
 #include "convert.hpp"
 #include "scheme.hpp"
-
-tree load_inclusion (url u); // implemented in tm_file.cpp
+#include "server.hpp"
 
 /******************************************************************************
 * Classical control structures
@@ -80,7 +79,7 @@ tree
 evaluate_include (tree t) {
   url base_file_name (as_string (std_env["base-file-name"]));
   url incl_file_name= url_system (as_string (evaluate (t[0])));
-  tree incl= load_inclusion (incl_file_name);
+  tree incl= get_server ()->load_inclusion (incl_file_name);
 
   assoc_environment local (2);
   local->raw_write (0, string ("cur-file-name"),

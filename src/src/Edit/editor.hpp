@@ -22,7 +22,7 @@
 #    include "Widkit/simple_wk_widget.hpp"
 #  endif
 #endif
-#include "server.hpp"
+//#include "server.hpp"
 #include "drd_info.hpp"
 #ifdef EXPERIMENTAL
 #  include "../Style/Environment/environment.hpp"
@@ -576,13 +576,14 @@ public:
   virtual void edit_test () = 0;
 
 //  friend class tm_window_rep;
-  friend class tm_server_rep;
+  friend class tm_server_rep; // needed for apply and animate
   friend class server_command_rep;
   friend void   edit_announce (editor_rep* ed, modification mod);
   friend void   edit_done (editor_rep* ed, modification mod);
   friend string get_editor_status_report ();
   friend void   tm_failure (const char* msg);
   friend void   set_current_view (url u); // needs access to the drd
+  friend class  tm_server_views_rep; // needed for set_current_view (url u);
 };
 
 class editor {
@@ -591,19 +592,16 @@ public:
   inline bool operator == (editor w) { return rep == w.rep; }
   inline bool operator != (editor w) { return rep != w.rep; }
 };
+
 EXTEND_NULL_CODE(widget,editor);
 
 editor new_editor (server_rep* sv, abs_buffer buf);
-editor get_current_editor ();
-
-void focus_on_editor (editor ed);
-
 
 #define SERVER(cmd) {                 \
-  url temp= get_current_view_safe (); \
+  url temp= sv->get_current_view_safe (); \
   focus_on_this_editor ();            \
   sv->cmd;                            \
-  set_current_view (temp);            \
+  sv->set_current_view (temp);            \
 }
 
 #endif // defined EDITOR_H

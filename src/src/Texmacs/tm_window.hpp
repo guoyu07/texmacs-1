@@ -14,9 +14,11 @@
 #include "server.hpp"
 #include "editor.hpp"
 #include "tm_buffer.hpp"
+#include "tm_server.hpp"
 
 class tm_window_rep {
 public:
+  tm_server_windows_rep *sv;
   widget win;
   widget wid;
   url    id;
@@ -34,8 +36,8 @@ protected:
   string   cur_title; // current window title
 
 public:
-  tm_window_rep (widget wid2, tree geom);
-  tm_window_rep (tree doc, command quit);
+  tm_window_rep (tm_server_windows_rep *sv2, widget wid2, tree geom);
+  tm_window_rep (tm_server_windows_rep *sv2, tree doc, command quit);
   ~tm_window_rep ();
   void set_window_name (string s);
   void set_modified (bool flag);

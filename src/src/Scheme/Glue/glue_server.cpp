@@ -578,6 +578,833 @@ tmg_quit_TeXmacs () {
   return TMSCM_UNSPECIFIED;
 }
 
+tmscm
+tmg_buffer_list () {
+  // TMSCM_DEFER_INTS;
+  array_url out= get_server()->get_all_buffers ();
+  // TMSCM_ALLOW_INTS;
+
+  return array_url_to_tmscm (out);
+}
+
+tmscm
+tmg_current_buffer_url () {
+  // TMSCM_DEFER_INTS;
+  url out= get_server()->get_current_buffer_safe ();
+  // TMSCM_ALLOW_INTS;
+
+  return url_to_tmscm (out);
+}
+
+tmscm
+tmg_path_to_buffer (tmscm arg1) {
+  TMSCM_ASSERT_PATH (arg1, TMSCM_ARG1, "path-to-buffer");
+
+  path in1= tmscm_to_path (arg1);
+
+  // TMSCM_DEFER_INTS;
+  url out= get_server()->path_to_buffer (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return url_to_tmscm (out);
+}
+
+tmscm
+tmg_buffer_new () {
+  // TMSCM_DEFER_INTS;
+  url out= get_server()->make_new_buffer ();
+  // TMSCM_ALLOW_INTS;
+
+  return url_to_tmscm (out);
+}
+
+tmscm
+tmg_buffer_rename (tmscm arg1, tmscm arg2) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-rename");
+  TMSCM_ASSERT_URL (arg2, TMSCM_ARG2, "buffer-rename");
+
+  url in1= tmscm_to_url (arg1);
+  url in2= tmscm_to_url (arg2);
+
+  // TMSCM_DEFER_INTS;
+  get_server()->rename_buffer (in1, in2);
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_buffer_set (tmscm arg1, tmscm arg2) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-set");
+  TMSCM_ASSERT_CONTENT (arg2, TMSCM_ARG2, "buffer-set");
+
+  url in1= tmscm_to_url (arg1);
+  content in2= tmscm_to_content (arg2);
+
+  // TMSCM_DEFER_INTS;
+  get_server()->set_buffer_tree (in1, in2);
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_buffer_get (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-get");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  tree out= get_server()->get_buffer_tree (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return tree_to_tmscm (out);
+}
+
+tmscm
+tmg_buffer_set_body (tmscm arg1, tmscm arg2) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-set-body");
+  TMSCM_ASSERT_CONTENT (arg2, TMSCM_ARG2, "buffer-set-body");
+
+  url in1= tmscm_to_url (arg1);
+  content in2= tmscm_to_content (arg2);
+
+  // TMSCM_DEFER_INTS;
+  get_server()->set_buffer_body (in1, in2);
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_buffer_get_body (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-get-body");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  tree out= get_server()->get_buffer_body (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return tree_to_tmscm (out);
+}
+
+tmscm
+tmg_buffer_set_master (tmscm arg1, tmscm arg2) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-set-master");
+  TMSCM_ASSERT_URL (arg2, TMSCM_ARG2, "buffer-set-master");
+
+  url in1= tmscm_to_url (arg1);
+  url in2= tmscm_to_url (arg2);
+
+  // TMSCM_DEFER_INTS;
+  get_server()->set_master_buffer (in1, in2);
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_buffer_get_master (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-get-master");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  url out= get_server()->get_master_buffer (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return url_to_tmscm (out);
+}
+
+tmscm
+tmg_buffer_set_title (tmscm arg1, tmscm arg2) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-set-title");
+  TMSCM_ASSERT_STRING (arg2, TMSCM_ARG2, "buffer-set-title");
+
+  url in1= tmscm_to_url (arg1);
+  string in2= tmscm_to_string (arg2);
+
+  // TMSCM_DEFER_INTS;
+  get_server()->set_title_buffer (in1, in2);
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_buffer_get_title (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-get-title");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  string out= get_server()->get_title_buffer (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return string_to_tmscm (out);
+}
+
+tmscm
+tmg_buffer_last_save (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-last-save");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  int out= get_server()->get_last_save_buffer (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return int_to_tmscm (out);
+}
+
+tmscm
+tmg_buffer_last_visited (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-last-visited");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  double out= get_server()->last_visited (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return double_to_tmscm (out);
+}
+
+tmscm
+tmg_buffer_modifiedP (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-modified?");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  bool out= get_server()->buffer_modified (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return bool_to_tmscm (out);
+}
+
+tmscm
+tmg_buffer_modified_since_autosaveP (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-modified-since-autosave?");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  bool out= get_server()->buffer_modified_since_autosave (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return bool_to_tmscm (out);
+}
+
+tmscm
+tmg_buffer_pretend_modified (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-pretend-modified");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  get_server()->pretend_buffer_modified (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_buffer_pretend_saved (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-pretend-saved");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  get_server()->pretend_buffer_saved (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_buffer_pretend_autosaved (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-pretend-autosaved");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  get_server()->pretend_buffer_autosaved (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_buffer_attach_notifier (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-attach-notifier");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  get_server()->attach_buffer_notifier (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_buffer_has_nameP (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-has-name?");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  bool out= get_server()->buffer_has_name (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return bool_to_tmscm (out);
+}
+
+tmscm
+tmg_buffer_auxP (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-aux?");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  bool out= get_server()->is_aux_buffer (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return bool_to_tmscm (out);
+}
+
+tmscm
+tmg_buffer_import (tmscm arg1, tmscm arg2, tmscm arg3) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-import");
+  TMSCM_ASSERT_URL (arg2, TMSCM_ARG2, "buffer-import");
+  TMSCM_ASSERT_STRING (arg3, TMSCM_ARG3, "buffer-import");
+
+  url in1= tmscm_to_url (arg1);
+  url in2= tmscm_to_url (arg2);
+  string in3= tmscm_to_string (arg3);
+
+  // TMSCM_DEFER_INTS;
+  bool out= get_server()->buffer_import (in1, in2, in3);
+  // TMSCM_ALLOW_INTS;
+
+  return bool_to_tmscm (out);
+}
+
+tmscm
+tmg_buffer_load (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-load");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  bool out= get_server()->buffer_load (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return bool_to_tmscm (out);
+}
+
+tmscm
+tmg_buffer_export (tmscm arg1, tmscm arg2, tmscm arg3) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-export");
+  TMSCM_ASSERT_URL (arg2, TMSCM_ARG2, "buffer-export");
+  TMSCM_ASSERT_STRING (arg3, TMSCM_ARG3, "buffer-export");
+
+  url in1= tmscm_to_url (arg1);
+  url in2= tmscm_to_url (arg2);
+  string in3= tmscm_to_string (arg3);
+
+  // TMSCM_DEFER_INTS;
+  bool out= get_server()->buffer_export (in1, in2, in3);
+  // TMSCM_ALLOW_INTS;
+
+  return bool_to_tmscm (out);
+}
+
+tmscm
+tmg_buffer_save (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-save");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  bool out= get_server()->buffer_save (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return bool_to_tmscm (out);
+}
+
+tmscm
+tmg_tree_import_loaded (tmscm arg1, tmscm arg2, tmscm arg3) {
+  TMSCM_ASSERT_STRING (arg1, TMSCM_ARG1, "tree-import-loaded");
+  TMSCM_ASSERT_URL (arg2, TMSCM_ARG2, "tree-import-loaded");
+  TMSCM_ASSERT_STRING (arg3, TMSCM_ARG3, "tree-import-loaded");
+
+  string in1= tmscm_to_string (arg1);
+  url in2= tmscm_to_url (arg2);
+  string in3= tmscm_to_string (arg3);
+
+  // TMSCM_DEFER_INTS;
+  tree out= get_server()->import_loaded_tree (in1, in2, in3);
+  // TMSCM_ALLOW_INTS;
+
+  return tree_to_tmscm (out);
+}
+
+tmscm
+tmg_tree_import (tmscm arg1, tmscm arg2) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "tree-import");
+  TMSCM_ASSERT_STRING (arg2, TMSCM_ARG2, "tree-import");
+
+  url in1= tmscm_to_url (arg1);
+  string in2= tmscm_to_string (arg2);
+
+  // TMSCM_DEFER_INTS;
+  tree out= get_server()->import_tree (in1, in2);
+  // TMSCM_ALLOW_INTS;
+
+  return tree_to_tmscm (out);
+}
+
+tmscm
+tmg_tree_export (tmscm arg1, tmscm arg2, tmscm arg3) {
+  TMSCM_ASSERT_TREE (arg1, TMSCM_ARG1, "tree-export");
+  TMSCM_ASSERT_URL (arg2, TMSCM_ARG2, "tree-export");
+  TMSCM_ASSERT_STRING (arg3, TMSCM_ARG3, "tree-export");
+
+  tree in1= tmscm_to_tree (arg1);
+  url in2= tmscm_to_url (arg2);
+  string in3= tmscm_to_string (arg3);
+
+  // TMSCM_DEFER_INTS;
+  bool out= get_server()->export_tree (in1, in2, in3);
+  // TMSCM_ALLOW_INTS;
+
+  return bool_to_tmscm (out);
+}
+
+tmscm
+tmg_tree_load_style (tmscm arg1) {
+  TMSCM_ASSERT_STRING (arg1, TMSCM_ARG1, "tree-load-style");
+
+  string in1= tmscm_to_string (arg1);
+
+  // TMSCM_DEFER_INTS;
+  tree out= get_server()->load_style_tree (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return tree_to_tmscm (out);
+}
+
+tmscm
+tmg_buffer_focus (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-focus");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  bool out= get_server()->focus_on_buffer (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return bool_to_tmscm (out);
+}
+
+tmscm
+tmg_view_list () {
+  // TMSCM_DEFER_INTS;
+  array_url out= get_server()->get_all_views ();
+  // TMSCM_ALLOW_INTS;
+
+  return array_url_to_tmscm (out);
+}
+
+tmscm
+tmg_buffer_2views (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer->views");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  array_url out= get_server()->buffer_to_views (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return array_url_to_tmscm (out);
+}
+
+tmscm
+tmg_current_view_url () {
+  // TMSCM_DEFER_INTS;
+  url out= get_server()->get_current_view_safe ();
+  // TMSCM_ALLOW_INTS;
+
+  return url_to_tmscm (out);
+}
+
+tmscm
+tmg_window_2view (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "window->view");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  url out= get_server()->window_to_view (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return url_to_tmscm (out);
+}
+
+tmscm
+tmg_view_2buffer (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "view->buffer");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  url out= get_server()->view_to_buffer (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return url_to_tmscm (out);
+}
+
+tmscm
+tmg_view_2window_url (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "view->window-url");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  url out= get_server()->view_to_window (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return url_to_tmscm (out);
+}
+
+tmscm
+tmg_view_new (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "view-new");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  url out= get_server()->get_new_view (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return url_to_tmscm (out);
+}
+
+tmscm
+tmg_view_passive (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "view-passive");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  url out= get_server()->get_passive_view (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return url_to_tmscm (out);
+}
+
+tmscm
+tmg_view_recent (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "view-recent");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  url out= get_server()->get_recent_view (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return url_to_tmscm (out);
+}
+
+tmscm
+tmg_view_delete (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "view-delete");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  get_server()->delete_view (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_window_set_view (tmscm arg1, tmscm arg2, tmscm arg3) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "window-set-view");
+  TMSCM_ASSERT_URL (arg2, TMSCM_ARG2, "window-set-view");
+  TMSCM_ASSERT_BOOL (arg3, TMSCM_ARG3, "window-set-view");
+
+  url in1= tmscm_to_url (arg1);
+  url in2= tmscm_to_url (arg2);
+  bool in3= tmscm_to_bool (arg3);
+
+  // TMSCM_DEFER_INTS;
+  get_server()->window_set_view (in1, in2, in3);
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_switch_to_buffer (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "switch-to-buffer");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  get_server()->switch_to_buffer (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_window_list () {
+  // TMSCM_DEFER_INTS;
+  array_url out= get_server()->windows_list ();
+  // TMSCM_ALLOW_INTS;
+
+  return array_url_to_tmscm (out);
+}
+
+tmscm
+tmg_windows_number () {
+  // TMSCM_DEFER_INTS;
+  int out= get_server()->get_nr_windows ();
+  // TMSCM_ALLOW_INTS;
+
+  return int_to_tmscm (out);
+}
+
+tmscm
+tmg_current_window () {
+  // TMSCM_DEFER_INTS;
+  url out= get_server()->get_current_window ();
+  // TMSCM_ALLOW_INTS;
+
+  return url_to_tmscm (out);
+}
+
+tmscm
+tmg_buffer_2windows (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer->windows");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  array_url out= get_server()->buffer_to_windows (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return array_url_to_tmscm (out);
+}
+
+tmscm
+tmg_window_to_buffer (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "window-to-buffer");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  url out= get_server()->window_to_buffer (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return url_to_tmscm (out);
+}
+
+tmscm
+tmg_window_set_buffer (tmscm arg1, tmscm arg2) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "window-set-buffer");
+  TMSCM_ASSERT_URL (arg2, TMSCM_ARG2, "window-set-buffer");
+
+  url in1= tmscm_to_url (arg1);
+  url in2= tmscm_to_url (arg2);
+
+  // TMSCM_DEFER_INTS;
+  get_server()->window_set_buffer (in1, in2);
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_window_focus (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "window-focus");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  get_server()->window_focus (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_new_buffer () {
+  // TMSCM_DEFER_INTS;
+  url out= get_server()->create_buffer ();
+  // TMSCM_ALLOW_INTS;
+
+  return url_to_tmscm (out);
+}
+
+tmscm
+tmg_open_buffer_in_window (tmscm arg1, tmscm arg2, tmscm arg3) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "open-buffer-in-window");
+  TMSCM_ASSERT_CONTENT (arg2, TMSCM_ARG2, "open-buffer-in-window");
+  TMSCM_ASSERT_CONTENT (arg3, TMSCM_ARG3, "open-buffer-in-window");
+
+  url in1= tmscm_to_url (arg1);
+  content in2= tmscm_to_content (arg2);
+  content in3= tmscm_to_content (arg3);
+
+  // TMSCM_DEFER_INTS;
+  url out= get_server()->new_buffer_in_new_window (in1, in2, in3);
+  // TMSCM_ALLOW_INTS;
+
+  return url_to_tmscm (out);
+}
+
+tmscm
+tmg_open_window () {
+  // TMSCM_DEFER_INTS;
+  url out= get_server()->open_window ();
+  // TMSCM_ALLOW_INTS;
+
+  return url_to_tmscm (out);
+}
+
+tmscm
+tmg_open_window_geometry (tmscm arg1) {
+  TMSCM_ASSERT_CONTENT (arg1, TMSCM_ARG1, "open-window-geometry");
+
+  content in1= tmscm_to_content (arg1);
+
+  // TMSCM_DEFER_INTS;
+  url out= get_server()->open_window (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return url_to_tmscm (out);
+}
+
+tmscm
+tmg_clone_window () {
+  // TMSCM_DEFER_INTS;
+  get_server()->clone_window ();
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_buffer_close (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "buffer-close");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  get_server()->kill_buffer (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_kill_window (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "kill-window");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  get_server()->kill_window (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_kill_current_window_and_buffer () {
+  // TMSCM_DEFER_INTS;
+  get_server()->kill_current_window_and_buffer ();
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_project_attach (tmscm arg1) {
+  TMSCM_ASSERT_STRING (arg1, TMSCM_ARG1, "project-attach");
+
+  string in1= tmscm_to_string (arg1);
+
+  // TMSCM_DEFER_INTS;
+  get_server()->project_attach (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_project_detach () {
+  // TMSCM_DEFER_INTS;
+  get_server()->project_attach ();
+  // TMSCM_ALLOW_INTS;
+
+  return TMSCM_UNSPECIFIED;
+}
+
+tmscm
+tmg_project_attachedP () {
+  // TMSCM_DEFER_INTS;
+  bool out= get_server()->project_attached ();
+  // TMSCM_ALLOW_INTS;
+
+  return bool_to_tmscm (out);
+}
+
+tmscm
+tmg_project_get () {
+  // TMSCM_DEFER_INTS;
+  url out= get_server()->project_get ();
+  // TMSCM_ALLOW_INTS;
+
+  return url_to_tmscm (out);
+}
+
+tmscm
+tmg_tree_load_inclusion (tmscm arg1) {
+  TMSCM_ASSERT_URL (arg1, TMSCM_ARG1, "tree-load-inclusion");
+
+  url in1= tmscm_to_url (arg1);
+
+  // TMSCM_DEFER_INTS;
+  tree out= get_server()->load_inclusion (in1);
+  // TMSCM_ALLOW_INTS;
+
+  return tree_to_tmscm (out);
+}
+
+tmscm
+tmg_widget_texmacs_input (tmscm arg1, tmscm arg2, tmscm arg3) {
+  TMSCM_ASSERT_CONTENT (arg1, TMSCM_ARG1, "widget-texmacs-input");
+  TMSCM_ASSERT_CONTENT (arg2, TMSCM_ARG2, "widget-texmacs-input");
+  TMSCM_ASSERT_URL (arg3, TMSCM_ARG3, "widget-texmacs-input");
+
+  content in1= tmscm_to_content (arg1);
+  content in2= tmscm_to_content (arg2);
+  url in3= tmscm_to_url (arg3);
+
+  // TMSCM_DEFER_INTS;
+  widget out= get_server()->texmacs_input_widget (in1, in2, in3);
+  // TMSCM_ALLOW_INTS;
+
+  return widget_to_tmscm (out);
+}
+
 void
 initialize_glue_server () {
   tmscm_install_procedure ("insert-kbd-wildcard",  tmg_insert_kbd_wildcard, 5, 0, 0);
@@ -625,4 +1452,69 @@ initialize_glue_server () {
   tmscm_install_procedure ("recall-message",  tmg_recall_message, 0, 0, 0);
   tmscm_install_procedure ("yes?",  tmg_yesP, 1, 0, 0);
   tmscm_install_procedure ("quit-TeXmacs",  tmg_quit_TeXmacs, 0, 0, 0);
+  tmscm_install_procedure ("buffer-list",  tmg_buffer_list, 0, 0, 0);
+  tmscm_install_procedure ("current-buffer-url",  tmg_current_buffer_url, 0, 0, 0);
+  tmscm_install_procedure ("path-to-buffer",  tmg_path_to_buffer, 1, 0, 0);
+  tmscm_install_procedure ("buffer-new",  tmg_buffer_new, 0, 0, 0);
+  tmscm_install_procedure ("buffer-rename",  tmg_buffer_rename, 2, 0, 0);
+  tmscm_install_procedure ("buffer-set",  tmg_buffer_set, 2, 0, 0);
+  tmscm_install_procedure ("buffer-get",  tmg_buffer_get, 1, 0, 0);
+  tmscm_install_procedure ("buffer-set-body",  tmg_buffer_set_body, 2, 0, 0);
+  tmscm_install_procedure ("buffer-get-body",  tmg_buffer_get_body, 1, 0, 0);
+  tmscm_install_procedure ("buffer-set-master",  tmg_buffer_set_master, 2, 0, 0);
+  tmscm_install_procedure ("buffer-get-master",  tmg_buffer_get_master, 1, 0, 0);
+  tmscm_install_procedure ("buffer-set-title",  tmg_buffer_set_title, 2, 0, 0);
+  tmscm_install_procedure ("buffer-get-title",  tmg_buffer_get_title, 1, 0, 0);
+  tmscm_install_procedure ("buffer-last-save",  tmg_buffer_last_save, 1, 0, 0);
+  tmscm_install_procedure ("buffer-last-visited",  tmg_buffer_last_visited, 1, 0, 0);
+  tmscm_install_procedure ("buffer-modified?",  tmg_buffer_modifiedP, 1, 0, 0);
+  tmscm_install_procedure ("buffer-modified-since-autosave?",  tmg_buffer_modified_since_autosaveP, 1, 0, 0);
+  tmscm_install_procedure ("buffer-pretend-modified",  tmg_buffer_pretend_modified, 1, 0, 0);
+  tmscm_install_procedure ("buffer-pretend-saved",  tmg_buffer_pretend_saved, 1, 0, 0);
+  tmscm_install_procedure ("buffer-pretend-autosaved",  tmg_buffer_pretend_autosaved, 1, 0, 0);
+  tmscm_install_procedure ("buffer-attach-notifier",  tmg_buffer_attach_notifier, 1, 0, 0);
+  tmscm_install_procedure ("buffer-has-name?",  tmg_buffer_has_nameP, 1, 0, 0);
+  tmscm_install_procedure ("buffer-aux?",  tmg_buffer_auxP, 1, 0, 0);
+  tmscm_install_procedure ("buffer-import",  tmg_buffer_import, 3, 0, 0);
+  tmscm_install_procedure ("buffer-load",  tmg_buffer_load, 1, 0, 0);
+  tmscm_install_procedure ("buffer-export",  tmg_buffer_export, 3, 0, 0);
+  tmscm_install_procedure ("buffer-save",  tmg_buffer_save, 1, 0, 0);
+  tmscm_install_procedure ("tree-import-loaded",  tmg_tree_import_loaded, 3, 0, 0);
+  tmscm_install_procedure ("tree-import",  tmg_tree_import, 2, 0, 0);
+  tmscm_install_procedure ("tree-export",  tmg_tree_export, 3, 0, 0);
+  tmscm_install_procedure ("tree-load-style",  tmg_tree_load_style, 1, 0, 0);
+  tmscm_install_procedure ("buffer-focus",  tmg_buffer_focus, 1, 0, 0);
+  tmscm_install_procedure ("view-list",  tmg_view_list, 0, 0, 0);
+  tmscm_install_procedure ("buffer->views",  tmg_buffer_2views, 1, 0, 0);
+  tmscm_install_procedure ("current-view-url",  tmg_current_view_url, 0, 0, 0);
+  tmscm_install_procedure ("window->view",  tmg_window_2view, 1, 0, 0);
+  tmscm_install_procedure ("view->buffer",  tmg_view_2buffer, 1, 0, 0);
+  tmscm_install_procedure ("view->window-url",  tmg_view_2window_url, 1, 0, 0);
+  tmscm_install_procedure ("view-new",  tmg_view_new, 1, 0, 0);
+  tmscm_install_procedure ("view-passive",  tmg_view_passive, 1, 0, 0);
+  tmscm_install_procedure ("view-recent",  tmg_view_recent, 1, 0, 0);
+  tmscm_install_procedure ("view-delete",  tmg_view_delete, 1, 0, 0);
+  tmscm_install_procedure ("window-set-view",  tmg_window_set_view, 3, 0, 0);
+  tmscm_install_procedure ("switch-to-buffer",  tmg_switch_to_buffer, 1, 0, 0);
+  tmscm_install_procedure ("window-list",  tmg_window_list, 0, 0, 0);
+  tmscm_install_procedure ("windows-number",  tmg_windows_number, 0, 0, 0);
+  tmscm_install_procedure ("current-window",  tmg_current_window, 0, 0, 0);
+  tmscm_install_procedure ("buffer->windows",  tmg_buffer_2windows, 1, 0, 0);
+  tmscm_install_procedure ("window-to-buffer",  tmg_window_to_buffer, 1, 0, 0);
+  tmscm_install_procedure ("window-set-buffer",  tmg_window_set_buffer, 2, 0, 0);
+  tmscm_install_procedure ("window-focus",  tmg_window_focus, 1, 0, 0);
+  tmscm_install_procedure ("new-buffer",  tmg_new_buffer, 0, 0, 0);
+  tmscm_install_procedure ("open-buffer-in-window",  tmg_open_buffer_in_window, 3, 0, 0);
+  tmscm_install_procedure ("open-window",  tmg_open_window, 0, 0, 0);
+  tmscm_install_procedure ("open-window-geometry",  tmg_open_window_geometry, 1, 0, 0);
+  tmscm_install_procedure ("clone-window",  tmg_clone_window, 0, 0, 0);
+  tmscm_install_procedure ("buffer-close",  tmg_buffer_close, 1, 0, 0);
+  tmscm_install_procedure ("kill-window",  tmg_kill_window, 1, 0, 0);
+  tmscm_install_procedure ("kill-current-window-and-buffer",  tmg_kill_current_window_and_buffer, 0, 0, 0);
+  tmscm_install_procedure ("project-attach",  tmg_project_attach, 1, 0, 0);
+  tmscm_install_procedure ("project-detach",  tmg_project_detach, 0, 0, 0);
+  tmscm_install_procedure ("project-attached?",  tmg_project_attachedP, 0, 0, 0);
+  tmscm_install_procedure ("project-get",  tmg_project_get, 0, 0, 0);
+  tmscm_install_procedure ("tree-load-inclusion",  tmg_tree_load_inclusion, 1, 0, 0);
+  tmscm_install_procedure ("widget-texmacs-input",  tmg_widget_texmacs_input, 3, 0, 0);
 }

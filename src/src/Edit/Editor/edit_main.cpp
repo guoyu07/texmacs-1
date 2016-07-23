@@ -21,6 +21,8 @@
 #include "message.hpp"
 #include <setjmp.h>
 #include "image_files.hpp"
+#include "scheme.hpp"
+#include "server.hpp"
 
 #ifdef EXPERIMENTAL
 #include "../../Style/Memorizer/clean_copy.hpp"
@@ -149,7 +151,7 @@ edit_main_rep::get_name () {
 
 void
 edit_main_rep::focus_on_this_editor () {
-  focus_on_editor (this);
+  sv->focus_on_editor (this);
 }
 
 void

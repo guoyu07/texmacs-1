@@ -67,7 +67,7 @@ get_editor_status_report () {
   string r;
   r << "Editor status:\n";
   server sv= get_server ();
-  editor ed= get_current_editor ();
+  editor ed= sv->get_current_editor ();
   path start_p, end_p;
   ed->get_selection (start_p, end_p);
   r << "  Root path          : "
@@ -151,7 +151,7 @@ tm_failure (const char* msg) {
 
   //cerr << "Saving current buffer...\n";
   server sv= get_server ();
-  editor ed= get_current_editor ();
+  editor ed= sv->get_current_editor ();
   string buf= tree_report (subtree (the_et, ed->rp), ed->rp);
   url buf_err= glue (err, "_tree");
   if (!save_string (buf_err, buf))

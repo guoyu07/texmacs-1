@@ -14,6 +14,7 @@
 #include "url.hpp"
 #include "widget.hpp"
 #include "scheme.hpp"
+#include "editor.hpp"
 
 class server_rep: public abstract_struct {
 public:
@@ -22,6 +23,7 @@ public:
   virtual server_rep* get_server () = 0;
 
   /* Control global server parameters */
+  
   virtual void   set_font_rules (scheme_tree rules) = 0;
   virtual bool   kbd_get_command (string s, string& help, command& cmd) = 0;
   virtual void   insert_kbd_wildcard (string key, string im,
@@ -34,6 +36,7 @@ public:
 			      command& cmd, string& sh, string& help) = 0;
 
   /* TeXmacs frames */
+  
   virtual int  get_window_serial () = 0;
   virtual void set_window_property (scheme_tree what, scheme_tree val) = 0;
   virtual void set_bool_window_property (string what, bool val) = 0;
@@ -70,6 +73,8 @@ public:
   virtual void full_screen_mode (bool on, bool edit) = 0;
   virtual bool in_full_screen_mode () = 0;
   virtual bool in_full_screen_edit_mode () = 0;
+  virtual void get_window_position (SI& x, SI& y) = 0;
+
 
   virtual void show_footer   (bool flag) = 0;
   virtual bool visible_footer () = 0;
@@ -84,8 +89,97 @@ public:
 			    string prompt, url name) = 0;
   virtual void interactive (object fun, scheme_tree p) = 0;
   virtual void keyboard_focus_on (string field) = 0;
+  
+  /* Buffers */
+  
+  virtual array<url> get_all_buffers () = 0;
+  virtual url  make_new_buffer () = 0;
+  virtual void remove_buffer (url name) = 0;
+  virtual int  number_buffers () = 0;
+  virtual url  get_current_buffer () = 0;
+  virtual url  get_current_buffer_safe () = 0;
+  virtual url  path_to_buffer (path p) = 0;
+  virtual void rename_buffer (url name, url new_name) = 0;
+  virtual url get_master_buffer (url name) = 0;
+  virtual void set_master_buffer (url name, url master) = 0;
+  virtual void set_title_buffer (url name, string title) = 0;
+  virtual string get_title_buffer (url name) = 0;
+  virtual void set_buffer_tree (url name, tree doc) = 0;
+  virtual tree get_buffer_tree (url name) = 0;
+  virtual void set_buffer_body (url name, tree body) = 0;
+  virtual tree get_buffer_body (url name) = 0;
+  virtual url new_buffer_in_new_window (url name, tree t, tree geom= "") = 0;
+  virtual int  get_last_save_buffer (url name) = 0;
+  virtual void set_last_save_buffer (url name, int t) = 0;
+  virtual bool is_aux_buffer (url name) = 0;
+  virtual double last_visited (url name) = 0;
+  virtual bool buffer_modified (url name) = 0;
+  virtual bool buffer_modified_since_autosave (url name) = 0;
+  virtual void pretend_buffer_modified (url name) = 0;
+  virtual void pretend_buffer_saved (url name) = 0;
+  virtual void pretend_buffer_autosaved (url name) = 0;
+  virtual void attach_buffer_notifier (url name) = 0;
+  virtual bool buffer_has_name (url name) = 0;
+  virtual bool buffer_import (url name, url src, string fm) = 0;
+  virtual bool buffer_load (url name) = 0;
+  virtual bool buffer_export (url name, url dest, string fm) = 0;
+  virtual bool buffer_save (url name) = 0;
+  virtual tree import_loaded_tree (string s, url u, string fm) = 0;
+  virtual tree import_tree (url u, string fm) = 0;
+  virtual bool export_tree (tree doc, url u, string fm) = 0;
+  virtual tree load_style_tree (string package) = 0;
+
+  /* Projects */
+  
+  virtual void project_attach (string prj_name= "") = 0;
+  virtual bool project_attached () = 0;
+  virtual url  project_get () = 0;
+
+  /* Views */
+  
+  virtual  array<url> get_all_views () = 0;
+  virtual  array<url> buffer_to_views (url name) = 0;
+  virtual  editor get_current_editor () = 0;
+  virtual  editor view_to_editor (url u) = 0;
+  virtual  bool has_current_view () = 0;
+  virtual  void set_current_view (url u) = 0;
+  virtual  url  get_current_view () = 0;
+  virtual  url  get_current_view_safe () = 0;
+  virtual  url  window_to_view (url win) = 0;
+  virtual  url  view_to_buffer (url u) = 0;
+  virtual  url  view_to_window (url u) = 0;
+  virtual  url  get_new_view (url name) = 0;
+  virtual  url  get_recent_view (url name) = 0;
+  virtual  url  get_passive_view (url name) = 0;
+  virtual  void delete_view (url u) = 0;
+  virtual  void notify_rename_before (url old_name) = 0;
+  virtual  void notify_rename_after (url new_name) = 0;
+  virtual  void window_set_view (url win, url new_u, bool focus) = 0;
+  virtual  void switch_to_buffer (url name) = 0;
+  virtual  void focus_on_editor (editor ed) = 0;
+  virtual  bool focus_on_buffer (url name) = 0;
+  
+  /* Windows */
+  
+  virtual  array<url> windows_list () = 0;
+  virtual  array<url> buffer_to_windows (url name) = 0;
+  virtual  int  get_nr_windows () = 0;
+  virtual  bool has_current_window () = 0;
+  virtual  url  get_current_window () = 0;
+  virtual  url  window_to_buffer (url win) = 0;
+  virtual  void window_set_buffer (url win, url name) = 0;
+  virtual  void window_focus (url win) = 0;
+  
+  virtual  url  create_buffer () = 0;
+  virtual  void create_buffer (url name, tree doc) = 0;
+  virtual  url  open_window (tree geom= "") = 0;
+  virtual  void clone_window () = 0;
+  virtual  void kill_buffer (url name) = 0;
+  virtual  void kill_window (url name) = 0;
+  virtual  void kill_current_window_and_buffer () = 0;
 
   /* Miscellaneous routines */
+  
   virtual void   style_clear_cache () = 0;
   virtual void   refresh () = 0;
   virtual void   interpose_handler () = 0;
@@ -103,6 +197,13 @@ public:
   virtual bool   is_yes (string s) = 0;
   virtual void   quit () = 0;
   virtual void   shell (string s) = 0;
+  
+  virtual tree   latex_expand (tree doc) = 0;
+  virtual tree   latex_expand (tree doc, url name) = 0;
+  
+  virtual tree   load_inclusion (url name) = 0;
+  virtual widget texmacs_input_widget (tree doc, tree style, url wname) = 0;
+  
 };
 
 class server {
@@ -112,19 +213,11 @@ class server {
 ABSTRACT_CODE(server);
 
 
-// the following are needed in the editor interface
-url  get_current_view ();
-url  get_current_view_safe ();
-void set_current_view (url u);
-bool has_current_window ();
-
 // the following are needed in the scheme interface (but not in editor)
 server get_server ();
 bool in_rescue_mode ();
 void gui_set_output_language (string lan);
-void project_attach (string prj_name= "");
-bool project_attached ();
-url  project_get ();
+
 
 
 #endif // defined SERVER_H

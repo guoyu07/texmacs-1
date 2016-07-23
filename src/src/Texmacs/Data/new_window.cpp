@@ -22,8 +22,6 @@
 * Manage global list of windows
 ******************************************************************************/
 
-static int last_window= 1;
-static array<url> all_windows;
 extern int nr_windows;
 
 /*
@@ -36,7 +34,7 @@ reset (path p, int i) {
 */
 
 url
-create_window_id () {
+tm_server_windows_rep::create_window_id () {
   url r= "tmfs://window/" * as_string (last_window);
   all_windows << r;
   last_window++;
@@ -44,7 +42,7 @@ create_window_id () {
 }
 
 void
-destroy_window_id (url win) {
+tm_server_windows_rep::destroy_window_id (url win) {
   for (int i=0; i<N(all_windows); i++)
     if (all_windows[i] == win) {
       all_windows= append (range (all_windows, 0, i),
@@ -54,7 +52,7 @@ destroy_window_id (url win) {
 }
 
 url
-abstract_window (tm_window win) {
+tm_server_windows_rep::abstract_window (tm_window win) {
   if (win == NULL) return url_none ();
   return win->id;
 }
@@ -63,7 +61,6 @@ abstract_window (tm_window win) {
 * Low level creation and destruction of windows
 ******************************************************************************/
 
-static hashmap<url,tm_window> tm_window_table (NULL);
 
 class kill_window_command_rep: public command_rep {
   url* id;
@@ -78,7 +75,7 @@ public:
 };
 
 url
-new_window (bool map_flag= true, tree geom= "") {
+tm_server_windows_rep::new_window (bool map_flag, tree geom) {
   int mask= 0;
   if (get_preference ("header") == "on") mask += 1;
   if (get_preference ("main icon bar") == "on") mask += 2;
@@ -90,15 +87,15 @@ new_window (bool map_flag= true, tree geom= "") {
   if (get_preference ("bottom tools") == "on") mask += 128;
   url* id= tm_new<url> (url_none ());
   command quit= tm_new<kill_window_command_rep> (id);
-  tm_window win= tm_new<tm_window_rep> (texmacs_widget (mask, quit), geom);
+  tm_window win= tm_new<tm_window_rep> (this, texmacs_widget (mask, quit), geom);
   tm_window_table (win->id)= win;
   if (map_flag) win->map ();
   *id= abstract_window (win);
   return abstract_window (win);
 }
 
-static bool
-delete_view_from_window (url win) {
+bool
+tm_server_windows_rep::delete_view_from_window (url win) {
   array<url> vs= get_all_views ();
   for (int i=0; i<N(vs); i++)
     if (view_to_window (vs[i]) == win) {
@@ -112,7 +109,7 @@ delete_view_from_window (url win) {
 }
 
 void
-delete_window (url win_u) {
+tm_server_windows_rep::delete_window (url win_u) {
   tm_window win= concrete_window (win_u);
   if (win == NULL) return;
   while (delete_view_from_window (win_u)) {}
@@ -123,7 +120,7 @@ delete_window (url win_u) {
 }
 
 tm_window
-concrete_window (url win) {
+tm_server_windows_rep::concrete_window (url win) {
   return tm_window_table [win];
 }
 
@@ -132,36 +129,36 @@ concrete_window (url win) {
 ******************************************************************************/
 
 array<url>
-windows_list () {
+tm_server_windows_rep::windows_list () {
   return all_windows;
 }
 
 int
-get_nr_windows () {
+tm_server_windows_rep::get_nr_windows () {
   return nr_windows;
 }
 
 bool
-has_current_window () {
+tm_server_windows_rep::has_current_window () {
   tm_view vw= concrete_view (get_current_view_safe ());
   return vw != NULL && vw->win != NULL;
 }
 
 tm_window
-concrete_window () {
+tm_server_windows_rep::concrete_window () {
   tm_view vw= concrete_view (get_current_view ());
   ASSERT (vw->win != NULL, "no window attached to view");
   return vw->win;
 }
 
 url
-get_current_window () {
+tm_server_windows_rep::get_current_window () {
   tm_window win= concrete_window ();
   return abstract_window (win);
 }
 
 array<url>
-buffer_to_windows (url name) {
+tm_server_windows_rep::buffer_to_windows (url name) {
   array<url> r, vs= buffer_to_views (name);
   for (int i=0; i<N(vs); i++) {
     url win= view_to_window (vs[i]);
@@ -171,12 +168,12 @@ buffer_to_windows (url name) {
 }
 
 url
-window_to_buffer (url win) {
+tm_server_windows_rep::window_to_buffer (url win) {
   return view_to_buffer (window_to_view (win));
 }
 
 url
-window_to_view (url win) {
+tm_server_views_rep::window_to_view (url win) {
   array<url> vs= get_all_views ();
   for (int i=0; i<N(vs); i++)
     if (view_to_window (vs[i]) == win)
@@ -185,14 +182,14 @@ window_to_view (url win) {
 }
 
 void
-window_set_buffer (url win, url name) {
+tm_server_windows_rep::window_set_buffer (url win, url name) {
   url old= window_to_view (win);
   if (is_none (old) || view_to_buffer (old) == name) return;
   window_set_view (win, get_passive_view (name), false);
 }
 
 void
-window_focus (url win) {
+tm_server_windows_rep::window_focus (url win) {
   if (win == get_current_window ()) return;
   url old= window_to_view (win);
   if (is_none (old)) return;
@@ -204,20 +201,20 @@ window_focus (url win) {
 ******************************************************************************/
 
 void
-create_buffer (url name, tree doc) {
+tm_server_windows_rep::create_buffer (url name, tree doc) {
   if (!is_nil (concrete_buffer (name))) return;
   set_buffer_tree (name, doc);
 }
 
 void
-new_buffer_in_this_window (url name, tree doc) {
+tm_server_windows_rep::new_buffer_in_this_window (url name, tree doc) {
   if (is_nil (concrete_buffer (name)))
     create_buffer (name, doc);
   switch_to_buffer (name);
 }
 
 url
-new_buffer_in_new_window (url name, tree doc, tree geom) {
+tm_server_windows_rep::new_buffer_in_new_window (url name, tree doc, tree geom) {
   if (is_nil (concrete_buffer (name)))
     create_buffer (name, doc);
   url win= new_window (true, geom);
@@ -230,26 +227,26 @@ new_buffer_in_new_window (url name, tree doc, tree geom) {
 ******************************************************************************/
 
 url
-create_buffer () {
+tm_server_windows_rep::create_buffer () {
   url name= make_new_buffer ();
   switch_to_buffer (name);
   return name;
 }
 
 url
-open_window (tree geom) {
+tm_server_windows_rep::open_window (tree geom) {
   url name= make_new_buffer ();
   return new_buffer_in_new_window (name, tree (DOCUMENT), geom);
 }
 
 void
-clone_window () {
+tm_server_windows_rep::clone_window () {
   url win= new_window ();
   window_set_view (win, get_passive_view (get_current_buffer ()), true);
 }
 
 void
-kill_buffer (url name) {
+tm_server_windows_rep::kill_buffer (url name) {
   array<url> vs= buffer_to_views (name);
   for (int i=0; i<N(vs); i++)
     if (!is_none (vs[i])) {
@@ -265,7 +262,7 @@ kill_buffer (url name) {
 }
 
 void
-kill_window (url wname) {
+tm_server_windows_rep::kill_window (url wname) {
   array<url> vs= get_all_views ();
   for (int i=0; i<N(vs); i++) {
     url win= view_to_window (vs[i]);
@@ -281,7 +278,7 @@ kill_window (url wname) {
 }
 
 void
-kill_current_window_and_buffer () {
+tm_server_windows_rep::kill_current_window_and_buffer () {
   if (N(bufs) <= 1) get_server () -> quit();
   url name= get_current_buffer ();
   array<url> vs= buffer_to_views (get_current_buffer ());

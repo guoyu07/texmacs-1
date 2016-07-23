@@ -18,7 +18,7 @@
 #include "promise.hpp"
 #include "widget.hpp"
 #include "boot.hpp"
-#include "editor.hpp"
+#include "server.hpp"
 #include "modification.hpp"
 #include "patch.hpp"
 
@@ -518,13 +518,13 @@ protected_call (object cmd) {
 #ifdef USE_EXCEPTIONS
   try {
 #endif
-    get_current_editor()->before_menu_action ();
+    get_server ()->get_current_editor ()->before_menu_action ();
     call (cmd);
-    get_current_editor()->after_menu_action ();
+    get_server ()->get_current_editor ()->after_menu_action ();
 #ifdef USE_EXCEPTIONS
   }
   catch (string s) {
-    get_current_editor()->cancel_menu_action ();
+    get_server ()->get_current_editor ()->cancel_menu_action ();
   }
   handle_exceptions ();
 #endif

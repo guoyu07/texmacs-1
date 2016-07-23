@@ -11,10 +11,10 @@
 
 #include "renderer.hpp"
 #include "gui.hpp"
+#include "server.hpp"
 #include "image_files.hpp"
 
-url get_current_buffer_safe ();
-bool is_percentage (tree t, string s= "%");
+//bool is_percentage (tree t, string s= "%");
 double as_percentage (tree t);
 
 /******************************************************************************
@@ -94,7 +94,7 @@ brush_rep::get_pattern_url () {
   url u= as_string (t[0]);
   url r= resolve (url ("$TEXMACS_PATTERN_PATH") * u);
   if (!is_none (r)) return r;
-  url base= get_current_buffer_safe ();
+  url base= get_server ()->get_current_buffer_safe ();
   r= resolve (relative (base, u));
   if (!is_none (r)) return r;
   return u;

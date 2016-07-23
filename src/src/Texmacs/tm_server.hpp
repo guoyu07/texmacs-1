@@ -15,6 +15,7 @@
 #include "tm_config.hpp"
 #include "tm_buffer.hpp"
 #include "tm_frame.hpp"
+#include "Data/new_buffer.hpp" 
 
 class tm_server_rep:
   public tm_config_rep,
@@ -46,6 +47,11 @@ public:
   bool   is_yes (string s);
   void   quit ();
   void   shell    (string s);
+  
+  widget texmacs_input_widget (tree doc, tree style, url wname);
+  
+  friend class close_embedded_command_rep;
+  friend class tm_window_rep;
 };
 
 #endif // defined TM_SERVER_H

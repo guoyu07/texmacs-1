@@ -10,6 +10,7 @@
 ******************************************************************************/
 
 #include "analyze.hpp"
+#include "scheme.hpp"
 #include "Replace/edit_replace.hpp"
 #include "Interface/edit_interface.hpp"
 

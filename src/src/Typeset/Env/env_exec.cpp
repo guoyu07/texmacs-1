@@ -14,6 +14,7 @@
 #include "file.hpp"
 #include "image_files.hpp"
 #include "scheme.hpp"
+#include "server.hpp"
 #include "page_type.hpp"
 #include "typesetter.hpp"
 #include "drd_mode.hpp"
@@ -102,7 +103,7 @@ edit_env_rep::rewrite (tree t) {
       if (N(t) == 0) return tree (ERROR, "invalid include");
       url file_name= url_unix (exec_string (t[0]));
       //cout << "file_name= " << as_tree (file_name) << LF;
-      return load_inclusion (relative (base_file_name, file_name));
+      return get_server ()->load_inclusion (relative (base_file_name, file_name));
     }
   case REWRITE_INACTIVE:
     {

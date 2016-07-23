@@ -13,6 +13,9 @@
 #include "analyze.hpp"
 #include "abs_buffer.hpp"
 #include "archiver.hpp"
+#include "scheme.hpp"
+#include "server.hpp"
+
 
 /******************************************************************************
 * Basic subroutines for keyboard handling

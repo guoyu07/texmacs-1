@@ -12,6 +12,7 @@
 #include "edit_text.hpp"
 #include "tree_traverse.hpp"
 #include "analyze.hpp"
+#include "scheme.hpp"
 
 bool is_empty_cell (tree t);
 

@@ -15,10 +15,8 @@
 #include "boxes.hpp"
 
 #include "Data/new_window.hpp"
-#include "Data/new_view.hpp"
 
-
-class tm_frame_rep: virtual public server_rep {
+class tm_frame_rep: virtual public server_rep, virtual public tm_server_windows_rep {
 protected:
   bool full_screen;        // full screen mode
   bool full_screen_edit;   // full screen edit mode
@@ -68,6 +66,7 @@ public:
   void full_screen_mode (bool on, bool edit);
   bool in_full_screen_mode ();
   bool in_full_screen_edit_mode ();
+  void get_window_position (SI& x, SI& y);
 
   /* footer */
   void show_footer (bool flag);

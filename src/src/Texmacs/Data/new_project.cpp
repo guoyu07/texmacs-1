@@ -23,7 +23,7 @@
 ******************************************************************************/
 
 void
-project_attach (string prj_name) {
+tm_server_buffers_rep::project_attach (string prj_name) {
   url name= get_current_buffer ();
   tm_buffer buf= concrete_buffer (name);
   buf->data->project= prj_name;
@@ -41,7 +41,7 @@ project_attach (string prj_name) {
 }
 
 bool
-is_implicit_project (tm_buffer buf) {
+tm_server_buffers_rep::is_implicit_project (tm_buffer buf) {
   if (suffix (buf->buf->name) == "tp") return true;
   array<url> vs= buffer_to_views (buf->buf->name);
   for (int i=0; i<N(vs); i++) {
@@ -53,14 +53,14 @@ is_implicit_project (tm_buffer buf) {
 }
 
 bool
-project_attached () {
+tm_server_buffers_rep::project_attached () {
   tm_buffer buf= concrete_buffer (get_current_buffer ());
   if (is_implicit_project (buf)) return true;
   return buf->data->project != "";
 }
 
 url
-project_get () {
+tm_server_buffers_rep::project_get () {
   tm_buffer buf= concrete_buffer (get_current_buffer ());
   if (is_implicit_project (buf)) return buf->buf->name;
   if (buf->data->project == "") return url_none ();

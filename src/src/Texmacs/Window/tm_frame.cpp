@@ -219,6 +219,12 @@ tm_frame_rep::keyboard_focus_on (string field) {
   send_keyboard_focus_on (win->wid, field);
 }
 
+void
+tm_frame_rep::get_window_position (SI& x, SI& y) {
+  get_position (get_window (concrete_window () -> win), x, y);
+}
+
+
 
 /******************************************************************************
 * Routines concerning the widget

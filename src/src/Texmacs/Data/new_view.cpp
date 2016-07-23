@@ -66,7 +66,7 @@ decode_url (string s) {
 }
 
 url
-abstract_view (tm_view vw) {
+tm_server_views_rep::abstract_view (tm_view vw) {
   if (vw == NULL) return url_none ();
   string name= encode_url (vw->buf->buf->name);
   //cout << vw->buf->buf->name << " -> " << name << "\n";
@@ -75,7 +75,7 @@ abstract_view (tm_view vw) {
 }
 
 tm_view
-concrete_view (url u) {
+tm_server_views_rep::concrete_view (url u) {
   if (is_none (u)) return NULL;
   string s= as_string (u);
   if (!starts (s, "tmfs://view/")) return NULL;
@@ -97,15 +97,14 @@ concrete_view (url u) {
 * Views associated to editor, window, or buffer
 ******************************************************************************/
 
-tm_view the_view= NULL;
 
 bool
-has_current_view () {
+tm_server_views_rep::has_current_view () {
   return the_view != NULL;
 }
 
 void
-set_current_view (url u) {
+tm_server_views_rep::set_current_view (url u) {
   tm_view vw= concrete_view (u);
   //ASSERT (is_none (u) || starts (as_string (tail (u)), "no_name") || vw != NULL, "bad view");
   the_view= vw;
@@ -116,13 +115,13 @@ set_current_view (url u) {
 }
 
 url
-get_current_view () {
+tm_server_views_rep::get_current_view () {
   ASSERT (the_view != NULL, "no active view");
   return abstract_view (the_view);
 }
 
 url
-get_current_view_safe () {
+tm_server_views_rep::get_current_view_safe () {
   if (the_view == NULL) return url_none ();
   return abstract_view (the_view);
 }
@@ -130,7 +129,7 @@ get_current_view_safe () {
 void notify_delete_view (url u);
 
 editor
-get_current_editor () {
+tm_server_views_rep::get_current_editor () {
   url u= get_current_view();
   tm_view vw= concrete_view (u);
   if (vw == NULL) { // HACK: shouldn't happen!
@@ -145,7 +144,7 @@ get_current_editor () {
 }
 
 array<url>
-buffer_to_views (url name) {
+tm_server_views_rep::buffer_to_views (url name) {
   tm_buffer buf= concrete_buffer (name);
   array<url> r;
   if (is_nil (buf)) return r;
@@ -155,21 +154,21 @@ buffer_to_views (url name) {
 }
 
 url
-view_to_buffer (url u) {
+tm_server_views_rep::view_to_buffer (url u) {
   tm_view vw= concrete_view (u);
   if (vw == NULL) return url_none ();
   return vw->buf->buf->name;
 }
 
 url
-view_to_window (url u) {
+tm_server_views_rep::view_to_window (url u) {
   tm_view vw= concrete_view (u);
   if (vw == NULL) return url_none ();
   return abstract_window (vw->win);
 }
 
 editor
-view_to_editor (url u) {
+tm_server_views_rep::view_to_editor (url u) {
   tm_view vw= concrete_view (u);
   if (vw == NULL) {
     notify_delete_view (u); // HACK: returns to valid (?) state.
@@ -183,10 +182,9 @@ view_to_editor (url u) {
 * Viewing history
 ******************************************************************************/
 
-array<url> view_history;
 
 void
-notify_set_view (url u) {
+tm_server_views_rep::notify_set_view (url u) {
   int i;
   for (i=0; i<N(view_history); i++)
     if (view_history[i] == u) break;
@@ -201,7 +199,7 @@ notify_set_view (url u) {
 }
 
 void
-notify_delete_view (url u) {
+tm_server_views_rep::notify_delete_view (url u) {
   for (int i=0; i<N(view_history); i++)
     if (view_history[i] == u) {
       view_history= append (range (view_history, 0, i),
@@ -211,7 +209,7 @@ notify_delete_view (url u) {
 }
 
 url
-get_recent_view (url name, bool same, bool other, bool active, bool passive) {
+tm_server_views_rep::get_recent_view (url name, bool same, bool other, bool active, bool passive) {
   // Get most recent view with the following filters:
   //   If same, then the name of the buffer much be name
   //   If other, then the name of the buffer much be other than name
@@ -232,7 +230,7 @@ get_recent_view (url name, bool same, bool other, bool active, bool passive) {
 }
 
 array<url>
-get_all_views () {
+tm_server_views_rep::get_all_views () {
   return view_history;
 }
 
@@ -244,7 +242,7 @@ url tm_init_buffer_file= url_none ();
 url my_init_buffer_file= url_none ();
 
 url
-get_new_view (url name) {
+tm_server_views_rep::get_new_view (url name) {
   //cout << "Creating new view " << name << "\n";
 
   create_buffer (name, tree (DOCUMENT));
@@ -269,7 +267,7 @@ get_new_view (url name) {
 }
 
 url
-get_passive_view (url name) {
+tm_server_views_rep::get_passive_view (url name) {
   // Get a view on a buffer, but not one which is attached to a window
   // Create a new view if no such view exists
   tm_buffer buf= concrete_buffer_insist (name);
@@ -283,7 +281,7 @@ get_passive_view (url name) {
 }
 
 url
-get_recent_view (url name) {
+tm_server_views_rep::get_recent_view (url name) {
   // Get (most) recent view on a buffer, with a preference for
   // the current buffer or another view attached to a window
   array<url> vs= buffer_to_views (name);
@@ -302,7 +300,7 @@ get_recent_view (url name) {
 ******************************************************************************/
 
 void
-delete_view (url u) {
+tm_server_views_rep::delete_view (url u) {
   tm_view vw= concrete_view (u);
   if (vw == NULL) return;
   tm_buffer buf= vw->buf;
@@ -320,14 +318,14 @@ delete_view (url u) {
 }
 
 void
-notify_rename_before (url old_name) {
+tm_server_views_rep::notify_rename_before (url old_name) {
   array<url> vs= buffer_to_views (old_name);
   for (int i=0; i<N(vs); i++)
     notify_delete_view (vs[i]);
 }
 
 void
-notify_rename_after (url new_name) {
+tm_server_views_rep::notify_rename_after (url new_name) {
   array<url> vs= buffer_to_views (new_name);
   for (int i=0; i<N(vs); i++)
     notify_set_view (vs[i]);
@@ -338,7 +336,7 @@ notify_rename_after (url new_name) {
 ******************************************************************************/
 
 void
-attach_view (url win_u, url u) {
+tm_server_views_rep::attach_view (url win_u, url u) {
   tm_window win= concrete_window (win_u);
   tm_view   vw = concrete_view (u);
   if (win == NULL || vw == NULL) return;
@@ -356,7 +354,7 @@ attach_view (url win_u, url u) {
 }
 
 void
-detach_view (url u) {
+tm_server_views_rep::detach_view (url u) {
   tm_view vw = concrete_view (u);
   if (vw == NULL) return;
   tm_window win= vw->win;
@@ -377,7 +375,7 @@ detach_view (url u) {
 ******************************************************************************/
 
 void
-window_set_view (url win_u, url new_u, bool focus) {
+tm_server_views_rep::window_set_view (url win_u, url new_u, bool focus) {
   //cout << "set view " << win_u << ", " << new_u << ", " << focus << "\n";
   tm_window win= concrete_window (win_u);
   if (win == NULL) return;
@@ -394,7 +392,7 @@ window_set_view (url win_u, url new_u, bool focus) {
 }
 
 void
-switch_to_buffer (url name) {
+tm_server_views_rep::switch_to_buffer (url name) {
   //cout << "Switching to buffer " << name << "\n";
   url u= get_passive_view (name);
   tm_view vw= concrete_view (u);
@@ -407,7 +405,7 @@ switch_to_buffer (url name) {
 }
 
 void
-focus_on_editor (editor ed) {
+tm_server_views_rep::focus_on_editor (editor ed) {
   array<url> bufs= get_all_buffers ();
   for (int i=0; i<N(bufs); i++) {
     array<url> vs= buffer_to_views (bufs[i]);
@@ -435,7 +433,7 @@ focus_on_editor (editor ed) {
 }
 
 bool
-focus_on_buffer (url name) {
+tm_server_views_rep::focus_on_buffer (url name) {
   // Focus on the most recent view on a buffer, preferably active in a window
   // Return false if no view exists for the buffer
   if (the_view != NULL && the_view->buf->buf->name == name) return true;

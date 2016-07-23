@@ -274,7 +274,7 @@ qt_chooser_widget_rep::perform_dialog () {
         string params;
         // HACK: which value should we choose here?
         //On other platforms we call image_size (u,  w,  h) which returns size in pt units.
-        int ww = get_current_editor()->get_page_width (false) / PIXEL;
+        int ww = get_server ()->get_current_editor ()->get_page_width (false) / PIXEL;
         int  w = pic.width ();
         int  h = pic.height ();
         string unit= "px";

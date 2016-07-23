@@ -45,7 +45,7 @@ init_style_data () {
   if (sd == NULL) sd= tm_new<style_data_rep> ();
 }
 
-extern hashmap<string,tree> style_tree_cache;
+hashmap<string,tree> style_tree_cache ("");
 hashmap<string,bool> hidden_packages (false);
 
 /******************************************************************************

@@ -19,7 +19,6 @@
 #include "new_document.hpp"
 #include "merge_sort.hpp"
 
-array<tm_buffer> bufs;
 
 string propose_title (string old_title, url u, tree doc);
 
@@ -61,7 +60,7 @@ tm_buffer_rep::needs_to_be_autosaved () {
 ******************************************************************************/
 
 void
-insert_buffer (url name) {
+tm_server_buffers_rep::insert_buffer (url name) {
   if (is_none (name)) return;
   if (!is_nil (concrete_buffer (name))) return;
   tm_buffer buf= tm_new<tm_buffer_rep> (name);
@@ -69,7 +68,7 @@ insert_buffer (url name) {
 }
 
 void
-remove_buffer (tm_buffer buf) {
+tm_server_buffers_rep::remove_buffer (tm_buffer buf) {
   int nr, n= N(bufs);
   for (nr=0; nr<n; nr++)
     if (bufs[nr] == buf) {
@@ -86,18 +85,18 @@ remove_buffer (tm_buffer buf) {
 }
 
 void
-remove_buffer (url name) {
+tm_server_buffers_rep::remove_buffer (url name) {
   tm_buffer buf= concrete_buffer (name);
   if (!is_nil (buf)) remove_buffer (buf);
 }
 
 int
-number_buffers () {
+tm_server_buffers_rep::number_buffers () {
   return N(bufs);
 }
 
 array<url>
-get_all_buffers () {
+tm_server_buffers_rep::get_all_buffers () {
   array<url> r;
   for (int i=N(bufs)-1; i>=0; i--)
     r << bufs[i]->buf->name;
@@ -105,7 +104,7 @@ get_all_buffers () {
 }
 
 tm_buffer
-concrete_buffer (url name) {
+tm_server_buffers_rep::concrete_buffer (url name) {
   int i, n= N(bufs);
   for (i=0; i<n; i++)
     if (bufs[i]->buf->name == name)
@@ -114,32 +113,33 @@ concrete_buffer (url name) {
 }
 
 tm_buffer
-concrete_buffer_insist (url u) {
+tm_server_buffers_rep::concrete_buffer_insist (url u) {
   tm_buffer buf= concrete_buffer (u);
   if (!is_nil (buf)) return buf;
   buffer_load (u);
   return concrete_buffer (u);
 }
 
+
 /******************************************************************************
 * Buffer names
 ******************************************************************************/
 
 url
-get_current_buffer () {
+tm_server_buffers_rep::get_current_buffer () {
   tm_view vw= concrete_view (get_current_view ());
   return vw->buf->buf->name;
 }
 
 url
-get_current_buffer_safe () {
+tm_server_buffers_rep::get_current_buffer_safe () {
   url v= get_current_view_safe ();
   if (is_none (v)) return v;
   return concrete_view (v)->buf->buf->name;
 }
 
 url
-path_to_buffer (path p) {
+tm_server_buffers_rep::path_to_buffer (path p) {
   int i;
   for (i=0; i<N(bufs); i++)
     if (bufs[i]->rp <= p)
@@ -148,7 +148,7 @@ path_to_buffer (path p) {
 }
 
 void
-rename_buffer (url name, url new_name) {
+tm_server_buffers_rep::rename_buffer (url name, url new_name) {
   if (new_name == name || is_nil (concrete_buffer (name))) return;
   kill_buffer (new_name);
   tm_buffer buf= concrete_buffer (name);
@@ -166,7 +166,7 @@ rename_buffer (url name, url new_name) {
 }
 
 url
-make_new_buffer () {
+tm_server_buffers_rep::make_new_buffer () {
   int i=1;
   while (true) {
     url name= url_scratch ("no_name_", ".tm", i);
@@ -179,7 +179,7 @@ make_new_buffer () {
 }
 
 bool
-buffer_has_name (url name) {
+tm_server_buffers_rep::buffer_has_name (url name) {
   return !is_scratch (name);
 }
 
@@ -188,7 +188,7 @@ buffer_has_name (url name) {
 ******************************************************************************/
 
 string
-propose_title (string old_title, url u, tree doc) {
+tm_server_buffers_rep::propose_title (string old_title, url u, tree doc) {
   string name= as_string (tail (u));
   if (starts (name, "no_name_") && ends (name, ".tm")) {
     string no_name= translate ("No name");
@@ -217,14 +217,14 @@ propose_title (string old_title, url u, tree doc) {
 }
 
 string
-get_title_buffer (url name) {
+tm_server_buffers_rep::get_title_buffer (url name) {
   tm_buffer buf= concrete_buffer (name);
   if (is_nil (buf)) return "";
   return buf->buf->title;
 }
 
 void
-set_title_buffer (url name, string title) {
+tm_server_buffers_rep::set_title_buffer (url name, string title) {
   tm_buffer buf= concrete_buffer (name);
   if (is_nil (buf)) return;
   if (buf->buf->title == title) return;
@@ -244,14 +244,14 @@ set_title_buffer (url name, string title) {
 ******************************************************************************/
 
 void
-set_buffer_data (url name, new_data data) {
+tm_server_buffers_rep::set_buffer_data (url name, new_data data) {
   array<url> vs= buffer_to_views (name);
   for (int i=0; i<N(vs); i++)
     view_to_editor (vs[i]) -> set_data (data);
 }
 
 void
-set_buffer_tree (url name, tree doc) {
+tm_server_buffers_rep::set_buffer_tree (url name, tree doc) {
   tm_buffer buf= concrete_buffer (name);
   if (is_nil (buf)) {
     insert_buffer (name);
@@ -280,7 +280,7 @@ set_buffer_tree (url name, tree doc) {
 }
 
 tree
-get_buffer_tree (url name) {
+tm_server_buffers_rep::get_buffer_tree (url name) {
   tm_buffer buf= concrete_buffer (name);
   if (is_nil (buf)) return "";
   tree body= subtree (the_et, buf->rp);
@@ -288,7 +288,7 @@ get_buffer_tree (url name) {
 }
 
 void
-set_buffer_body (url name, tree body) {
+tm_server_buffers_rep::set_buffer_body (url name, tree body) {
   tm_buffer buf= concrete_buffer (name);
   if (is_nil (buf)) {
     new_data data;
@@ -301,7 +301,7 @@ set_buffer_body (url name, tree body) {
 }
 
 tree
-get_buffer_body (url name) {
+tm_server_buffers_rep::get_buffer_body (url name) {
   tm_buffer buf= concrete_buffer (name);
   if (is_nil (buf)) return "";
   return subtree (the_et, buf->rp);
@@ -312,14 +312,14 @@ get_buffer_body (url name) {
 ******************************************************************************/
 
 url
-get_master_buffer (url name) {
+tm_server_buffers_rep::get_master_buffer (url name) {
   tm_buffer buf= concrete_buffer (name);
   if (is_nil (buf)) return url_none ();
   return buf->buf->master;
 }
 
 void
-set_master_buffer (url name, url master) {
+tm_server_buffers_rep::set_master_buffer (url name, url master) {
   tm_buffer buf= concrete_buffer (name);
   if (is_nil (buf)) return;
   if (buf->buf->master == master) return;
@@ -330,14 +330,14 @@ set_master_buffer (url name, url master) {
 }
 
 void
-set_last_save_buffer (url name, int t) {
+tm_server_buffers_rep::set_last_save_buffer (url name, int t) {
   tm_buffer buf= concrete_buffer (name);
   if (!is_nil (buf)) buf->buf->last_save= t;
   //cout << "Set last save " << name << " -> " << t << "\n";
 }
 
 int
-get_last_save_buffer (url name) {
+tm_server_buffers_rep::get_last_save_buffer (url name) {
   tm_buffer buf= concrete_buffer (name);
   if (is_nil (buf)) {
     //cout << "Get last save " << name << " -> *\n";
@@ -348,35 +348,35 @@ get_last_save_buffer (url name) {
 }
 
 bool
-is_aux_buffer (url name) {
+tm_server_buffers_rep::is_aux_buffer (url name) {
   tm_buffer buf= concrete_buffer (name);
   if (is_nil (buf)) return false;
   return buf->buf->master != buf->buf->name;
 }
 
 double
-last_visited (url name) {
+tm_server_buffers_rep::last_visited (url name) {
   tm_buffer buf= concrete_buffer (name);
   if (is_nil (buf)) return (double) texmacs_time ();
   return (double) buf->buf->last_visit;
 }
 
 bool
-buffer_modified (url name) {
+tm_server_buffers_rep::buffer_modified (url name) {
   tm_buffer buf= concrete_buffer (name);
   if (is_nil (buf)) return false;
   return buf->needs_to_be_saved ();
 }
 
 bool
-buffer_modified_since_autosave (url name) {
+tm_server_buffers_rep::buffer_modified_since_autosave (url name) {
   tm_buffer buf= concrete_buffer (name);
   if (is_nil (buf)) return false;
   return buf->needs_to_be_autosaved ();
 }
 
 void
-pretend_buffer_modified (url name) {
+tm_server_buffers_rep::pretend_buffer_modified (url name) {
   tm_buffer buf= concrete_buffer (name);
   if (is_nil (buf)) return;
   array<url> vs= buffer_to_views (name);
@@ -385,7 +385,7 @@ pretend_buffer_modified (url name) {
 }
 
 void
-pretend_buffer_saved (url name) {
+tm_server_buffers_rep::pretend_buffer_saved (url name) {
   tm_buffer buf= concrete_buffer (name);
   if (is_nil (buf)) return;
   array<url> vs= buffer_to_views (name);
@@ -395,7 +395,7 @@ pretend_buffer_saved (url name) {
 }
 
 void
-pretend_buffer_autosaved (url name) {
+tm_server_buffers_rep::pretend_buffer_autosaved (url name) {
   tm_buffer buf= concrete_buffer (name);
   if (is_nil (buf)) return;
   array<url> vs= buffer_to_views (name);
@@ -404,7 +404,7 @@ pretend_buffer_autosaved (url name) {
 }
 
 void
-attach_buffer_notifier (url name) {
+tm_server_buffers_rep::attach_buffer_notifier (url name) {
   tm_buffer buf= concrete_buffer (name);
   if (is_nil (buf)) return;
   buf->attach_notifier ();
@@ -431,7 +431,7 @@ attach_subformat (tree t, url u, string fm) {
 }
 
 tree
-import_loaded_tree (string s, url u, string fm) {
+tm_server_buffers_rep::import_loaded_tree (string s, url u, string fm) {
   set_file_focus (u);
   if (fm == "generic" && suffix (u) == "txt") fm= "verbatim";
   if (fm == "generic") fm= get_format (s, suffix (u));
@@ -445,7 +445,7 @@ import_loaded_tree (string s, url u, string fm) {
 }
 
 tree
-import_tree (url u, string fm) {
+tm_server_buffers_rep::import_tree (url u, string fm) {
   u= resolve (u, "fr");
   set_file_focus (u);
   string s;
@@ -454,7 +454,7 @@ import_tree (url u, string fm) {
 }
 
 bool
-buffer_import (url name, url src, string fm) {
+tm_server_buffers_rep::buffer_import (url name, url src, string fm) {
   tree t= import_tree (src, fm);
   if (t == "error") return true;
   set_buffer_tree (name, t);
@@ -462,15 +462,15 @@ buffer_import (url name, url src, string fm) {
 }
 
 bool
-buffer_load (url name) {
+tm_server_buffers_rep::buffer_load (url name) {
   string fm= file_format (name);
   return buffer_import (name, name, fm);
 }
 
-hashmap<string,tree> style_tree_cache ("");
+extern hashmap<string,tree> style_tree_cache;
 
 tree
-load_style_tree (string package) {
+tm_server_buffers_rep::load_style_tree (string package) {
   if (style_tree_cache->contains (package))
     return style_tree_cache [package];
   url name= url_none ();
@@ -494,7 +494,7 @@ load_style_tree (string package) {
 ******************************************************************************/
 
 bool
-export_tree (tree doc, url u, string fm) {
+tm_server_buffers_rep::export_tree (tree doc, url u, string fm) {
   // NOTE: hook for encryption
   tree init= extract (doc, "initial");
   if (fm == "texmacs")
@@ -510,7 +510,7 @@ export_tree (tree doc, url u, string fm) {
 }
 
 bool
-buffer_export (url name, url dest, string fm) {
+tm_server_buffers_rep::buffer_export (url name, url dest, string fm) {
   tm_view vw= concrete_view (get_recent_view (name));
   ASSERT (vw != NULL, "view expected");
 
@@ -545,14 +545,14 @@ buffer_export (url name, url dest, string fm) {
 }
 
 tree
-latex_expand (tree doc, url name) {
+tm_server_buffers_rep::latex_expand (tree doc, url name) {
   tm_view vw= concrete_view (get_recent_view (name));
   tree body= vw->ed->exec_latex (extract (doc, "body"));
   return change_doc_attr (doc, "body", body);
 }
 
 tree
-latex_expand (tree doc) {
+tm_server_buffers_rep::latex_expand (tree doc) {
   tm_view vw= concrete_view (url (as_string (extract (doc, "view"))));
   tree body= vw->ed->exec_latex (extract (doc, "body"));
   doc= change_doc_attr (doc, "body", body);
@@ -560,7 +560,7 @@ latex_expand (tree doc) {
 }
 
 bool
-buffer_save (url name) {
+tm_server_buffers_rep::buffer_save (url name) {
   string fm= file_format (name);
   if (fm == "generic") fm= "verbatim";
   bool r= buffer_export (name, name, fm);
@@ -572,21 +572,20 @@ buffer_save (url name) {
 * Loading inclusions
 ******************************************************************************/
 
-static hashmap<string,tree> document_inclusions ("");
 
 void
-reset_inclusions () {
+tm_server_buffers_rep::reset_inclusions () {
   document_inclusions = hashmap<string,tree> ("");
 }
 
 void
-reset_inclusion (url name) {
+tm_server_buffers_rep::reset_inclusion (url name) {
   string name_s= as_string (name);
   document_inclusions -> reset (name_s);
 }
 
 tree
-load_inclusion (url name) {
+tm_server_buffers_rep::load_inclusion (url name) {
   // url name= relative (base_file_name, file_name);
   string name_s= as_string (name);
   if (document_inclusions->contains (name_s))

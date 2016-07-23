@@ -12,6 +12,7 @@
 #include "Interface/edit_interface.hpp"
 #include "message.hpp"
 #include "gui.hpp" // for gui_interrupted
+#include "scheme.hpp"
 
 extern int nr_painted;
 extern void clear_pattern_rectangles (renderer ren, rectangle m, rectangles l);
