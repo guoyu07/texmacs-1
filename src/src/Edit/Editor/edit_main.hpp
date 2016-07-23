@@ -89,7 +89,6 @@ public:
   void edit_special ();
   void edit_test ();
 
-  friend class editor;
 };
 
 #endif // defined EDIT_MAIN_H

@@ -575,16 +575,14 @@ public:
   virtual void edit_special () = 0;
   virtual void edit_test () = 0;
 
-  friend class tm_window_rep;
+//  friend class tm_window_rep;
   friend class tm_server_rep;
   friend class server_command_rep;
   friend void   edit_announce (editor_rep* ed, modification mod);
   friend void   edit_done (editor_rep* ed, modification mod);
   friend string get_editor_status_report ();
   friend void   tm_failure (const char* msg);
-  friend void   set_buffer_tree (url name, tree doc);
-  friend void   set_current_view (url u);
-  friend void   focus_on_editor (editor ed);
+  friend void   set_current_view (url u); // needs access to the drd
 };
 
 class editor {
@@ -597,6 +595,9 @@ EXTEND_NULL_CODE(widget,editor);
 
 editor new_editor (server_rep* sv, abs_buffer buf);
 editor get_current_editor ();
+
+void focus_on_editor (editor ed);
+
 
 #define SERVER(cmd) {                 \
   url temp= get_current_view_safe (); \

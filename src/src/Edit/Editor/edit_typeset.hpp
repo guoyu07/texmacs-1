@@ -116,8 +116,6 @@ public:
   void     typeset_sub (SI& x1, SI& y1, SI& x2, SI& y2);
   void     typeset (SI& x1, SI& y1, SI& x2, SI& y2);
 
-  friend class tm_window_rep;
-  friend class tm_server_rep;
 };
 
 #endif // defined EDIT_TYPESET_H
