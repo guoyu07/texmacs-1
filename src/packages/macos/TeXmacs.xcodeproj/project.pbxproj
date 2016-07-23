@@ -2237,7 +2237,6 @@
 		9C0B496A10A8CC110097A335 /* texmacs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = texmacs.cpp; sourceTree = "<group>"; };
 		9C0B496B10A8CC110097A335 /* tm_buffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tm_buffer.hpp; sourceTree = "<group>"; };
 		9C0B496C10A8CC110097A335 /* tm_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tm_config.hpp; sourceTree = "<group>"; };
-		9C0B496D10A8CC110097A335 /* tm_data.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tm_data.hpp; sourceTree = "<group>"; };
 		9C0B496E10A8CC110097A335 /* tm_frame.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tm_frame.hpp; sourceTree = "<group>"; };
 		9C0B497010A8CC110097A335 /* tm_server.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tm_server.hpp; sourceTree = "<group>"; };
 		9C0B497110A8CC110097A335 /* tm_window.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tm_window.hpp; sourceTree = "<group>"; };
@@ -4095,7 +4094,6 @@
 				9C0B496910A8CC110097A335 /* Texmacs */,
 				9C0B496B10A8CC110097A335 /* tm_buffer.hpp */,
 				9C0B496C10A8CC110097A335 /* tm_config.hpp */,
-				9C0B496D10A8CC110097A335 /* tm_data.hpp */,
 				9C0B496E10A8CC110097A335 /* tm_frame.hpp */,
 				9C0B497010A8CC110097A335 /* tm_server.hpp */,
 				9C0B497110A8CC110097A335 /* tm_window.hpp */,

@@ -11,7 +11,6 @@
 
 #include "tm_window.hpp"
 #include "tm_server.hpp"
-#include "../Data/new_window.hpp"
 
 #include "message.hpp"
 #include "dictionary.hpp"

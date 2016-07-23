@@ -9,7 +9,9 @@
 * in the root directory or <http://www.gnu.org/licenses/gpl-3.0.html>.
 ******************************************************************************/
 
-#include "tm_data.hpp"
+#include "new_window.hpp"
+#include "tm_buffer.hpp"
+#include "tm_window.hpp"
 #include "convert.hpp"
 #include "file.hpp"
 #include "web_files.hpp"
