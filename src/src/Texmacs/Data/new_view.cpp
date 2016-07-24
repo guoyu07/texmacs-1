@@ -345,8 +345,7 @@ tm_server_views_rep::attach_view (url win_u, url u) {
   // cout << "Attach view " << vw->buf->buf->name << "\n";
   vw->win= win;
   widget wid= win->wid;
-  set_scrollable (wid, vw->ed->proxy);
-  vw->ed->cvw= wid.rep;
+  vw->ed->set_view_widget (wid);
   ASSERT (is_attached (wid), "widget should be attached");
   vw->ed->resume ();
   win->set_window_name (vw->buf->buf->title);

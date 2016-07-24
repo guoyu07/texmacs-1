@@ -39,10 +39,6 @@ class editor;
 extern bool enable_fastenv;
 
 class editor_rep : public widget_delegate_rep {
-public:
-  server_rep*  sv;     // the underlying texmacs server
-  widget_rep*  cvw;    // non reference counted canvas widget
-  widget       proxy;  // proxy widget for interfacing with the UI (strong reference)
 
 protected:
   buffer   buf;  // the underlying buffer
@@ -124,7 +120,7 @@ protected:
 
 public:
   editor_rep ();
-  editor_rep (server_rep* sv, buffer buf);
+  editor_rep (buffer buf);
   inline virtual ~editor_rep () {}
 
   /* public routines from edit_interface */
@@ -567,6 +563,10 @@ public:
   virtual void edit_special () = 0;
   virtual void edit_test () = 0;
   
+  
+  // some other interface functions
+  
+  virtual void set_view_widget(widget w) = 0;
 
 //  friend class tm_window_rep;
   friend class tm_server_rep; // needed for apply and animate

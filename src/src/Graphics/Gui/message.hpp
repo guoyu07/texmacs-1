@@ -81,7 +81,9 @@ enum slot_id {
   SLOT_INPUT_PROPOSAL,
   SLOT_FILE,
   SLOT_DIRECTORY,
-  
+
+  SLOT_DELEGATE,
+
   slot_id__LAST // Please leave last and don't assign integer values to members
 };
 

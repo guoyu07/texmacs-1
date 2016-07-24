@@ -44,8 +44,9 @@ MODE_LANGUAGE (string mode) {
 * Main edit_interface routines
 ******************************************************************************/
 
-edit_interface_rep::edit_interface_rep ():
+edit_interface_rep::edit_interface_rep (server_rep* sv2):
   editor_rep (), // NOTE: ignored by the compiler, but suppresses warning
+  sv(sv2), cvw(NULL),
   env_change (0),
   last_change (texmacs_time()), last_update (last_change-1),
   anim_next (1.0e12),
@@ -67,10 +68,20 @@ edit_interface_rep::edit_interface_rep ():
 }
 
 edit_interface_rep::~edit_interface_rep () {
+  
+  // remove weak reference
+  send (proxy, SLOT_DELEGATE, (pointer)(NULL));
+  
   if (shadow != NULL) tm_delete (shadow);
   if (stored != NULL) tm_delete (stored);
   shadow = NULL;
   stored = NULL;
+}
+
+void
+edit_interface_rep::set_view_widget(widget w) {
+  set_scrollable (w, proxy);
+  cvw = w.rep;
 }
 
 edit_interface_rep::operator tree () {

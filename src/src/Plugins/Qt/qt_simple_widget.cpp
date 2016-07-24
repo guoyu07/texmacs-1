@@ -89,7 +89,12 @@ qt_simple_widget_rep::handle_notify_resize (SI w, SI h) {
 
 void
 qt_simple_widget_rep::handle_keypress (string key, time_t t) {
-  if (del) del->handle_keypress (key, t);
+  if (del) {
+    // keep delegate alive
+    INC_COUNT (del);
+    del->handle_keypress (key, t);
+    DEC_COUNT (del);
+  }
 }
 
 void
@@ -161,6 +166,15 @@ qt_simple_widget_rep::send (slot s, blackbox val) {
   save_send_slot (s, val);
 
   switch (s) {
+    case SLOT_DELEGATE:
+    {
+      check_type<pointer>(val, s);
+      pointer p = open_box<pointer> (val);
+      del = (widget_delegate_rep*)p;
+    }
+      break;
+      
+      
     case SLOT_INVALIDATE:
     {
       check_type<coord4>(val, s);

@@ -280,8 +280,7 @@ tm_server_rep::texmacs_input_widget (tree doc, tree style, url wname) {
   tm_window win  = tm_new<tm_window_rep> (this, doc, command ());
   set_master_buffer (name, base);
   vw->win= win;
-  set_scrollable (win->wid, vw->ed->proxy);
-  vw->ed->cvw= win->wid.rep;
+  vw->ed->set_view_widget (win->wid);
   return wrapped_widget (win->wid, close_embedded_command (this, vw, curvw));
 }
 

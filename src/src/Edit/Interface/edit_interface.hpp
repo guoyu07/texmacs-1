@@ -24,6 +24,12 @@
 string MODE_LANGUAGE (string mode);
 
 class edit_interface_rep: virtual public editor_rep {
+public:
+  server_rep*  sv;     // the underlying texmacs server
+  widget_rep*  cvw;    // non reference counted canvas widget
+  widget       proxy;  // proxy widget for interfacing with the UI (strong reference)
+  
+
 protected:
   int           env_change;    // which things have been changed ?
   time_t        last_change;   // time of last processed change
@@ -76,7 +82,7 @@ protected:
   SI            cur_wx, cur_wy;
 
 public:
-  edit_interface_rep ();
+  edit_interface_rep (server_rep* sv);
   ~edit_interface_rep ();
   operator tree ();
   void suspend ();
@@ -197,7 +203,11 @@ public:
   void handle_set_zoom_factor (double zoomf);
   void handle_clear (renderer win, SI x1, SI y1, SI x2, SI y2);
   void handle_repaint (renderer win, SI x1, SI y1, SI x2, SI y2);
+  
+  void set_view_widget(widget w);
 
 };
+
+
 
 #endif // defined EDIT_INTERFACE_H

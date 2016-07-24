@@ -46,16 +46,15 @@
 ******************************************************************************/
 
 editor_rep::editor_rep ():
-  cvw (NULL), drd (std_drd), et (the_et), rp () {
+  drd (std_drd), et (the_et), rp () {
   cout << "TeXmacs] warning, this virtual constructor should never be called\n";
 }
 
-editor_rep::editor_rep (server_rep* sv2, buffer buf2):
-  sv (sv2), cvw (NULL), buf (buf2),
-  drd (buf->buf->title, std_drd), et (the_et), rp (buf2->rp) {}
+editor_rep::editor_rep (buffer buf2):
+  buf (buf2), drd (buf->buf->title, std_drd), et (the_et), rp (buf2->rp) {}
 
 edit_main_rep::edit_main_rep (server_rep* sv, buffer buf):
-  editor_rep (sv, buf), props (UNKNOWN), ed_obs (edit_observer (this))
+  editor_rep (buf), edit_interface_rep (sv), props (UNKNOWN), ed_obs (edit_observer (this))
 {
   proxy = proxy_widget (this);
   
