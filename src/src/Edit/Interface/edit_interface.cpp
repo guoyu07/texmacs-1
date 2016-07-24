@@ -242,11 +242,11 @@ edit_interface_rep::cursor_visible () {
     update_visible ();
     cu->y1 -= 2*pixel; cu->y2 += 2*pixel;
     bool must_update=
-      (cu->ox+ ((SI) (cu->y1 * cu->slope)) <  vx1) ||
-      (cu->ox+ ((SI) (cu->y2 * cu->slope)) >= vx2) ||
-      (cu->oy+ cu->y1 <  vy1) ||
-      (cu->oy+ cu->y2 >= vy2);
-
+    (cu->ox+ ((SI) (cu->y1 * cu->slope)) <  vx1) ||
+    (cu->ox+ ((SI) (cu->y2 * cu->slope)) >= vx2) ||
+    (cu->oy+ cu->y1 <  vy1) ||
+    (cu->oy+ cu->y2 >= vy2);
+    
     box pages= eb[0];
     if (N(pages) > 1) {
       SI vw= vx2 - vx1, vh= vy2 - vy1;
@@ -298,7 +298,7 @@ edit_interface_rep::cursor_visible () {
         }
       }
     }
-
+    
     if (must_update) {
       scroll_to (cu->ox, cu->oy);
       send_invalidate_all (proxy);
@@ -309,47 +309,47 @@ edit_interface_rep::cursor_visible () {
     rectangle outer, inner;
     find_canvas_info (eb, sp, x, y, sx, sy, outer, inner);
     if ((cu->ox+ ((SI) (cu->y1 * cu->slope)) < x + outer->x1) ||
-	(cu->ox+ ((SI) (cu->y2 * cu->slope)) > x + outer->x2))
-      {
-	SI tx= inner->x2 - inner->x1;
-	SI cx= outer->x2 - outer->x1;
-	if (tx > cx) {
-	  SI outer_cx= cu->ox - x;
-	  SI inner_cx= outer_cx - sx;
-	  SI dx= inner_cx - inner->x1;
-	  double p= 100.0 * ((double) (dx - (cx>>1))) / ((double) (tx-cx));
-	  p= max (min (p, 100.0), 0.0);
-	  tree old_xt= eb[path_up (sp)]->get_info ("scroll-x");
-	  tree new_xt= as_string (p) * "%";
-	  if (new_xt != old_xt && is_accessible (obtain_ip (old_xt))) {
-	    object fun= symbol_object ("tree-set");
-	    object cmd= list_object (fun, old_xt, new_xt);
-	    exec_delayed (scheme_cmd (cmd));
-	    temp_invalid_cursor= true;
-	  }
-	}
+        (cu->ox+ ((SI) (cu->y2 * cu->slope)) > x + outer->x2))
+    {
+      SI tx= inner->x2 - inner->x1;
+      SI cx= outer->x2 - outer->x1;
+      if (tx > cx) {
+        SI outer_cx= cu->ox - x;
+        SI inner_cx= outer_cx - sx;
+        SI dx= inner_cx - inner->x1;
+        double p= 100.0 * ((double) (dx - (cx>>1))) / ((double) (tx-cx));
+        p= max (min (p, 100.0), 0.0);
+        tree old_xt= eb[path_up (sp)]->get_info ("scroll-x");
+        tree new_xt= as_string (p) * "%";
+        if (new_xt != old_xt && is_accessible (obtain_ip (old_xt))) {
+          object fun= symbol_object ("tree-set");
+          object cmd= list_object (fun, old_xt, new_xt);
+          exec_delayed (scheme_cmd (cmd));
+          temp_invalid_cursor= true;
+        }
       }
+    }
     if ((cu->oy+ cu->y1 < y + outer->y1) ||
-	(cu->oy+ cu->y2 > y + outer->y2))
-      {
-	SI ty= inner->y2 - inner->y1;
-	SI cy= outer->y2 - outer->y1;
-	if (ty > cy) {
-	  SI outer_cy= cu->oy + ((cu->y1 + cu->y2) >> 1) - y;
-	  SI inner_cy= outer_cy - sy;
-	  SI dy= inner_cy - inner->y1;
-	  double p= 100.0 * ((double) (dy - (cy>>1))) / ((double) (ty-cy));
-	  p= max (min (p, 100.0), 0.0);
-	  tree old_yt= eb[path_up (sp)]->get_info ("scroll-y");
-	  tree new_yt= as_string (p) * "%";
-	  if (new_yt != old_yt && is_accessible (obtain_ip (old_yt))) {
-	    object fun= symbol_object ("tree-set");
-	    object cmd= list_object (fun, old_yt, new_yt);
-	    exec_delayed (scheme_cmd (cmd));
-	    temp_invalid_cursor= true;
-	  }
-	}
+        (cu->oy+ cu->y2 > y + outer->y2))
+    {
+      SI ty= inner->y2 - inner->y1;
+      SI cy= outer->y2 - outer->y1;
+      if (ty > cy) {
+        SI outer_cy= cu->oy + ((cu->y1 + cu->y2) >> 1) - y;
+        SI inner_cy= outer_cy - sy;
+        SI dy= inner_cy - inner->y1;
+        double p= 100.0 * ((double) (dy - (cy>>1))) / ((double) (ty-cy));
+        p= max (min (p, 100.0), 0.0);
+        tree old_yt= eb[path_up (sp)]->get_info ("scroll-y");
+        tree new_yt= as_string (p) * "%";
+        if (new_yt != old_yt && is_accessible (obtain_ip (old_yt))) {
+          object fun= symbol_object ("tree-set");
+          object cmd= list_object (fun, old_yt, new_yt);
+          exec_delayed (scheme_cmd (cmd));
+          temp_invalid_cursor= true;
+        }
       }
+    }
   }
 }
 
@@ -357,19 +357,19 @@ void
 edit_interface_rep::selection_visible () {
   update_visible ();
   if ((vx2 - vx1 <= 80*pixel) || (vy2 - vy1 <= 80*pixel)) return;
-
+  
   SI extra= (cur_sb == 1? 20 * pixel: 0);
   /*
-  bool scroll_x= (end_x < vx1 + extra) || (end_x >= vx2 - extra);
-  bool scroll_y= (end_y < vy1 + extra) || (end_y >= vy2 - extra);
-  if (scroll_x || scroll_y) {
-    SI new_x = (scroll_x)? end_x : (vx1+vx2)/2;
-    SI new_y = (scroll_y)? end_y : (vy1+vy2)/2;
-  */
-  // trying a "proportional" scroll 
+   bool scroll_x= (end_x < vx1 + extra) || (end_x >= vx2 - extra);
+   bool scroll_y= (end_y < vy1 + extra) || (end_y >= vy2 - extra);
+   if (scroll_x || scroll_y) {
+   SI new_x = (scroll_x)? end_x : (vx1+vx2)/2;
+   SI new_y = (scroll_y)? end_y : (vy1+vy2)/2;
+   */
+  // trying a "proportional" scroll
   SI mx = max (-end_x + vx1 + extra, max (end_x - vx2 + extra, 0));
   SI my = max (-end_y + vy1 + extra, max (end_y - vy2 + extra, 0));
-
+  
   if ((mx>0) || (my>0)) {
     SI vxc = (vx1+vx2)/2, dx = end_x - vxc;
     SI vyc = (vy1+vy2)/2, dy = end_y - vyc;
@@ -476,10 +476,10 @@ edit_interface_rep::compute_env_rects (path p, rectangles& rs, bool recurse) {
       if (is_script (subtree (et, p), right) ||
           is_func (st, TEXT_AT) ||
           is_func (st, MATH_AT))
-        {
-          p1= start (et, p * 0);
-          p2= end   (et, p * 0);
-        }
+      {
+        p1= start (et, p * 0);
+        p2= end   (et, p * 0);
+      }
       if (is_func (st, CELL)) { q1= p1; q2= p2; }
       else selection_correct (p1, p2, q1, q2);
       selection sel= eb->find_check_selection (q1, q2);
