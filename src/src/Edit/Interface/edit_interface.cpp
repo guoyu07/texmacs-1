@@ -79,7 +79,7 @@ edit_interface_rep::~edit_interface_rep () {
 }
 
 void
-edit_interface_rep::set_view_widget(widget w) {
+edit_interface_rep::set_view_widget (widget w) {
   set_scrollable (w, proxy);
   cvw = w.rep;
 }

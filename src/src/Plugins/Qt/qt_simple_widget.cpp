@@ -104,7 +104,12 @@ qt_simple_widget_rep::handle_keyboard_focus (bool has_focus, time_t t) {
 
 void
 qt_simple_widget_rep::handle_mouse (string kind, SI x, SI y, int mods, time_t t) {
-  if (del) del->handle_mouse (kind, x, y, mods, t);
+  if (del) {
+    // keep delegate alive
+    INC_COUNT (del);
+    del->handle_mouse (kind, x, y, mods, t);
+    DEC_COUNT (del);
+  }
 }
 
 void

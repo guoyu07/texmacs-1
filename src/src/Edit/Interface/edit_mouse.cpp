@@ -185,6 +185,11 @@ edit_interface_rep::mouse_adjust (SI x, SI y, int mods) {
     get_position (proxy, ox, oy);
     get_scroll_position(proxy, sx, sy);
     ox -= sx; oy -= sy;
+#else
+    SI ox, oy, sx, sy;
+    get_position (proxy, ox, oy);
+    get_scroll_position(proxy, sx, sy);
+    ox -= sx; oy -= sy;
 #endif
     set_position (popup_win, wx+ ox+ x, wy+ oy+ y);
     set_visibility (popup_win, true);

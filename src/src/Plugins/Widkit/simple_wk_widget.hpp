@@ -15,8 +15,13 @@
 
 class attribute_widget_rep;
 class simple_widget_rep: public attribute_widget_rep {
+
+  widget_delegate_rep *del;
+  
 public:
-  simple_widget_rep ();
+  simple_widget_rep (widget_delegate_rep *ed);
+
+  operator tree ();
 
   virtual bool is_editor_widget ();
   virtual void handle_get_size_hint (SI& w, SI& h);
@@ -40,6 +45,8 @@ public:
   void handle_repaint (repaint_event ev);
   void handle_set_coord2 (set_coord2_event ev);
   void handle_get_coord2 (get_coord2_event ev);
+  
+  void send (slot s, blackbox val);
 };
 
 #endif // defined WK_WIDGET_H

@@ -11,13 +11,24 @@
 
 #include "Widkit/simple_wk_widget.hpp"
 #include "gui.hpp"
+#include "message.hpp"
 
 /******************************************************************************
 * Constructor
 ******************************************************************************/
 
-simple_widget_rep::simple_widget_rep ():
-  attribute_widget_rep () {}
+simple_widget_rep::simple_widget_rep (widget_delegate_rep *del2):
+  attribute_widget_rep (), del (del2) {}
+
+widget proxy_widget (widget_delegate_rep *del) {
+  wk_widget wid =  tm_new<simple_widget_rep> (del);
+  return abstract (wid);
+}
+
+
+simple_widget_rep::operator tree () {
+  return tree (TUPLE, "simple");
+}
 
 /******************************************************************************
 * Empty handlers for redefinition later on
@@ -25,47 +36,84 @@ simple_widget_rep::simple_widget_rep ():
 
 bool
 simple_widget_rep::is_editor_widget () {
-  return false;
+  return del ? del->is_editor_widget() : false;
 }
 
 void
 simple_widget_rep::handle_get_size_hint (SI& w, SI& h) {
-  gui_root_extents (w, h);  
+  if (del) del->handle_get_size_hint(w,h);
+  else gui_root_extents (w, h);
 }
 
 void
 simple_widget_rep::handle_notify_resize (SI w, SI h) {
-  (void) w; (void) h;
+  if (del) del->handle_notify_resize (w, h);
 }
 
 void
 simple_widget_rep::handle_keypress (string key, time_t t) {
-  (void) key; (void) t;
+  if (del) {
+    // keep delegate alive
+    INC_COUNT (del);
+    del->handle_keypress (key, t);
+    DEC_COUNT (del);
+  }
 }
 
 void
 simple_widget_rep::handle_keyboard_focus (bool has_focus, time_t t) {
-  (void) has_focus; (void) t;
+  if (del) del->handle_keyboard_focus (has_focus, t);
 }
 
 void
 simple_widget_rep::handle_mouse (string kind, SI x, SI y, int mods, time_t t) {
-  (void) kind; (void) x; (void) y; (void) mods; (void) t;
+  if (del) {
+    // keep delegate alive
+    INC_COUNT (del);
+    del->handle_mouse (kind, x, y, mods, t);
+    DEC_COUNT (del);
+  }
 }
 
 void
 simple_widget_rep::handle_set_zoom_factor (double zoom) {
-  (void) zoom;
+  if (del) del->handle_set_zoom_factor (zoom);
 }
 
 void
-simple_widget_rep::handle_clear (renderer ren, SI x1, SI y1, SI x2, SI y2) {
-  (void) x1; (void) y1; (void) x2; (void) y2;
+simple_widget_rep::handle_clear (renderer win, SI x1, SI y1, SI x2, SI y2) {
+  if (del) del->handle_clear (win, x1, y1, x2, y2);
 }
 
 void
-simple_widget_rep::handle_repaint (renderer ren, SI x1, SI y1, SI x2, SI y2) {
-  (void) x1; (void) y1; (void) x2; (void) y2;
+simple_widget_rep::handle_repaint (renderer win, SI x1, SI y1, SI x2, SI y2) {
+  if (del) del->handle_repaint (win, x1, y1, x2, y2);
+}
+
+
+template<class T> void
+check_type (blackbox bb, string s) {
+  if (type_box (bb) != type_helper<T>::id) {
+    failed_error << "slot type= " << s << "\n";
+    FAILED ("type mismatch");
+  }
+}
+
+void
+simple_widget_rep::send (slot s, blackbox val) {
+  switch (s) {
+    case SLOT_DELEGATE:
+    {
+      check_type<pointer> (val, "SLOT_DELEGATE");
+      pointer p = open_box<pointer> (val);
+      del = (widget_delegate_rep*)p;
+    }
+      break;
+      
+    default:
+      attribute_widget_rep::send (s, val);
+      break;
+  }
 }
 
 /******************************************************************************
