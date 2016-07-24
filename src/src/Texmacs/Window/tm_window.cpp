@@ -195,12 +195,13 @@ texmacs_window_widget (widget wid, tree geom) {
 ******************************************************************************/
 
 class close_embedded_command_rep: public command_rep {
+  tm_server_rep* sv;
   tm_view vw;
   tm_view focus_view;
-  tm_server_rep* sv;
   
 public:
-  close_embedded_command_rep ( tm_server_rep* sv2, tm_view vw2, tm_view focus_view2): sv(sv2), vw (vw2), focus_view(focus_view2) {}
+  close_embedded_command_rep ( tm_server_rep* sv2, tm_view vw2, tm_view focus_view2)
+   :  sv(sv2), vw (vw2), focus_view(focus_view2) {}
   void apply ();
   tm_ostream& print (tm_ostream& out) {
     return out << "Close_Embedded widget command"; }
@@ -279,7 +280,7 @@ tm_server_rep::texmacs_input_widget (tree doc, tree style, url wname) {
   tm_window win  = tm_new<tm_window_rep> (this, doc, command ());
   set_master_buffer (name, base);
   vw->win= win;
-  set_scrollable (win->wid, vw->ed);
+  set_scrollable (win->wid, vw->ed->proxy);
   vw->ed->cvw= win->wid.rep;
   return wrapped_widget (win->wid, close_embedded_command (this, vw, curvw));
 }
