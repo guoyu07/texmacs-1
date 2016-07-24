@@ -37,15 +37,15 @@ extern const QX11Info *qt_x11Info (const QPaintDevice *pd);
 
 
 
-qt_simple_widget_rep::qt_simple_widget_rep (editor_rep *ed2)
- : qt_widget_rep (simple_widget), sequencer (0), ed (ed2) { }
+qt_simple_widget_rep::qt_simple_widget_rep (widget_delegate_rep *del2)
+ : qt_widget_rep (simple_widget), sequencer (0), del (del2) { }
 
 qt_simple_widget_rep::~qt_simple_widget_rep () {
   all_widgets->remove ((pointer) this);
 }
 
-widget proxy_widget (editor ed) {
-  qt_widget wid =  tm_new<qt_simple_widget_rep> (ed.rep);
+widget proxy_widget (widget_delegate_rep *del) {
+  qt_widget wid =  tm_new<qt_simple_widget_rep> (del);
   return abstract (wid);
 }
 
@@ -73,48 +73,48 @@ qt_simple_widget_rep::as_qwidget () {
 ******************************************************************************/
 bool
 qt_simple_widget_rep::is_editor_widget () {
-  return ed->is_editor_widget();
+  return del ? del->is_editor_widget() : false;
 }
 
 void
 qt_simple_widget_rep::handle_get_size_hint (SI& w, SI& h) {
-  if (ed) ed->handle_get_size_hint(w,h);
+  if (del) del->handle_get_size_hint(w,h);
   else gui_root_extents (w, h);
 }
 
 void
 qt_simple_widget_rep::handle_notify_resize (SI w, SI h) {
-  ed->handle_notify_resize (w, h);
+  if (del) del->handle_notify_resize (w, h);
 }
 
 void
 qt_simple_widget_rep::handle_keypress (string key, time_t t) {
-  ed->handle_keypress (key, t);
+  if (del) del->handle_keypress (key, t);
 }
 
 void
 qt_simple_widget_rep::handle_keyboard_focus (bool has_focus, time_t t) {
-  ed->handle_keyboard_focus (has_focus, t);
+  if (del) del->handle_keyboard_focus (has_focus, t);
 }
 
 void
 qt_simple_widget_rep::handle_mouse (string kind, SI x, SI y, int mods, time_t t) {
-  ed->handle_mouse (kind, x, y, mods, t);
+  if (del) del->handle_mouse (kind, x, y, mods, t);
 }
 
 void
 qt_simple_widget_rep::handle_set_zoom_factor (double zoom) {
-  ed->handle_set_zoom_factor (zoom);
+  if (del) del->handle_set_zoom_factor (zoom);
 }
 
 void
 qt_simple_widget_rep::handle_clear (renderer win, SI x1, SI y1, SI x2, SI y2) {
-  ed->handle_clear (win, x1, y1, x2, y2);
+  if (del) del->handle_clear (win, x1, y1, x2, y2);
 }
 
 void
 qt_simple_widget_rep::handle_repaint (renderer win, SI x1, SI y1, SI x2, SI y2) {
-  ed->handle_repaint (win, x1, y1, x2, y2);
+  if (del) del->handle_repaint (win, x1, y1, x2, y2);
 }
 
 /******************************************************************************

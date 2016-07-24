@@ -52,10 +52,10 @@ class qt_simple_widget_rep: public qt_widget_rep {
   
   int sequencer;
   
-  editor_rep *ed;
+  widget_delegate_rep *del;
   
 public:
-  qt_simple_widget_rep (editor_rep *ed);
+  qt_simple_widget_rep (widget_delegate_rep *ed);
   ~qt_simple_widget_rep ();
 
   bool is_editor_widget ();

@@ -251,10 +251,44 @@ widget refreshable_widget (object prom, string kind= "any");
   // the contents should also be updated dynamically by reevaluating
   // the scheme widget promise (in case of matching kind)
 
+
+// incoming notifications from GUI
+
+class widget_delegate_rep : public abstract_struct {
+    
+public:
+  widget_delegate_rep () {};
+  virtual ~widget_delegate_rep () {};
+
+  
+  virtual bool is_editor_widget () { return false; }
+  //   should return true for editor widgets only
+  virtual void handle_get_size_hint (SI& w, SI& h) {};
+  //   propose a size for the widget
+  virtual void handle_notify_resize (SI w, SI h) {};
+  //   issued when the size of the widget has changed
+  virtual void handle_keypress (string key, time_t t) {};
+  //   issed when a key is pressed
+  virtual void handle_keyboard_focus (bool has_focus, time_t t) {};
+  //   issued when the keyboard focus of the widget has changed
+  virtual void handle_mouse (string kind, SI x, SI y, int mods, time_t t) {};
+  //   a mouse event of a given kind at position (x, y) and time t
+  //   mods contains the active keyboard modifiers at time t
+  virtual void handle_set_zoom_factor (double zoom) {};
+  //   set the zoom factor for painting
+  virtual void handle_clear (renderer win, SI x1, SI y1, SI x2, SI y2) {};
+  //   clear the widget to the background color
+  //   this event may for instance occur when scrolling
+  virtual void handle_repaint (renderer win, SI x1, SI y1, SI x2, SI y2) {};
+  //   repaint the region (x1, y1, x2, y2)
+};
+
+widget proxy_widget (widget_delegate_rep *del);
+
 /******************************************************************************
-* Besides the widget constructors, any GUI implementation should also provide
-* a simple_widget_rep class with the following virtual methods:
-******************************************************************************/
+ * Besides the widget constructors, any GUI implementation should also provide
+ * a simple_widget_rep class with the following virtual methods:
+ ******************************************************************************/
 
 // bool simple_widget_rep::is_editor_widget ();
 //   should return true for editor widgets only

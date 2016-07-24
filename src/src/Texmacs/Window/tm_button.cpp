@@ -14,15 +14,7 @@
 #include "font.hpp"
 #include "tm_frame.hpp"
 #include "message.hpp"
-#ifdef AQUATEXMACS
-#include "Cocoa/ns_simple_widget.h"
-#else
-#ifdef QTTEXMACS
-#include "Qt/qt_simple_widget.hpp"
-#else
-#include "Widkit/simple_wk_widget.hpp"
-#endif
-#endif
+#include "widget.hpp"
 
 /******************************************************************************
 * Getting extents of a typesetted tree
@@ -94,7 +86,7 @@ tree_extents (tree doc) {
 * Typesetted boxes as widgets
 ******************************************************************************/
 
-class box_widget_rep: public simple_widget_rep {
+class box_widget_rep: public widget_delegate_rep {
   box    b;
   color  bg;
   bool   transparent;
@@ -112,8 +104,7 @@ public:
 
 box_widget_rep::box_widget_rep
   (box b2, color bg2, bool trans2, double zoom, int dw2, int dh2):
-    simple_widget_rep (NULL), b (b2),
-    bg (bg2), transparent (trans2),
+    b (b2), bg (bg2), transparent (trans2),
     zoomf (zoom), magf (zoom / std_shrinkf),
     dw (dw2+2*PIXEL), dh (dh2+2*PIXEL) {}
 
@@ -154,7 +145,8 @@ box_widget_rep::handle_repaint (renderer ren, SI x1, SI y1, SI x2, SI y2) {
 widget
 box_widget (box b, bool tr) {
   color col= light_grey;
-  return widget (tm_new<box_widget_rep> (b, col, tr, 5/6.0, 3*PIXEL, 3*PIXEL));
+  box_widget_rep *del = tm_new<box_widget_rep> (b, col, tr, 5/6.0, 3*PIXEL, 3*PIXEL);
+  return proxy_widget (del);
 }
 
 widget
@@ -216,5 +208,6 @@ texmacs_output_widget (tree doc, tree style) {
 #else
     col= light_grey;
 #endif
-  return widget (tm_new<box_widget_rep> (b, col, false, 1.0, 0, 0));
+  box_widget_rep *del = tm_new<box_widget_rep> (b, col, false, 1.0, 0, 0);
+  return proxy_widget (del);
 }
