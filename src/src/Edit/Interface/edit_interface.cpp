@@ -129,7 +129,7 @@ edit_interface_rep::set_zoom_factor (double zoom) {
 
 void
 edit_interface_rep::invalidate (SI x1, SI y1, SI x2, SI y2) {
-  send_invalidate (this, (SI) floor (x1*magf), (SI) floor (y1*magf),
+  send_invalidate (proxy, (SI) floor (x1*magf), (SI) floor (y1*magf),
                          (SI) ceil  (x2*magf), (SI) ceil  (y2*magf));
 }
 
@@ -144,7 +144,7 @@ edit_interface_rep::invalidate (rectangles rs) {
 
 void
 edit_interface_rep::invalidate_all () {
-  send_invalidate_all (this);
+  send_invalidate_all (proxy);
 }
 
 void
@@ -281,7 +281,7 @@ edit_interface_rep::cursor_visible () {
               else             my= y1 + ((vy2 - vy1) >> 1);
             }
             scroll_to (mx, my);
-            send_invalidate_all (this);
+            send_invalidate_all (proxy);
             return;
           }
         }
@@ -290,7 +290,7 @@ edit_interface_rep::cursor_visible () {
 
     if (must_update) {
       scroll_to (cu->ox, cu->oy);
-      send_invalidate_all (this);
+      send_invalidate_all (proxy);
     }
   }
   else {
@@ -366,7 +366,7 @@ edit_interface_rep::selection_visible () {
     SI new_y = vyc+ ((extra)? (my*dy)/extra: dy);
     //end change
     scroll_to (new_x, new_y);
-    send_invalidate_all (this);
+    send_invalidate_all (proxy);
     SI old_vx1= vx1, old_vy1= vy1;
     update_visible ();
     end_x += vx1- old_vx1;
@@ -503,7 +503,7 @@ int
 edit_interface_rep::idle_time (int event_type) {
   if (env_change == 0 &&
       got_focus &&
-      (!query_invalid (this)) &&
+      (!query_invalid (proxy)) &&
       (!check_event (event_type)))
     return texmacs_time () - last_change;
   else return 0;
@@ -556,7 +556,7 @@ edit_interface_rep::apply_changes () {
   
   // cout << "Handling automatic resizing\n";
   int sb= 1;
-  if (is_attached (this) && sv->has_current_window ()) {
+  if (is_attached (proxy) && sv->has_current_window ()) {
     tree new_zoom= as_string (zoomf);
     tree old_zoom= get_init_value (ZOOM_FACTOR);
     if (new_zoom != old_zoom) {
@@ -564,23 +564,23 @@ edit_interface_rep::apply_changes () {
       notify_change (THE_ENVIRONMENT);
     }
   }
-  if (is_attached (this) &&
+  if (is_attached (proxy) &&
       sv->has_current_window () &&
       get_init_string (PAGE_MEDIUM) == "automatic")
-    {
-      SI wx, wy;
-      if (cvw == NULL) ::get_size (get_window (this), wx, wy);
-      else ::get_size (widget (cvw), wx, wy);
-      if (get_init_string (SCROLL_BARS) == "false") sb= 0;
-      if (sv -> in_full_screen_mode ()) sb= 0;
-      if (sb) wx -= scrollbar_width();
-      if (wx != cur_wx || wy != cur_wy) {
-	cur_wx= wx; cur_wy= wy;
-	init_env (PAGE_SCREEN_WIDTH, as_string ((SI) (wx/magf)) * "tmpt");
-	init_env (PAGE_SCREEN_HEIGHT, as_string ((SI) (wy/magf)) * "tmpt");
-	notify_change (THE_ENVIRONMENT);
-      }
+  {
+    SI wx, wy;
+    if (cvw == NULL) ::get_size (get_window (proxy), wx, wy);
+    else ::get_size (widget (cvw), wx, wy);
+    if (get_init_string (SCROLL_BARS) == "false") sb= 0;
+    if (sv -> in_full_screen_mode ()) sb= 0;
+    if (sb) wx -= scrollbar_width();
+    if (wx != cur_wx || wy != cur_wy) {
+      cur_wx= wx; cur_wy= wy;
+      init_env (PAGE_SCREEN_WIDTH, as_string ((SI) (wx/magf)) * "tmpt");
+      init_env (PAGE_SCREEN_HEIGHT, as_string ((SI) (wy/magf)) * "tmpt");
+      notify_change (THE_ENVIRONMENT);
     }
+  }
   if (get_init_string (PAGE_MEDIUM) == "beamer" && full_screen) sb= 0;
   if (sb != cur_sb) {
     cur_sb= sb;
@@ -589,7 +589,7 @@ edit_interface_rep::apply_changes () {
   
   // window decorations (menu bar, icon bars, footer)
   int wb= 2;
-  if (is_attached (this)) {
+  if (is_attached (proxy)) {
     string val= get_init_string (WINDOW_BARS);
     if (val == "auto") wb= 2;
     else if (val == "false") wb= 0;
@@ -626,7 +626,7 @@ edit_interface_rep::apply_changes () {
   // cout << "Handling environment\n";
   if (env_change & THE_ENVIRONMENT)
     typeset_invalidate_all ();
-
+  
   // cout << "Handling tree\n";
   if (env_change & (THE_TREE+THE_ENVIRONMENT)) {
     typeset_invalidate_env ();
@@ -718,11 +718,11 @@ edit_interface_rep::apply_changes () {
     invalidate (ncr->x1, ncr->y1, ncr->x2, ncr->y2);
     copy_always= rectangles (ncr, copy_always);
     oc= copy (cu);
-   
+    
     // set hot spot in the gui
-    send_cursor (this, (SI) floor (cu->ox * magf),
-                       (SI) floor (cu->oy * magf));
-
+    send_cursor (proxy, (SI) floor (cu->ox * magf),
+                 (SI) floor (cu->oy * magf));
+    
     path sp= selection_get_cursor_path ();
     bool semantic_flag= semantic_active (path_up (sp));
     bool full_context= (get_preference ("show full context") == "on");
@@ -837,7 +837,7 @@ edit_interface_rep::apply_changes () {
         invalidate (gx1, gy1, gx2, gy2);
     }
   }
-
+  
   // cout << "Graphics snapping\n";
   if (inside_active_graphics ()) {
     tree t= as_tree (call ("graphics-get-snap-mode"));
@@ -848,12 +848,12 @@ edit_interface_rep::apply_changes () {
   
   // cout << "Handling environment changes\n";
   if (env_change & THE_ENVIRONMENT)
-    send_invalidate_all (this);
-
+    send_invalidate_all (proxy);
+  
   // cout << "Handling menus\n";
   if (env_change & THE_MENUS)
     update_menus ();
-
+  
   // cout << "Applied changes\n";
   // time_t t2= texmacs_time ();
   // if (t2 - t1 >= 10) cout << "apply_changes took " << t2-t1 << "ms\n";
@@ -883,7 +883,7 @@ edit_interface_rep::animate () {
 void
 edit_interface_rep::full_screen_mode (bool flag) {
   full_screen= flag;
-  send_invalidate_all (this);
+  send_invalidate_all (proxy);
 }
 
 void

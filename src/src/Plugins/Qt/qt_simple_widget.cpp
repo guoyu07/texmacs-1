@@ -9,12 +9,13 @@
 * in the root directory or <http://www.gnu.org/licenses/gpl-3.0.html>.
 ******************************************************************************/
 
-#include "iterator.hpp"
 
 #include "qt_simple_widget.hpp"
 #include "qt_window_widget.hpp"
 #include "qt_utilities.hpp"
 #include "qt_renderer.hpp"
+
+#include "iterator.hpp"
 
 #include "QTMWidget.hpp"
 #include "QTMMenuHelper.hpp"
@@ -36,11 +37,16 @@ extern const QX11Info *qt_x11Info (const QPaintDevice *pd);
 
 
 
-qt_simple_widget_rep::qt_simple_widget_rep ()
- : qt_widget_rep (simple_widget),  sequencer (0) { }
+qt_simple_widget_rep::qt_simple_widget_rep (editor_rep *ed2)
+ : qt_widget_rep (simple_widget), sequencer (0), ed (ed2) { }
 
 qt_simple_widget_rep::~qt_simple_widget_rep () {
   all_widgets->remove ((pointer) this);
+}
+
+widget proxy_widget (editor ed) {
+  qt_widget wid =  tm_new<qt_simple_widget_rep> (ed.rep);
+  return abstract (wid);
 }
 
 QWidget*
@@ -65,52 +71,51 @@ qt_simple_widget_rep::as_qwidget () {
 * Empty handlers for redefinition by our subclasses editor_rep, 
 * box_widget_rep...
 ******************************************************************************/
-
 bool
 qt_simple_widget_rep::is_editor_widget () {
-  return false;
+  return ed->is_editor_widget();
 }
 
 void
 qt_simple_widget_rep::handle_get_size_hint (SI& w, SI& h) {
-  gui_root_extents (w, h);
+  if (ed) ed->handle_get_size_hint(w,h);
+  else gui_root_extents (w, h);
 }
 
 void
 qt_simple_widget_rep::handle_notify_resize (SI w, SI h) {
-  (void) w; (void) h;
+  ed->handle_notify_resize (w, h);
 }
 
 void
 qt_simple_widget_rep::handle_keypress (string key, time_t t) {
-  (void) key; (void) t;
+  ed->handle_keypress (key, t);
 }
 
 void
 qt_simple_widget_rep::handle_keyboard_focus (bool has_focus, time_t t) {
-  (void) has_focus; (void) t;
+  ed->handle_keyboard_focus (has_focus, t);
 }
 
 void
 qt_simple_widget_rep::handle_mouse (string kind, SI x, SI y, int mods, time_t t) {
-  (void) kind; (void) x; (void) y; (void) mods; (void) t;
+  ed->handle_mouse (kind, x, y, mods, t);
 }
 
 void
 qt_simple_widget_rep::handle_set_zoom_factor (double zoom) {
-  (void) zoom;
+  ed->handle_set_zoom_factor (zoom);
 }
 
 void
 qt_simple_widget_rep::handle_clear (renderer win, SI x1, SI y1, SI x2, SI y2) {
-  (void) win; (void) x1; (void) y1; (void) x2; (void) y2;
+  ed->handle_clear (win, x1, y1, x2, y2);
 }
 
 void
 qt_simple_widget_rep::handle_repaint (renderer win, SI x1, SI y1, SI x2, SI y2) {
-  (void) win; (void) x1; (void) y1; (void) x2; (void) y2;
+  ed->handle_repaint (win, x1, y1, x2, y2);
 }
-
 
 /******************************************************************************
 * Handling of TeXmacs messages

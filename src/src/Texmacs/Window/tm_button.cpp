@@ -112,7 +112,7 @@ public:
 
 box_widget_rep::box_widget_rep
   (box b2, color bg2, bool trans2, double zoom, int dw2, int dh2):
-    simple_widget_rep (), b (b2),
+    simple_widget_rep (NULL), b (b2),
     bg (bg2), transparent (trans2),
     zoomf (zoom), magf (zoom / std_shrinkf),
     dw (dw2+2*PIXEL), dh (dh2+2*PIXEL) {}

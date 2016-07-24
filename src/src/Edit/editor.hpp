@@ -11,18 +11,9 @@
 
 #ifndef EDITOR_H
 #define EDITOR_H
+#include "widget.hpp"
 #include "typesetter.hpp"
 #include "tree_select.hpp"
-#ifdef AQUATEXMACS
-#  include "Cocoa/ns_simple_widget.h"
-#else
-#  ifdef QTTEXMACS
-#    include "Qt/qt_simple_widget.hpp"
-#  else
-#    include "Widkit/simple_wk_widget.hpp"
-#  endif
-#endif
-//#include "server.hpp"
 #include "drd_info.hpp"
 #ifdef EXPERIMENTAL
 #  include "../Style/Environment/environment.hpp"
@@ -47,10 +38,11 @@ class modification;
 class editor;
 extern bool enable_fastenv;
 
-class editor_rep: public simple_widget_rep {
+class editor_rep : public abstract_struct {
 public:
-  server_rep*  sv;   // the underlying texmacs server
-  widget_rep*  cvw;  // non reference counted canvas widget
+  server_rep*  sv;     // the underlying texmacs server
+  widget_rep*  cvw;    // non reference counted canvas widget
+  widget       proxy;  // proxy widget for interfacing with the UI (strong reference)
 
 protected:
   abs_buffer   buf;  // the underlying buffer
@@ -574,6 +566,19 @@ public:
   virtual void show_meminfo () = 0;
   virtual void edit_special () = 0;
   virtual void edit_test () = 0;
+  
+  // incoming notifications from GUI
+  
+  virtual bool is_editor_widget () = 0;
+  virtual void handle_get_size_hint (SI& w, SI& h) = 0;
+  virtual void handle_notify_resize (SI w, SI h) = 0;
+  virtual void handle_keypress (string key, time_t t) = 0;
+  virtual void handle_keyboard_focus (bool has_focus, time_t t) = 0;
+  virtual void handle_mouse (string kind, SI x, SI y, int mods, time_t t) = 0;
+  virtual void handle_set_zoom_factor (double zoom) = 0;
+  virtual void handle_clear (renderer win, SI x1, SI y1, SI x2, SI y2) = 0;
+  virtual void handle_repaint (renderer win, SI x1, SI y1, SI x2, SI y2) = 0;
+
 
 //  friend class tm_window_rep;
   friend class tm_server_rep; // needed for apply and animate
@@ -587,15 +592,18 @@ public:
 };
 
 class editor {
-EXTEND_NULL(widget,editor);
+ABSTRACT_NULL(editor);
 public:
   inline bool operator == (editor w) { return rep == w.rep; }
   inline bool operator != (editor w) { return rep != w.rep; }
+  
+  friend widget proxy_widget (editor ed); // needs access for weak reference
 };
 
-EXTEND_NULL_CODE(widget,editor);
+ABSTRACT_NULL_CODE(editor);
 
 editor new_editor (server_rep* sv, abs_buffer buf);
+widget proxy_widget (editor ed);
 
 #define SERVER(cmd) {                 \
   url temp= sv->get_current_view_safe (); \

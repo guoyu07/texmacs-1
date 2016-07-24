@@ -12,6 +12,7 @@
 #ifndef QT_SIMPLE_WIDGET_HPP
 #define QT_SIMPLE_WIDGET_HPP
 
+#include "editor.hpp"
 #include "hashset.hpp"
 #include "basic_renderer.hpp"
 
@@ -51,20 +52,21 @@ class qt_simple_widget_rep: public qt_widget_rep {
   
   int sequencer;
   
+  editor_rep *ed;
   
 public:
-  qt_simple_widget_rep ();
+  qt_simple_widget_rep (editor_rep *ed);
   ~qt_simple_widget_rep ();
-  
-  virtual bool is_editor_widget ();
-  virtual void handle_get_size_hint (SI& w, SI& h);
-  virtual void handle_notify_resize (SI w, SI h);
-  virtual void handle_keypress (string key, time_t t);
-  virtual void handle_keyboard_focus (bool has_focus, time_t t);
-  virtual void handle_mouse (string kind, SI x, SI y, int mods, time_t t);
-  virtual void handle_set_zoom_factor (double zoom);
-  virtual void handle_clear (renderer win, SI x1, SI y1, SI x2, SI y2);
-  virtual void handle_repaint (renderer win, SI x1, SI y1, SI x2, SI y2);
+
+  bool is_editor_widget ();
+  void handle_get_size_hint (SI& w, SI& h);
+  void handle_notify_resize (SI w, SI h);
+  void handle_keypress (string key, time_t t);
+  void handle_keyboard_focus (bool has_focus, time_t t);
+  void handle_mouse (string kind, SI x, SI y, int mods, time_t t);
+  void handle_set_zoom_factor (double zoom);
+  void handle_clear (renderer win, SI x1, SI y1, SI x2, SI y2);
+  void handle_repaint (renderer win, SI x1, SI y1, SI x2, SI y2);
   
     ////////////////////// Handling of TeXmacs' messages
   

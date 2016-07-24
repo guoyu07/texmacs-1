@@ -46,18 +46,19 @@
 ******************************************************************************/
 
 editor_rep::editor_rep ():
-  simple_widget_rep (), cvw (NULL),
-  drd (std_drd), et (the_et), rp () {
+  cvw (NULL), drd (std_drd), et (the_et), rp () {
   cout << "TeXmacs] warning, this virtual constructor should never be called\n";
 }
 
 editor_rep::editor_rep (server_rep* sv2, abs_buffer buf2):
-  simple_widget_rep (), sv (sv2), cvw (NULL), buf (buf2),
+  sv (sv2), cvw (NULL), buf (buf2),
   drd (buf->buf->title, std_drd), et (the_et), rp (buf2->rp) {}
 
 edit_main_rep::edit_main_rep (server_rep* sv, abs_buffer buf):
   editor_rep (sv, buf), props (UNKNOWN), ed_obs (edit_observer (this))
 {
+  proxy = proxy_widget (this);
+  
 #ifdef EXPERIMENTAL
   cct= copy (subtree (et, rp));
   copy_ip (subtree (et, rp), cct);
@@ -156,7 +157,7 @@ edit_main_rep::focus_on_this_editor () {
 
 void
 edit_main_rep::notify_page_change () {
-  if (is_attached (this)) send_invalidate_all (this);
+  if (is_attached (proxy)) send_invalidate_all (proxy);
 }
 
 string

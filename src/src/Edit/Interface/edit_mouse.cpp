@@ -41,7 +41,7 @@ edit_interface_rep::mouse_click (SI x, SI y) {
   if (eb->action ("click", x, y, 0) != "") return;
   start_x= x;
   start_y= y;
-  send_mouse_grab (this, true);
+  send_mouse_grab (proxy, true);
 }
 
 bool
@@ -172,7 +172,7 @@ edit_interface_rep::mouse_adjust (SI x, SI y, int mods) {
   abs_round (x, y);
   if (is_nil (popup_win)) {
     SI wx, wy;
-    ::get_position (get_window (this), wx, wy);
+    ::get_position (get_window (proxy), wx, wy);
     widget wid;
     string menu= "texmacs-popup-menu";
     if ((mods & (ShiftMask + ControlMask)) != 0)
@@ -182,13 +182,13 @@ edit_interface_rep::mouse_adjust (SI x, SI y, int mods) {
     popup_win= ::popup_window_widget (popup_wid, "Popup menu");
 #if defined (QTTEXMACS) || defined(AQUATEXMACS)
     SI ox, oy, sx, sy;
-    get_position (this, ox, oy);
-    get_scroll_position(this, sx, sy);
+    get_position (proxy, ox, oy);
+    get_scroll_position(proxy, sx, sy);
     ox -= sx; oy -= sy;
 #endif
     set_position (popup_win, wx+ ox+ x, wy+ oy+ y);
     set_visibility (popup_win, true);
-    send_keyboard_focus (this);
+    send_keyboard_focus (proxy);
     send_mouse_grab (popup_wid, true);
   }
 }
@@ -260,14 +260,14 @@ edit_interface_rep::get_mouse_position () {
 
 void
 edit_interface_rep::set_pointer (string name) {
-  send_mouse_pointer (this, name);
+  send_mouse_pointer (proxy, name);
 }
 
 void
 edit_interface_rep::set_pointer (
   string curs_name, string mask_name)
 {
-  send_mouse_pointer (this, curs_name, mask_name);
+  send_mouse_pointer (proxy, curs_name, mask_name);
 }
 
 /******************************************************************************
@@ -462,7 +462,7 @@ edit_interface_rep::mouse_any (string type, SI x, SI y, int mods, time_t t) {
   last_x= x; last_y= y; last_t= t;
   bool move_like=
     (type == "move" || type == "dragging-left" || type == "dragging-right");
-  if ((!move_like) || (is_attached (this) && !check_event (MOTION_EVENT)))
+  if ((!move_like) || (is_attached (proxy) && !check_event (MOTION_EVENT)))
     update_mouse_loci ();
   if (!is_nil (mouse_ids) && type == "move")
     call ("link-follow-ids", object (mouse_ids), object ("mouse-over"));
@@ -496,18 +496,18 @@ edit_interface_rep::mouse_any (string type, SI x, SI y, int mods, time_t t) {
     if (mouse_adjusting && mods > 1) {
       mouse_adjusting = mods;
       mouse_adjust_selection(x, y, mods);
-    } else if (is_attached (this) && check_event (DRAG_EVENT)) return;
+    } else if (is_attached (proxy) && check_event (DRAG_EVENT)) return;
     else mouse_drag (x, y);
   }
   if ((type == "release-left" || type == "end-drag-left")) {
     if (!(mouse_adjusting & ShiftMask))
       mouse_select (x, y, mods, type == "end-drag-left");
-    send_mouse_grab (this, false);
+    send_mouse_grab (proxy, false);
     mouse_adjusting &= ~mouse_adjusting;
   }
   
   if (type == "double-left") {
-    send_mouse_grab (this, false);
+    send_mouse_grab (proxy, false);
     if (mouse_extra_click (x, y))
       drag_left_reset ();
   }
