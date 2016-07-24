@@ -412,8 +412,8 @@ tm_server_views_rep::focus_on_editor (editor ed) {
     array<url> vs= buffer_to_views (bufs[i]);
     for (int j=0; j<N(vs); j++)
       if (view_to_editor (vs[j]) == ed) {
-	set_current_view (vs[j]);
-	return;
+        set_current_view (vs[j]);
+        return;
       }
   }
 

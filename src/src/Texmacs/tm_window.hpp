@@ -95,11 +95,8 @@ public:
   tm_view_rep (tm_buffer buf2, editor ed2);
 };
 
-typedef tm_buffer_rep* tm_buffer;
-typedef tm_view_rep*   tm_view;
-
 widget texmacs_output_widget (tree doc, tree style);
-widget texmacs_input_widget (tree doc, tree style, url wname);
+//widget texmacs_input_widget (tree doc, tree style, url wname);
 
 int window_handle ();
 void window_create (int win, widget wid, string name, bool plain);

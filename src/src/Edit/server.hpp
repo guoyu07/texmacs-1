@@ -35,7 +35,7 @@ public:
   virtual void   get_keycomb (string& s, int& status,
 			      command& cmd, string& sh, string& help) = 0;
 
-  /* TeXmacs frames */
+  // current window properties
   
   virtual int  get_window_serial () = 0;
   virtual void set_window_property (scheme_tree what, scheme_tree val) = 0;
@@ -47,41 +47,32 @@ public:
   virtual int get_int_window_property (string what) = 0;
   virtual string get_string_window_property (string what) = 0;
 
+  // current window UI and infos
+  
+  virtual void show_footer   (bool flag) = 0;
   virtual void show_header (bool flag) = 0;
   virtual void show_icon_bar (int which, bool flag) = 0;
   virtual void show_side_tools (int which, bool flag) = 0;
   virtual void show_bottom_tools (int which, bool flag) = 0;
+  virtual bool visible_footer () = 0;
   virtual bool visible_header () = 0;
   virtual bool visible_icon_bar (int which) = 0;
   virtual bool visible_side_tools (int which) = 0;
   virtual bool visible_bottom_tools (int which) = 0;
-  virtual void menu_widget (string menu, widget& w) = 0;
-  virtual void menu_main (string menu) = 0;
-  virtual void menu_icons (int which, string menu) = 0;
-  virtual void side_tools (int which, string menu) = 0;
-  virtual void bottom_tools (int which, string menu) = 0;
+
+  virtual void set_message (tree left, tree right, bool temp= false) = 0;
+  virtual void recall_message () = 0;
 
   virtual void set_window_modified (bool flag) = 0;
   virtual void set_window_zoom_factor (double zoom) = 0;
   virtual double get_window_zoom_factor () = 0;
-  virtual void set_scrollbars (int sb) = 0;
-  virtual void get_visible (SI& x1, SI& y1, SI& x2, SI& y2) = 0;
-  virtual void scroll_where (SI& x, SI& y) = 0;
-  virtual void scroll_to (SI x, SI y) = 0;
-  virtual void set_extents (SI x1, SI y1, SI x2, SI y2) = 0;
-  virtual void get_extents (SI& x1, SI& y1, SI& x2, SI& y2) = 0;
   virtual void full_screen_mode (bool on, bool edit) = 0;
   virtual bool in_full_screen_mode () = 0;
   virtual bool in_full_screen_edit_mode () = 0;
   virtual void get_window_position (SI& x, SI& y) = 0;
 
-
-  virtual void show_footer   (bool flag) = 0;
-  virtual bool visible_footer () = 0;
-  virtual void set_left_footer (string s) = 0;
-  virtual void set_right_footer (string s) = 0;
-  virtual void set_message (tree left, tree right, bool temp= false) = 0;
-  virtual void recall_message () = 0;
+  // interaction with user
+  
   virtual void dialogue_start (string name, widget wid) = 0;
   virtual void dialogue_inquire (int i, string& arg) = 0;
   virtual void dialogue_end () = 0;
@@ -90,11 +81,27 @@ public:
   virtual void interactive (object fun, scheme_tree p) = 0;
   virtual void keyboard_focus_on (string field) = 0;
   
-  /* Buffers */
+  // candidate methods for deletion (they are used only by edit to interact with widgets)
+  
+  virtual void menu_widget (string menu, widget& w) = 0;
+  virtual void menu_main (string menu) = 0;
+  virtual void menu_icons (int which, string menu) = 0;
+  virtual void side_tools (int which, string menu) = 0;
+  virtual void bottom_tools (int which, string menu) = 0;
+  virtual void set_scrollbars (int sb) = 0;
+  virtual void get_visible (SI& x1, SI& y1, SI& x2, SI& y2) = 0;
+  virtual void scroll_where (SI& x, SI& y) = 0;
+  virtual void scroll_to (SI x, SI y) = 0;
+  virtual void set_extents (SI x1, SI y1, SI x2, SI y2) = 0;
+  virtual void get_extents (SI& x1, SI& y1, SI& x2, SI& y2) = 0;
+  virtual void set_left_footer (string s) = 0;
+  virtual void set_right_footer (string s) = 0;
+ 
+  // buffers
   
   virtual array<url> get_all_buffers () = 0;
   virtual url  make_new_buffer () = 0;
-  virtual void remove_buffer (url name) = 0;
+ // virtual void remove_buffer (url name) = 0;
   virtual int  number_buffers () = 0;
   virtual url  get_current_buffer () = 0;
   virtual url  get_current_buffer_safe () = 0;
@@ -129,13 +136,13 @@ public:
   virtual bool export_tree (tree doc, url u, string fm) = 0;
   virtual tree load_style_tree (string package) = 0;
 
-  /* Projects */
+  // projects
   
   virtual void project_attach (string prj_name= "") = 0;
   virtual bool project_attached () = 0;
   virtual url  project_get () = 0;
 
-  /* Views */
+  // views
   
   virtual  array<url> get_all_views () = 0;
   virtual  array<url> buffer_to_views (url name) = 0;
@@ -159,7 +166,7 @@ public:
   virtual  void focus_on_editor (editor ed) = 0;
   virtual  bool focus_on_buffer (url name) = 0;
   
-  /* Windows */
+  // windows
   
   virtual  array<url> windows_list () = 0;
   virtual  array<url> buffer_to_windows (url name) = 0;
@@ -178,7 +185,7 @@ public:
   virtual  void kill_window (url name) = 0;
   virtual  void kill_current_window_and_buffer () = 0;
 
-  /* Miscellaneous routines */
+  // miscellaneous routines
   
   virtual void   style_clear_cache () = 0;
   virtual void   refresh () = 0;
@@ -197,6 +204,8 @@ public:
   virtual bool   is_yes (string s) = 0;
   virtual void   quit () = 0;
   virtual void   shell (string s) = 0;
+  
+  // the following routines should maybe be removed from the server interface
   
   virtual tree   latex_expand (tree doc) = 0;
   virtual tree   latex_expand (tree doc, url name) = 0;

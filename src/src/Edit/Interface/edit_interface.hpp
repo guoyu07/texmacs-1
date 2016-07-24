@@ -204,7 +204,7 @@ public:
   void handle_clear (renderer win, SI x1, SI y1, SI x2, SI y2);
   void handle_repaint (renderer win, SI x1, SI y1, SI x2, SI y2);
   
-  void set_view_widget(widget w);
+  void set_view_widget (widget w);
 
 };
 
