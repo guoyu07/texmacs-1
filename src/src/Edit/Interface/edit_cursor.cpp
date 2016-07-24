@@ -11,7 +11,7 @@
 
 #include "edit_cursor.hpp"
 #include "iterator.hpp"
-#include "abs_buffer.hpp"
+#include "buffer.hpp"
 #include "tree_traverse.hpp"
 #include "drd_mode.hpp"
 #include "analyze.hpp"

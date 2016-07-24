@@ -13,7 +13,7 @@
 #include "file.hpp"
 #include "convert.hpp"
 #include "server.hpp"
-#include "abs_buffer.hpp"
+#include "buffer.hpp"
 #include "window.hpp"
 #include "Metafont/tex_files.hpp"
 #include "data_cache.hpp"

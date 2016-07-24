@@ -16,7 +16,6 @@
 #include "editor.hpp"
 #include "hashset.hpp"
 
-class document_rep;
 class edit_typeset_rep: virtual public editor_rep {
 protected:
   tree the_style;                         // document style

@@ -31,9 +31,9 @@
 #define THE_LOCUS 128
 #define THE_MENUS 256
 
-class abs_buffer_rep;
+class buffer_rep;
 class server_rep;
-typedef abs_buffer_rep* abs_buffer;
+typedef buffer_rep* buffer;
 class modification;
 class editor;
 extern bool enable_fastenv;
@@ -45,7 +45,7 @@ public:
   widget       proxy;  // proxy widget for interfacing with the UI (strong reference)
 
 protected:
-  abs_buffer   buf;  // the underlying buffer
+  buffer   buf;  // the underlying buffer
   drd_info     drd;  // the drd for the buffer
   tree&        et;   // all TeXmacs trees
   box          eb;   // box translation of tree
@@ -124,7 +124,7 @@ protected:
 
 public:
   editor_rep ();
-  editor_rep (server_rep* sv, abs_buffer buf);
+  editor_rep (server_rep* sv, buffer buf);
   inline virtual ~editor_rep () {}
 
   /* public routines from edit_interface */
@@ -590,7 +590,7 @@ public:
 
 ABSTRACT_NULL_CODE(editor);
 
-editor new_editor (server_rep* sv, abs_buffer buf);
+editor new_editor (server_rep* sv, buffer buf);
 
 #define SERVER(cmd) {                 \
   url temp= sv->get_current_view_safe (); \

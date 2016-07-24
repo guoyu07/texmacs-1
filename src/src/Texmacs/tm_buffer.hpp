@@ -11,7 +11,7 @@
 
 #ifndef TM_BUFFER_H
 #define TM_BUFFER_H
-#include "abs_buffer.hpp"
+#include "buffer.hpp"
 #include "link.hpp"
 #include "new_data.hpp"
 
@@ -26,13 +26,13 @@ void set_document (path rp, tree t);
 url  create_window_id ();
 void destroy_window_id (url);
 
-class tm_buffer_rep : public abs_buffer_rep {
+class tm_buffer_rep : public buffer_rep {
 public:
   array<tm_view> vws;     // views attached to buffer
   link_repository lns;    // global links
   bool notify;            // notify modifications to scheme
 
-  inline tm_buffer_rep (url name): abs_buffer_rep (name),
+  inline tm_buffer_rep (url name): buffer_rep (name),
     vws (0), notify (false) {}
 
   virtual ~tm_buffer_rep () { delete_document (rp); }

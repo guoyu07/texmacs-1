@@ -10,7 +10,7 @@
 ******************************************************************************/
 
 #include "edit_interface.hpp"
-#include "abs_buffer.hpp"
+#include "buffer.hpp"
 #include "timer.hpp"
 #include "link.hpp"
 #include "analyze.hpp"

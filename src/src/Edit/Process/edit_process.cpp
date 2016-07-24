@@ -11,7 +11,7 @@
 
 #include "Process/edit_process.hpp"
 #include "analyze.hpp"
-#include "abs_buffer.hpp"
+#include "buffer.hpp"
 #include "merge_sort.hpp"
 #include "Bibtex/bibtex.hpp"
 #include "Bibtex/bibtex_functions.hpp"

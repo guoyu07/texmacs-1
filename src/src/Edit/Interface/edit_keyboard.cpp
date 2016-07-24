@@ -11,7 +11,7 @@
 
 #include "edit_interface.hpp"
 #include "analyze.hpp"
-#include "abs_buffer.hpp"
+#include "buffer.hpp"
 #include "archiver.hpp"
 #include "scheme.hpp"
 #include "server.hpp"

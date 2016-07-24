@@ -11,7 +11,7 @@
 
 #include <climits>
 #include "edit_typeset.hpp"
-#include "abs_buffer.hpp"
+#include "buffer.hpp"
 #include "convert.hpp"
 #include "file.hpp"
 #include "analyze.hpp"
