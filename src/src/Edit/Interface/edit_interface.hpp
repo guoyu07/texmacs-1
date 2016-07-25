@@ -183,13 +183,12 @@ public:
   tree compute_text_footer (tree st);
   tree compute_operation_footer (tree st);
   tree compute_compound_footer (tree t, path p);
-  bool set_latex_footer (tree st);
-  bool set_hybrid_footer (tree st);
-  void set_left_footer (tree l);
+  bool compute_latex_footer (tree st, tree& left, tree& right);
+  bool compute_hybrid_footer (tree st, tree& left, tree& right);
   void append_left_footer (tree& l, string env_var);
-  void set_left_footer ();
-  void set_right_footer (tree r);
-  void set_right_footer ();
+  void compute_left_footer (tree &left);
+  void set_footer (tree l, tree r);
+  void compute_right_footer (tree &right);
   void set_footer ();
   void set_message (tree l, tree r= "", bool temp= false);
   void recall_message ();

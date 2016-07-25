@@ -268,15 +268,9 @@ tm_frame_rep::set_extents (SI x1, SI y1, SI x2, SI y2) {
 }
 
 void
-tm_frame_rep::set_left_footer (string s) {
+tm_frame_rep::set_footer (string l, string r) {
   if (!has_current_window ()) return;
-  concrete_window () -> set_left_footer (s);
-}
-
-void
-tm_frame_rep::set_right_footer (string s) {
-  if (!has_current_window ()) return;
-  concrete_window () -> set_right_footer (s);
+  concrete_window () -> set_footer (l, r);
 }
 
 void

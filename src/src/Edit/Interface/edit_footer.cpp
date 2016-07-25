@@ -21,11 +21,6 @@
 ******************************************************************************/
 
 void
-edit_interface_rep::set_left_footer (tree l) {
-  SERVER (set_left_footer (translate (l)));
-}
-
-void
 edit_interface_rep::append_left_footer (tree& l, string env_var) {
   if (!is_concat (l)) l= concat (l);
   string i= get_init_string (env_var);
@@ -34,7 +29,7 @@ edit_interface_rep::append_left_footer (tree& l, string env_var) {
 }
 
 void
-edit_interface_rep::set_left_footer () {
+edit_interface_rep::compute_left_footer (tree &left) {
   tree s= concat ();
   double base_sz= get_env_int (FONT_BASE_SIZE);
   double sz= get_env_double (FONT_SIZE);
@@ -92,7 +87,7 @@ edit_interface_rep::set_left_footer () {
     }
   }
   s= as_tree (call ("footer-hook", object (s)));
-  set_left_footer (s);
+  left = s;
 }
 
 /******************************************************************************
@@ -100,8 +95,8 @@ edit_interface_rep::set_left_footer () {
 ******************************************************************************/
 
 void
-edit_interface_rep::set_right_footer (tree r) {
-  SERVER (set_right_footer (translate (r)));
+edit_interface_rep::set_footer (tree l, tree r) {
+  SERVER (set_footer (translate (l), translate(r)));
 }
 
 tree
@@ -375,14 +370,14 @@ edit_interface_rep::compute_compound_footer (tree t, path p) {
 }
 
 void
-edit_interface_rep::set_right_footer () {
+edit_interface_rep::compute_right_footer (tree& right) {
   tree cf= compute_compound_footer (et, path_up (tp));
   tree st= subtree (et, path_up (tp));
   tree lf;
   if (is_atomic (st)) lf= compute_text_footer (st);
   else lf= compute_operation_footer (st);
   if (N(focus_get (false))+1 >= N(tp)) cf= concat (cf, lf);
-  set_right_footer (cf);
+  right = cf;
 }
 
 /******************************************************************************
@@ -390,7 +385,7 @@ edit_interface_rep::set_right_footer () {
 ******************************************************************************/
 
 bool
-edit_interface_rep::set_latex_footer (tree st) {
+edit_interface_rep::compute_latex_footer (tree st, tree& left, tree& right) {
   if (is_atomic (st))
     if (is_func (subtree (et, path_up (tp, 2)), LATEX, 1) ||
         is_func (subtree (et, path_up (tp, 2)), HYBRID, 1)) {
@@ -398,8 +393,8 @@ edit_interface_rep::set_latex_footer (tree st) {
       string help;
       command cmd;
       if (sv->kbd_get_command (s, help, cmd)) {
-        set_left_footer (concat (kbd ("return"), ": " * help));
-        set_right_footer ("latex command");
+        left = concat (kbd ("return"), ": " * help);
+        right = "latex command";
         return true;
       }
     }
@@ -407,7 +402,7 @@ edit_interface_rep::set_latex_footer (tree st) {
 }
 
 bool
-edit_interface_rep::set_hybrid_footer (tree st) {
+edit_interface_rep::compute_hybrid_footer (tree st, tree& left, tree& right) {
   // WARNING: update edit_dynamic_rep::activate_hybrid when updating this
   if (is_atomic (st))
     if (is_func (subtree (et, path_up (tp, 2)), HYBRID, 1)) {
@@ -420,23 +415,23 @@ edit_interface_rep::set_hybrid_footer (tree st) {
         int i, n= N(mt)-1;
         for (i=0; i<n; i++)
           if (mt[i] == name) {
-            set_message (concat (kbd ("return"), ": insert argument ", name),
-                         "hybrid command");
+            left = concat (kbd ("return"), ": insert argument ", name);
+            right = "hybrid command";
             return true;
           }
       }
       // macro application
       tree f= get_env_value (name);
-      if (drd->contains (name) && (f == UNINIT))
-        set_message (concat (kbd ("return"), ": insert primitive ", name),
-                     "hybrid command");
-      else if (is_func (f, MACRO) || is_func (f, XMACRO))
-        set_message (concat (kbd ("return"), ": insert macro ", name),
-                     "hybrid command");
-      else if (f != UNINIT)
-        set_message (concat (kbd ("return"), ": insert value ", name),
-                     "hybrid command");
-      else return false;
+      if (drd->contains (name) && (f == UNINIT)) {
+        left = concat (kbd ("return"), ": insert primitive ", name);
+        right = "hybrid command";
+      } else if (is_func (f, MACRO) || is_func (f, XMACRO)) {
+        left = concat (kbd ("return"), ": insert macro ", name);
+        right = "hybrid command";
+      } else if (f != UNINIT) {
+        left = concat (kbd ("return"), ": insert value ", name);
+        right = "hybrid command";
+      } else return false;
       return true;
     }
   return false;
@@ -481,21 +476,26 @@ edit_interface_rep::set_footer () {
     cout << "instance  " << instance_count << "\n";
   )
 
+  tree left;
+  tree right;
+
   if ((message_l == "") && (message_r == "")) {
     last_l= ""; last_r= "";
     tree st= subtree (et, path_up (tp));
-    if (set_latex_footer (st)) return;
-    if (set_hybrid_footer (st)) return;
-    set_left_footer();
-    set_right_footer();
+    if (!compute_latex_footer (st, left, right))
+      if (!compute_hybrid_footer (st, left, right)) {
+        compute_left_footer (left);
+        compute_right_footer (right);
+      }
   }
   else {
-    if (message_l == "") set_left_footer ();
-    else set_left_footer (message_l);
-    if (message_r == "") set_right_footer ();
-    else set_right_footer (message_r);
+    if (message_l == "") compute_left_footer (left);
+    else left = message_l;
+    if (message_r == "") compute_right_footer (right);
+    else right = message_r;
     message_l= message_r= "";
   }
+  set_footer (left, right);
 }
 
 /******************************************************************************

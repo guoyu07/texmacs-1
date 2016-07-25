@@ -76,8 +76,7 @@ public:
 
   bool get_footer_flag ();
   void set_footer_flag (bool on);
-  void set_left_footer (string s);
-  void set_right_footer (string s);
+  void set_footer (string l, string r);
   bool get_interactive_mode ();
   void set_interactive_mode (bool on);
   void interactive (string name, string type, array<string> def,

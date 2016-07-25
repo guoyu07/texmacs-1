@@ -508,13 +508,9 @@ tm_window_rep::set_footer_flag (bool flag) {
 }
 
 void
-tm_window_rep::set_left_footer (string s) {
-  ::set_left_footer (wid, s);
-}
-
-void
-tm_window_rep::set_right_footer (string s) {
-  ::set_right_footer (wid, s);
+tm_window_rep::set_footer (string l, string r) {
+  ::set_left_footer (wid, l);
+  ::set_right_footer (wid, r);
 }
 
 /******************************************************************************

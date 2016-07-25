@@ -95,8 +95,7 @@ public:
   virtual void scroll_to (SI x, SI y) = 0;
   virtual void set_extents (SI x1, SI y1, SI x2, SI y2) = 0;
   virtual void get_extents (SI& x1, SI& y1, SI& x2, SI& y2) = 0;
-  virtual void set_left_footer (string s) = 0;
-  virtual void set_right_footer (string s) = 0;
+  virtual void set_footer (string l, string r) = 0;
  
   // buffers
   
