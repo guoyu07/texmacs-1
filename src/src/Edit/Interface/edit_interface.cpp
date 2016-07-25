@@ -105,14 +105,7 @@ edit_interface_rep::suspend () {
 void
 edit_interface_rep::resume () {
   got_focus= true;
-  SERVER (menu_main ("(horizontal (link texmacs-menu))"));
-  SERVER (menu_icons (0, "(horizontal (link texmacs-main-icons))"));
-  SERVER (menu_icons (1, "(horizontal (link texmacs-mode-icons))"));
-  SERVER (menu_icons (2, "(horizontal (link texmacs-focus-icons))"));
-  SERVER (menu_icons (3, "(horizontal (link texmacs-extra-icons))"));
-  if (use_side_tools)
-    { SERVER (side_tools (0, "(vertical (link texmacs-side-tools))")); }
-  SERVER (bottom_tools (0, "(vertical (link texmacs-bottom-tools))"));
+  SERVER (update_menus ());
   cur_sb= 2;
   notify_change (THE_FOCUS + THE_EXTENTS);
   path new_tp= make_cursor_accessible (tp, true);
@@ -527,14 +520,7 @@ edit_interface_rep::change_time () {
 
 void
 edit_interface_rep::update_menus () {
-  SERVER (menu_main ("(horizontal (link texmacs-menu))"));
-  SERVER (menu_icons (0, "(horizontal (link texmacs-main-icons))"));
-  SERVER (menu_icons (1, "(horizontal (link texmacs-mode-icons))"));
-  SERVER (menu_icons (2, "(horizontal (link texmacs-focus-icons))"));
-  SERVER (menu_icons (3, "(horizontal (link texmacs-extra-icons))"));
-  if (use_side_tools)
-    { SERVER (side_tools (0, "(vertical (link texmacs-side-tools))")); }
-  SERVER (bottom_tools (0, "(vertical (link texmacs-bottom-tools))"));
+  SERVER (update_menus ());
   set_footer ();
   {
     bool ns= need_save ();

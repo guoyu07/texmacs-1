@@ -106,6 +106,12 @@ tm_frame_rep::menu_widget (string menu, widget& w) {
 }
 
 void
+tm_frame_rep::update_menus () {
+  if (!has_current_view ()) return;
+  concrete_window () -> update_menus ();
+}
+
+void
 tm_frame_rep::menu_main (string menu) {
   if (!has_current_view ()) return;
   concrete_window () -> menu_main (menu);

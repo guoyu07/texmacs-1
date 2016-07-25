@@ -84,6 +84,7 @@ public:
   // candidate methods for deletion (they are used only by edit to interact with widgets)
   
   virtual void menu_widget (string menu, widget& w) = 0;
+  virtual void update_menus () = 0;
   virtual void menu_main (string menu) = 0;
   virtual void menu_icons (int which, string menu) = 0;
   virtual void side_tools (int which, string menu) = 0;

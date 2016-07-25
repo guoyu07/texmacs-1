@@ -52,6 +52,7 @@ public:
 
   bool get_menu_widget (int which, string menu, widget& w);
   void menu_main (string menu);
+  void update_menus ();
   void menu_icons (int which, string menu);
   void side_tools (int which, string tools);
   void bottom_tools (int which, string tools);

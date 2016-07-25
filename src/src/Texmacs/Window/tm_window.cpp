@@ -347,6 +347,20 @@ tm_window_rep::get_menu_widget (int which, string menu, widget& w) {
   return true;
 }
 
+
+void
+tm_window_rep::update_menus () {
+  eval ("(lazy-initialize-force)");
+  menu_main ("(horizontal (link texmacs-menu))");
+  menu_icons (0, "(horizontal (link texmacs-main-icons))");
+  menu_icons (1, "(horizontal (link texmacs-mode-icons))");
+  menu_icons (2, "(horizontal (link texmacs-focus-icons))");
+  menu_icons (3, "(horizontal (link texmacs-extra-icons))");
+  if (use_side_tools)
+  { side_tools (0, "(vertical (link texmacs-side-tools))"); }
+  bottom_tools (0, "(vertical (link texmacs-bottom-tools))");
+}
+
 void
 tm_window_rep::menu_main (string menu) {
   eval ("(lazy-initialize-force)");

@@ -592,11 +592,5 @@ ABSTRACT_NULL_CODE(editor);
 
 editor new_editor (server_rep* sv, buffer buf);
 
-#define SERVER(cmd) {                 \
-  url temp= sv->get_current_view_safe (); \
-  focus_on_this_editor ();            \
-  sv->cmd;                            \
-  sv->set_current_view (temp);            \
-}
 
 #endif // defined EDITOR_H
