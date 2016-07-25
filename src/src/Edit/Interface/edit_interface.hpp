@@ -14,6 +14,7 @@
 #include "editor.hpp"
 #include "timer.hpp"
 #include "widget.hpp"
+#include "server.hpp"
 
 #define INPUT_NORMAL      0
 #define INPUT_SEARCH      1
@@ -206,8 +207,32 @@ public:
   
   void set_view_widget (widget w);
 
+  friend class with_focus;
 };
 
+#ifdef OLD_SERVER_MACRO
+#define SERVER(cmd) {                 \
+url temp= sv->get_current_view_safe (); \
+focus_on_this_editor ();            \
+sv->cmd;                            \
+sv->set_current_view (temp);            \
+}
+#else
+#define SERVER(cmd) { \
+  with_focus temp_focus (this); \
+  sv->cmd;                            \
+}
+#endif
+
+class with_focus {
+
+  edit_interface_rep* ed;
+  url temp; // old view
+  
+public:
+  with_focus (edit_interface_rep* ed2) : ed (ed2), temp (ed->sv->get_current_view_safe ()) { ed->focus_on_this_editor (); };
+  ~with_focus () { ed->sv->set_current_view (temp); }
+};
 
 
 #endif // defined EDIT_INTERFACE_H
