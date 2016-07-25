@@ -81,6 +81,8 @@ slot_name (const slot s) {
     "SLOT_FILE",
     "SLOT_DIRECTORY",
 
+    "SLOT_DELEGATE",
+
     "slot_id__LAST"
   };
   
