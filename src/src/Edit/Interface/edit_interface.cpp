@@ -153,7 +153,8 @@ edit_interface_rep::invalidate_all () {
 
 void
 edit_interface_rep::update_visible () {
-  SERVER (get_visible (vx1, vy1, vx2, vy2));
+//  SERVER (get_visible (vx1, vy1, vx2, vy2));
+  ::get_visible_part (cvw, vx1, vy1, vx2, vy2);
   vx1= (SI) (vx1 / magf); vy1= (SI) (vy1 / magf);
   vx2= (SI) (vx2 / magf); vy2= (SI) (vy2 / magf);
 }
@@ -210,15 +211,18 @@ void
 edit_interface_rep::scroll_to (SI x, SI y) {
   stored_rects= rectangles ();
   copy_always = rectangles ();
-  SERVER (scroll_to ((SI) (x * magf), ((SI) (y * magf))));
+  //SERVER (scroll_to ((SI) (x * magf), ((SI) (y * magf))));
+  ::set_scroll_position (cvw, (SI) (x * magf), ((SI) (y * magf)));
 }
 
 void
 edit_interface_rep::set_extents (SI x1, SI y1, SI x2, SI y2) {
   stored_rects= rectangles ();
   copy_always = rectangles ();
-  SERVER (set_extents ((SI) floor (x1*magf), (SI) floor (y1*magf),
-                       (SI) ceil  (x2*magf), (SI) ceil  (y2*magf)));
+//  SERVER (set_extents ((SI) floor (x1*magf), (SI) floor (y1*magf),
+//                       (SI) ceil  (x2*magf), (SI) ceil  (y2*magf)));
+  ::set_extents(cvw, (SI) floor (x1*magf), (SI) floor (y1*magf),
+                     (SI) ceil  (x2*magf), (SI) ceil  (y2*magf));
 }
 
 /******************************************************************************
@@ -245,7 +249,8 @@ edit_interface_rep::cursor_visible () {
       SI vw= vx2 - vx1, vh= vy2 - vy1;
       for (int i=0; i<N(pages); i++) {
         SI scx, scy;
-        SERVER (scroll_where (scx, scy));
+//        SERVER (scroll_where (scx, scy));
+        ::get_scroll_position (cvw, scx, scy);
         scx= (SI) (scx / magf);
         scy= (SI) (scy / magf);
         SI x1= eb->sy(0)+ pages->sx1 (i);
@@ -689,7 +694,9 @@ edit_interface_rep::apply_changes () {
 #endif
       }
     }
-    SERVER (set_extents (ex1, ey1, ex2, ey2));
+    //SERVER (set_extents (ex1, ey1, ex2, ey2));
+    ::set_extents (cvw, ex1, ey1, ex2, ey2);
+    
     //set_extents (eb->x1, eb->y1, eb->x2, eb->y2);
   }
   
@@ -911,7 +918,8 @@ edit_interface_rep::get_window_extents () {
   ::get_position (me, ox, oy);
   ::get_size (me, w, h);
   SI vx1, vy1, vx2, vy2;
-  SERVER (get_visible (vx1, vy1, vx2, vy2));
+//  SERVER (get_visible (vx1, vy1, vx2, vy2));
+  ::get_visible_part (cvw, vx1, vy1, vx2, vy2);
   ox -= vx1; oy -= vy2;
   return rectangle (ox, oy - h, ox + w, oy);
 }

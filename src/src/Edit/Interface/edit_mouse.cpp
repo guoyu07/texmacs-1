@@ -206,9 +206,11 @@ edit_interface_rep::mouse_scroll (SI x, SI y, bool up) {
   if (!up) dy= -dy;
   path sp= find_innermost_scroll (eb, tp);
   if (is_nil (sp)) {
-    SERVER (scroll_where (x, y));
+    //SERVER (scroll_where (x, y));
+    ::get_scroll_position (cvw, x, y);
     y += dy;
-    SERVER (scroll_to (x, y));
+//    SERVER (scroll_to (x, y));
+    ::set_scroll_position (cvw, x, y);
   }
   else {
     SI x, y, sx, sy;
