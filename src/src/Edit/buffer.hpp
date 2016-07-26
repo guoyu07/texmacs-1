@@ -1,10 +1,13 @@
-//
-//  buffer.hpp
-//  TeXmacs
-//
-//  Created by Massimiliano Gubinelli on 21/07/16.
-//  Copyright © 2016 TeXmacs.org. All rights reserved.
-//
+
+/******************************************************************************
+ * MODULE     : buffer.hpp
+ * DESCRIPTION: basic buffers and file related informations about buffers
+ * COPYRIGHT  : (C) 1999-2012  Joris van der Hoeven
+ *******************************************************************************
+ * This software falls under the GNU general public license version 3 or later.
+ * It comes WITHOUT ANY WARRANTY WHATSOEVER. For details, see the file LICENSE
+ * in the root directory or <http://www.gnu.org/licenses/gpl-3.0.html>.
+ ******************************************************************************/
 
 #ifndef ABS_BUFFER_HPP
 #define ABS_BUFFER_HPP
@@ -55,10 +58,10 @@ typedef buffer_rep *buffer;
 
 class buffer_rep {
 public:
-  buffer_info buf;         // file related information
-  new_data data;          // data associated to document
-  buffer prj;         // buffer which corresponds to the project
-  path rp;                // path to the document's root in the_et
+  buffer_info buf;       // file related information
+  new_data data;         // data associated to document
+  buffer prj;            // buffer which corresponds to the project
+  path rp;               // path to the document's root in the_et
 
   inline buffer_rep (url name):
   buf (name), data (), prj (NULL), rp (new_document ())  {}
