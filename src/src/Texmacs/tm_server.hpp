@@ -48,6 +48,10 @@ public:
   void   quit ();
   void   shell    (string s);
   
+  void remove_interpose_command (command cmd);
+  void add_interpose_command (command cmd);
+
+  
   widget texmacs_input_widget (tree doc, tree style, url wname);
   
   friend class close_embedded_command_rep;

@@ -12,6 +12,7 @@
 #ifndef SERVER_H
 #define SERVER_H
 #include "url.hpp"
+#include "command.hpp"
 #include "widget.hpp"
 #include "scheme.hpp"
 #include "editor.hpp"
@@ -204,6 +205,11 @@ public:
   virtual bool   is_yes (string s) = 0;
   virtual void   quit () = 0;
   virtual void   shell (string s) = 0;
+  
+  // execution of commands in the server loop
+  
+  virtual void remove_interpose_command (command cmd) = 0;
+  virtual void add_interpose_command (command cmd) = 0;
   
   // the following routines should maybe be removed from the server interface
   

@@ -139,8 +139,53 @@ tm_server_rep::refresh () {
   }
 }
 
-void
-tm_server_rep::interpose_handler () {
+
+list<command> interpose_commands;
+
+void tm_server_rep::add_interpose_command (command cmd) {
+  interpose_commands << cmd;
+}
+
+void tm_server_rep::remove_interpose_command (command cmd) {
+  list<command> l = interpose_commands;
+  interpose_commands = list<command> ();
+  while (!is_nil (l)) {
+    if (l->item == cmd) continue;
+    interpose_commands = list<command>(l->item, interpose_commands);
+    l = l->next;
+  }
+}
+
+void exec_interpose_commands () {
+  list<command> l = interpose_commands;
+  interpose_commands = list<command> ();
+  while (!is_nil (l)) {
+    l->item->apply ();
+    l = l->next;
+  }
+}
+
+
+/******************************************************************************
+ * repeating command
+ ******************************************************************************/
+
+class repeat_command_rep: public command_rep {
+  void (*routine) (void);
+public:
+  repeat_command_rep (void (*routine2) (void)) : routine (routine2) {}
+  void apply () {
+    routine ();
+    interpose_commands << command (this);
+  }
+};
+
+command make_repeat_command (void (*routine) (void)) {
+  return command (tm_new<repeat_command_rep> (routine));
+}
+
+
+static void standard_interposing_commands () {
 #ifdef AQUATEXMACS
 #else
 #ifdef QTTEXMACS
@@ -155,24 +200,21 @@ tm_server_rep::interpose_handler () {
   exec_pending_commands ();
 #endif
 #endif
-
-  int i, j;
-  for (i=0; i<N(bufs); i++) {
-    tm_buffer buf= (tm_buffer) bufs[i];
-
-    for (j=0; j<N(buf->vws); j++) {
-      tm_view vw= (tm_view) buf->vws[j];
-      if (vw->win != NULL) vw->ed->apply_changes ();
-    }
-
-    for (j=0; j<N(buf->vws); j++) {
-      tm_view vw= (tm_view) buf->vws[j];
-      if (vw->win != NULL) vw->ed->animate ();
-    }
-  }
-
+  
   windows_refresh ();
   sync_databases ();
+}
+
+void
+tm_server_rep::interpose_handler () {
+  static bool init = false;
+  if (!init) {
+    static command std_cmd = make_repeat_command (standard_interposing_commands);
+    add_interpose_command (std_cmd);
+    init = true;
+  }
+  
+  exec_interpose_commands ();
 }
 
 void

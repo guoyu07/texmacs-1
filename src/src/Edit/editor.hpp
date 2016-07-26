@@ -569,7 +569,7 @@ public:
   virtual void set_view_widget(widget w) = 0;
 
 //  friend class tm_window_rep;
-  friend class tm_server_rep; // needed for apply and animate
+  //friend class tm_server_rep; // needed for apply and animate
   friend class server_command_rep;
   friend void   edit_announce (editor_rep* ed, modification mod);
   friend void   edit_done (editor_rep* ed, modification mod);

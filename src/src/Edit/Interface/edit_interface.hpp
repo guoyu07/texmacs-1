@@ -81,6 +81,8 @@ protected:
   list<string>  focus_ids;
   int           cur_sb, cur_wb;
   SI            cur_wx, cur_wy;
+  
+  command       update_cmd;
 
 public:
   edit_interface_rep (server_rep* sv);

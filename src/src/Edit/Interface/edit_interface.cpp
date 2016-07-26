@@ -40,6 +40,17 @@ MODE_LANGUAGE (string mode) {
   return LANGUAGE;
 }
 
+class update_command_rep: public command_rep {
+  edit_interface_rep *ed;
+public:
+  update_command_rep (edit_interface_rep *ed2) : ed (ed2) {}
+  void apply () {
+    ed->apply_changes ();
+    ed->animate ();
+    ed->sv->add_interpose_command (command(this));
+  }
+};
+
 /******************************************************************************
 * Main edit_interface routines
 ******************************************************************************/
@@ -61,13 +72,17 @@ edit_interface_rep::edit_interface_rep (server_rep* sv2):
   table_selection (false), mouse_adjusting (false),
   oc (0, 0), temp_invalid_cursor (false),
   shadow (NULL), stored (NULL),
-  cur_sb (2), cur_wb (2)
+  cur_sb (2), cur_wb (2),
+  update_cmd (tm_new<update_command_rep>(this))
 {
   input_mode= INPUT_NORMAL;
   gui_root_extents (cur_wx, cur_wy);
+  sv->add_interpose_command (update_cmd);
 }
 
 edit_interface_rep::~edit_interface_rep () {
+  
+  sv->remove_interpose_command (update_cmd);
   
   // remove weak reference
   send (proxy, SLOT_DELEGATE, (pointer)(NULL));
