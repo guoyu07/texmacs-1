@@ -41,16 +41,8 @@ class buffer_info {
   CONCRETE(buffer_info);
   inline buffer_info (url name): rep (tm_new<buffer_info_rep> (name)) {}
 };
-//CONCRETE_CODE(new_buffer);
 
-inline buffer_info::buffer_info (const buffer_info& x):
-rep(x.rep) { INC_COUNT (this->rep); }
-inline buffer_info::~buffer_info () { DEC_COUNT (this->rep); }
-inline buffer_info_rep* buffer_info::operator -> () {
-  return rep; }
-inline buffer_info& buffer_info::operator = (buffer_info x) {
-  INC_COUNT (x.rep); DEC_COUNT (this->rep);
-  this->rep=x.rep; return *this; }
+CONCRETE_CODE(buffer_info);
 
 /******************************************************************************
  * The abstract buffer class
