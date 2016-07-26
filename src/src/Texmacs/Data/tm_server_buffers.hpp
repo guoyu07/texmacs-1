@@ -1,6 +1,6 @@
 
 /******************************************************************************
-* MODULE     : new_buffer.hpp
+* MODULE     : tm_server_buffers.hpp
 * DESCRIPTION: File related information for buffers
 * COPYRIGHT  : (C) 1999-2012  Joris van der Hoeven
 *******************************************************************************

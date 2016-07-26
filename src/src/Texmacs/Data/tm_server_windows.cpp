@@ -1,6 +1,6 @@
 
 /******************************************************************************
-* MODULE     : new_window.cpp
+* MODULE     : tm_server_windows.cpp
 * DESCRIPTION: Global window management
 * COPYRIGHT  : (C) 1999-2012  Joris van der Hoeven
 *******************************************************************************
@@ -9,7 +9,7 @@
 * in the root directory or <http://www.gnu.org/licenses/gpl-3.0.html>.
 ******************************************************************************/
 
-#include "new_window.hpp"
+#include "tm_server_windows.hpp"
 #include "tm_buffer.hpp"
 #include "tm_window.hpp"
 #include "convert.hpp"

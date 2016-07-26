@@ -14,7 +14,7 @@
 #include "server.hpp"
 #include "boxes.hpp"
 
-#include "Data/new_window.hpp"
+#include "Data/tm_server_windows.hpp"
 
 class tm_frame_rep: virtual public server_rep, virtual public tm_server_windows_rep {
 protected:

@@ -1,6 +1,6 @@
 
 /******************************************************************************
-* MODULE     : new_view.cpp
+* MODULE     : tm_server_views.cpp
 * DESCRIPTION: View management
 * COPYRIGHT  : (C) 1999-2012  Joris van der Hoeven
 *******************************************************************************
@@ -9,7 +9,7 @@
 * in the root directory or <http://www.gnu.org/licenses/gpl-3.0.html>.
 ******************************************************************************/
 
-#include "new_view.hpp"
+#include "tm_server_views.hpp"
 #include "tm_buffer.hpp"
 #include "tm_window.hpp"
 #include "convert.hpp"

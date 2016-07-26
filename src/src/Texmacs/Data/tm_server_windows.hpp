@@ -1,6 +1,6 @@
 
 /******************************************************************************
-* MODULE     : new_window.hpp
+* MODULE     : tm_server_windows.hpp
 * DESCRIPTION: Window management
 * COPYRIGHT  : (C) 1999-2012  Joris van der Hoeven
 *******************************************************************************
@@ -13,7 +13,7 @@
 #define NEW_WINDOW_H
 #include "tree.hpp"
 #include "url.hpp"
-#include "new_view.hpp"
+#include "tm_server_views.hpp"
 
 
 /******************************************************************************

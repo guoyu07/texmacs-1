@@ -1,6 +1,6 @@
 
 /******************************************************************************
-* MODULE     : new_view.hpp
+* MODULE     : tm_server_views.hpp
 * DESCRIPTION: View management
 * COPYRIGHT  : (C) 1999-2012  Joris van der Hoeven
 *******************************************************************************
@@ -13,7 +13,7 @@
 #define NEW_VIEW_H
 #include "tree.hpp"
 #include "url.hpp"
-#include "new_buffer.hpp"
+#include "tm_server_buffers.hpp"
 
 class editor;
 

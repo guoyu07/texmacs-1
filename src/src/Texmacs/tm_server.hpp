@@ -15,7 +15,7 @@
 #include "tm_config.hpp"
 #include "tm_buffer.hpp"
 #include "tm_frame.hpp"
-#include "Data/new_buffer.hpp" 
+#include "Data/tm_server_buffers.hpp" 
 
 class tm_server_rep:
   public tm_config_rep,

@@ -18,7 +18,7 @@
 #include "scheme.hpp"
 #include "dictionary.hpp"
 #include "editor.hpp"
-#include "new_view.hpp"      // get_current_editor()
+#include "server.hpp" // get_current_editor()
 #include "image_files.hpp"
 #include "QTMFileDialog.hpp"
 
