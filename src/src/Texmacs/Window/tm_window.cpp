@@ -653,7 +653,7 @@ window_get_position (int win) {
   ASSERT (window_table->contains (win), "window does not exist");
   widget pww= window_table [win];
   int x, y;
-  get_position(pww, x, y);
+  get_position (pww, x, y);
   return tuple (as_string (x/PIXEL), as_string (y/PIXEL));
 }
 
